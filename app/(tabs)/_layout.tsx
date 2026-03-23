@@ -1,7 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
-import { Colors, BorderRadius } from '../../lib/theme';
 import { useTheme } from '../../context/ThemeContext';
 
 interface TabIconProps {
@@ -27,14 +26,23 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colors.tabBar,
-          borderTopColor: colors.cardBorder,
-          borderTopWidth: 1,
+          backgroundColor: 'rgba(255,248,245,0.92)',
+          borderTopWidth: 0,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
           height: 72,
           paddingBottom: 8,
           paddingTop: 8,
+          shadowColor: '#864D5F',
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.08,
+          shadowRadius: 16,
+          elevation: 8,
+          position: 'absolute',
         },
         tabBarShowLabel: false,
+        tabBarActiveTintColor: '#994530',
+        tabBarInactiveTintColor: 'rgba(134,77,95,0.4)',
       }}
     >
       <Tabs.Screen
@@ -83,12 +91,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 12,
     paddingVertical: 4,
-    borderRadius: BorderRadius.full,
+    borderRadius: 999,
     gap: 2,
     minWidth: 64,
   },
   tabIconFocused: {
-    backgroundColor: `${Colors.rose}15`,
+    backgroundColor: 'rgba(153,69,48,0.08)',
   },
   tabEmoji: {
     fontSize: 18,
@@ -97,11 +105,12 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     fontFamily: 'DMSans',
-    color: Colors.muted,
-    letterSpacing: 0.3,
+    color: 'rgba(134,77,95,0.4)',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   tabLabelFocused: {
-    color: Colors.rose,
+    color: '#994530',
     fontWeight: '600',
   },
 });
