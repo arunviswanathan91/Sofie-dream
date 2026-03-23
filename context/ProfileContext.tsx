@@ -55,9 +55,15 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     async (updates: Partial<BusinessProfile>): Promise<void> => {
       const next = { ...profile, ...updates };
       setProfile(next);
+      // Always persist locally first — this is the source of truth
       await saveLocalProfile(next);
+      // Best-effort cloud sync — never throw to the caller if Firebase fails
       if (isFirebaseConfigured) {
-        await setDoc(doc(db, 'settings', 'profile'), next, { merge: true });
+        try {
+          await setDoc(doc(db, 'settings', 'profile'), next, { merge: true });
+        } catch {
+          // Silently ignore — local save already succeeded
+        }
       }
     },
     [profile]
