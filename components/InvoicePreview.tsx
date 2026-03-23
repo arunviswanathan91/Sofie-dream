@@ -3,8 +3,20 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } fr
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
 import { generateInvoiceHTML } from '../lib/reports';
-import { Colors, Spacing, BorderRadius, getCurrencySymbol } from '../lib/theme';
+import { Spacing, BorderRadius, getCurrencySymbol } from '../lib/theme';
 import type { Order } from '../types';
+
+// Stitch "Warm Artisan Editorial" tokens
+const PRIMARY = '#864D5F';
+const PRIMARY_CONTAINER = '#C9879A';
+const ON_PRIMARY = '#FFFFFF';
+const ON_PRIMARY_CONTAINER = '#522232';
+const TERTIARY = '#994530';
+const SURFACE_LOWEST = '#FFFFFF';
+const SURFACE_LOW = '#F9F2EF';
+const OUTLINE_VARIANT = '#D5C2C5';
+const TEXT = '#1D1B1A';
+const SUB_TEXT = '#514346';
 
 interface Props {
   order: Order;
@@ -39,37 +51,48 @@ export function InvoicePreview({ order, businessName, businessTagline, businessA
   return (
     <View style={styles.container}>
       <View style={styles.preview}>
+        {/* Header */}
         <View style={styles.previewHeader}>
           <Text style={styles.businessName}>{businessName.toUpperCase()}</Text>
           <Text style={styles.invoiceLabel}>INVOICE</Text>
         </View>
+
+        {/* Divider */}
         <View style={styles.divider} />
+
         <Text style={styles.billTo}>{order.customerName}</Text>
         <Text style={styles.address}>{order.customerAddress}</Text>
+
         <View style={styles.divider} />
+
+        {/* Line item */}
         <View style={styles.lineItem}>
           <Text style={styles.itemName}>{order.orderName}</Text>
           <Text style={styles.itemPrice}>
             {symbol}{order.askingPrice.toFixed(2)}
           </Text>
         </View>
+
+        {/* Total section */}
         <View style={styles.totalRow}>
           <Text style={styles.totalLabel}>TOTAL DUE</Text>
           <Text style={styles.totalValue}>
             {symbol}{order.askingPrice.toFixed(2)}
           </Text>
         </View>
+
+        {/* Status badge */}
         <View style={styles.statusRow}>
           <View
             style={[
               styles.statusBadge,
-              { backgroundColor: order.isPaid ? `${Colors.sage}22` : `${Colors.coral}22` },
+              { backgroundColor: order.isPaid ? 'rgba(153,69,48,0.1)' : 'rgba(134,77,95,0.1)' },
             ]}
           >
             <Text
               style={[
                 styles.statusText,
-                { color: order.isPaid ? Colors.sage : Colors.coral },
+                { color: order.isPaid ? TERTIARY : PRIMARY },
               ]}
             >
               {order.isPaid ? '● PAID' : '○ UNPAID'}
@@ -85,7 +108,7 @@ export function InvoicePreview({ order, businessName, businessTagline, businessA
         activeOpacity={0.8}
       >
         {loading ? (
-          <ActivityIndicator color={Colors.white} size="small" />
+          <ActivityIndicator color={ON_PRIMARY} size="small" />
         ) : (
           <Text style={styles.buttonText}>Generate & Share PDF Invoice</Text>
         )}
@@ -97,11 +120,9 @@ export function InvoicePreview({ order, businessName, businessTagline, businessA
 const styles = StyleSheet.create({
   container: { gap: Spacing.md },
   preview: {
-    backgroundColor: Colors.warmWhite,
-    borderRadius: BorderRadius.md,
+    backgroundColor: SURFACE_LOWEST,
+    borderRadius: BorderRadius.card,
     padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   previewHeader: {
     flexDirection: 'row',
@@ -111,66 +132,77 @@ const styles = StyleSheet.create({
   businessName: {
     fontSize: 14,
     fontFamily: 'PlayfairDisplay',
-    color: Colors.bark,
+    color: PRIMARY,
     letterSpacing: 2,
   },
   invoiceLabel: {
     fontSize: 14,
-    fontFamily: 'DMMono',
-    color: Colors.rose,
+    fontFamily: 'DMSans',
+    color: SUB_TEXT,
     letterSpacing: 2,
+    fontWeight: '600',
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: OUTLINE_VARIANT,
+    opacity: 0.4,
     marginVertical: Spacing.sm,
   },
   billTo: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: Colors.bark,
+    color: TEXT,
     fontWeight: '600',
   },
   address: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: Colors.muted,
+    color: SUB_TEXT,
     marginTop: 2,
   },
   lineItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    backgroundColor: SURFACE_LOW,
+    paddingHorizontal: Spacing.sm,
+    borderRadius: BorderRadius.sm,
   },
   itemName: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: Colors.bark,
+    color: TEXT,
     flex: 1,
   },
   itemPrice: {
     fontSize: 13,
-    fontFamily: 'DMMono',
-    color: Colors.bark,
+    fontFamily: 'DMSans',
+    color: TEXT,
+    fontWeight: '600',
   },
   totalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingTop: Spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    backgroundColor: PRIMARY_CONTAINER,
+    borderRadius: BorderRadius.sm,
   },
   totalLabel: {
     fontSize: 11,
-    fontFamily: 'DMMono',
-    color: Colors.muted,
+    fontFamily: 'DMSans',
+    color: ON_PRIMARY_CONTAINER,
     letterSpacing: 1,
+    fontWeight: '600',
   },
   totalValue: {
     fontSize: 15,
-    fontFamily: 'DMMono',
-    color: Colors.bark,
-    fontWeight: '600',
+    fontFamily: 'DMSans',
+    color: ON_PRIMARY_CONTAINER,
+    fontWeight: '700',
   },
   statusRow: {
     marginTop: Spacing.sm,
@@ -179,21 +211,27 @@ const styles = StyleSheet.create({
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: BorderRadius.full,
+    borderRadius: BorderRadius.pill,
   },
   statusText: {
     fontSize: 11,
-    fontFamily: 'DMMono',
+    fontFamily: 'DMSans',
     letterSpacing: 1,
+    fontWeight: '600',
   },
   button: {
-    backgroundColor: Colors.rose,
-    borderRadius: BorderRadius.md,
+    backgroundColor: PRIMARY,
+    borderRadius: BorderRadius.pill,
     padding: Spacing.md,
     alignItems: 'center',
+    shadowColor: 'rgba(134,77,95,0.25)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   buttonText: {
-    color: Colors.white,
+    color: ON_PRIMARY,
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
