@@ -16,18 +16,22 @@ export interface ThemeColors {
   subText: string;     // secondary / muted text
   tabBar: string;      // tab bar background
   header: string;      // header background
+  primary: string;     // primary accent
+  accent: string;      // tertiary accent
   isDark: boolean;
 }
 
 const THEME_PALETTE: Record<Exclude<AppTheme, 'system'>, ThemeColors> = {
   'warm-cream': {
-    bg: '#FAF7F2',
-    card: '#FFF9F5',
-    cardBorder: '#E2D8CF',
-    text: '#3D2B1F',
-    subText: '#8A7B72',
-    tabBar: '#FAF7F2',
-    header: '#FAF7F2',
+    bg: '#FFF8F5',
+    card: '#FFFFFF',
+    cardBorder: 'transparent',
+    text: '#1D1B1A',
+    subText: '#514346',
+    tabBar: '#FFF8F5',
+    header: '#FFF8F5',
+    primary: '#864D5F',
+    accent: '#994530',
     isDark: false,
   },
   'dark-walnut': {
@@ -38,6 +42,8 @@ const THEME_PALETTE: Record<Exclude<AppTheme, 'system'>, ThemeColors> = {
     subText: '#A89080',
     tabBar: '#221A12',
     header: '#221A12',
+    primary: '#C9879A',
+    accent: '#FFDAD2',
     isDark: true,
   },
   'soft-sage': {
@@ -48,6 +54,8 @@ const THEME_PALETTE: Record<Exclude<AppTheme, 'system'>, ThemeColors> = {
     subText: '#6B8A6B',
     tabBar: '#EAF0EA',
     header: '#EAF0EA',
+    primary: '#864D5F',
+    accent: '#994530',
     isDark: false,
   },
   'lavender': {
@@ -58,6 +66,8 @@ const THEME_PALETTE: Record<Exclude<AppTheme, 'system'>, ThemeColors> = {
     subText: '#7B6A9A',
     tabBar: '#EDE5F8',
     header: '#F0EAF8',
+    primary: '#864D5F',
+    accent: '#994530',
     isDark: false,
   },
 };
@@ -77,7 +87,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue>({
   theme: 'warm-cream',
-  colors: THEME_PALETTE['warm-cream'],
+  colors: THEME_PALETTE['warm-cream'] as ThemeColors,
   setTheme: () => {},
 });
 
