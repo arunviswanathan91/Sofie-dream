@@ -6,7 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { OrdersProvider } from '../context/OrdersContext';
 import { ProfileProvider } from '../context/ProfileContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
@@ -18,32 +18,32 @@ function StitchSplashScreen() {
   return (
     <View style={splash.container}>
       {/* Decorative orb — top left */}
-      <View style={[splash.orb, splash.orbTopLeft]} pointerEvents="none" />
+      <Animated.View entering={FadeIn.delay(0).duration(800)} style={[splash.orb, splash.orbTopLeft]} pointerEvents="none" />
       {/* Decorative orb — bottom right */}
-      <View style={[splash.orb, splash.orbBottomRight]} pointerEvents="none" />
+      <Animated.View entering={FadeIn.delay(0).duration(800)} style={[splash.orb, splash.orbBottomRight]} pointerEvents="none" />
 
       {/* Center content */}
       <View style={splash.centerContent}>
         {/* Hoop logo */}
-        <Animated.View entering={FadeInDown.delay(0).duration(600)} style={splash.hoopOuter}>
+        <Animated.View entering={FadeInDown.delay(200).duration(600)} style={splash.hoopOuter}>
           <View style={splash.hoopInner}>
             <Text style={splash.hoopMark}>✦</Text>
           </View>
         </Animated.View>
 
         {/* App name */}
-        <Animated.Text entering={FadeInDown.delay(120).duration(600)} style={splash.title}>
+        <Animated.Text entering={FadeInDown.delay(400).duration(500)} style={splash.title}>
           Sofi Dream ✦
         </Animated.Text>
 
         {/* Subtitle */}
-        <Animated.Text entering={FadeInDown.delay(200).duration(600)} style={splash.subtitle}>
+        <Animated.Text entering={FadeInDown.delay(550).duration(400)} style={splash.subtitle}>
           Handmade with love ✦
         </Animated.Text>
       </View>
 
       {/* Bottom quote card */}
-      <Animated.View entering={FadeInDown.delay(320).duration(700)} style={splash.quoteCard}>
+      <Animated.View entering={FadeInDown.delay(700).duration(500)} style={splash.quoteCard}>
         <Text style={splash.quoteText}>"Every stitch tells a story."</Text>
         <View style={splash.quoteDots}>
           <View style={splash.dot} />
