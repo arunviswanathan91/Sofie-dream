@@ -12,6 +12,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useOrders } from '../../hooks/useOrders';
 import { useCategories } from '../../hooks/useCategories';
 import { useTheme } from '../../context/ThemeContext';
@@ -113,22 +114,22 @@ export default function TrackScreen() {
   const cardWidth = isTablet ? (width >= 840 ? '31%' : '47%') : '47%';
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
+    <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-        <Text style={[styles.screenTitle, { color: colors.text }]}>Craft Tracking</Text>
+        <Text style={styles.screenTitle}>Craft Tracking</Text>
 
         {/* Revenue Chart */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.subText }]}>Revenue by Category</Text>
-            <View style={[styles.toggleRow, { backgroundColor: colors.cardBorder }]}>
+            <Text style={styles.sectionTitle}>Revenue by Category</Text>
+            <View style={[styles.toggleRow, { backgroundColor: OUTLINE_VARIANT }]}>
               {(['month', 'all'] as const).map((v) => (
                 <TouchableOpacity
                   key={v}
-                  style={[styles.toggle, revenueView === v && { backgroundColor: colors.card }]}
+                  style={[styles.toggle, revenueView === v && { backgroundColor: '#FFFFFF' }]}
                   onPress={() => setRevenueView(v)}
                 >
-                  <Text style={[styles.toggleText, { color: colors.subText }, revenueView === v && { color: colors.text, fontWeight: '600' }]}>
+                  <Text style={[styles.toggleText, revenueView === v && styles.toggleTextActive]}>
                     {v === 'month' ? 'Month' : 'All Time'}
                   </Text>
                 </TouchableOpacity>
@@ -141,7 +142,7 @@ export default function TrackScreen() {
         {/* Category Grid */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.subText }]}>Categories</Text>
+            <Text style={styles.sectionTitle}>Categories</Text>
             <TouchableOpacity
               style={styles.addButton}
               onPress={() => setShowAddModal(true)}
@@ -150,16 +151,20 @@ export default function TrackScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.categoryGrid}>
-            {categoryStats.map((cat) => (
-              <TouchableOpacity
+            {categoryStats.map((cat, index) => (
+              <Animated.View
                 key={cat.id}
-                style={[styles.categoryCard, { backgroundColor: colors.card, borderColor: colors.cardBorder, borderLeftColor: cat.color, width: cardWidth as any }]}
+                entering={FadeInDown.delay(index * 60).duration(350)}
+                style={{ width: cardWidth as any }}
+              >
+              <TouchableOpacity
+                style={[styles.categoryCard, { backgroundColor: SURFACE_LOW, borderLeftColor: cat.color }]}
                 onLongPress={() => handleDeleteCategory(cat)}
                 activeOpacity={0.85}
               >
                 <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-                <Text style={[styles.categoryName, { color: colors.text }]}>{cat.name}</Text>
-                <Text style={[styles.categoryOrders, { color: colors.subText }]}>
+                <Text style={styles.categoryName}>{cat.name}</Text>
+                <Text style={styles.categoryOrders}>
                   {cat.totalOrders} order{cat.totalOrders !== 1 ? 's' : ''}
                 </Text>
                 {cat.activeCount > 0 && (
@@ -175,6 +180,7 @@ export default function TrackScreen() {
                   </Text>
                 )}
               </TouchableOpacity>
+              </Animated.View>
             ))}
           </View>
         </View>
@@ -185,23 +191,23 @@ export default function TrackScreen() {
       {/* Add Category Modal */}
       <Modal visible={showAddModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.bg }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>New Category</Text>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>New Category</Text>
 
             <TextInput
-              style={[styles.input, { backgroundColor: colors.card, borderColor: colors.cardBorder, color: colors.text }]}
+              style={styles.input}
               placeholder="Category name"
-              placeholderTextColor={colors.subText}
+              placeholderTextColor='#514346'
               value={newName}
               onChangeText={setNewName}
             />
 
-            <Text style={[styles.inputLabel, { color: colors.subText }]}>Emoji</Text>
+            <Text style={styles.inputLabel}>Emoji</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.emojiRow}>
               {EMOJI_OPTIONS.map((e) => (
                 <TouchableOpacity
                   key={e}
-                  style={[styles.emojiOption, { borderColor: colors.cardBorder }, newEmoji === e && styles.emojiOptionActive]}
+                  style={[styles.emojiOption, newEmoji === e && styles.emojiOptionActive]}
                   onPress={() => setNewEmoji(e)}
                 >
                   <Text style={styles.emojiText}>{e}</Text>
@@ -209,7 +215,7 @@ export default function TrackScreen() {
               ))}
             </ScrollView>
 
-            <Text style={[styles.inputLabel, { color: colors.subText }]}>Color</Text>
+            <Text style={styles.inputLabel}>Color</Text>
             <View style={styles.colorRow}>
               {COLOR_OPTIONS.map((c) => (
                 <TouchableOpacity
@@ -226,10 +232,10 @@ export default function TrackScreen() {
 
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={[styles.cancelButton, { backgroundColor: colors.cardBorder }]}
+                style={styles.cancelButton}
                 onPress={() => setShowAddModal(false)}
               >
-                <Text style={[styles.cancelText, { color: colors.subText }]}>Cancel</Text>
+                <Text style={styles.cancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.saveButton, addingCategory && { opacity: 0.6 }]} onPress={handleAddCategory} disabled={addingCategory}>
                 <Text style={styles.saveText}>{addingCategory ? 'Adding…' : 'Add Category'}</Text>
@@ -245,6 +251,7 @@ export default function TrackScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFF8F5',
   },
   content: {
     paddingBottom: 24,
@@ -252,6 +259,7 @@ const styles = StyleSheet.create({
   screenTitle: {
     fontSize: 26,
     fontFamily: 'PlayfairDisplay',
+    color: '#1D1B1A',
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.lg,
     paddingBottom: Spacing.md,
@@ -272,6 +280,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     fontWeight: '600',
+    color: '#514346',
   },
   toggleRow: {
     flexDirection: 'row',
@@ -287,6 +296,11 @@ const styles = StyleSheet.create({
   toggleText: {
     fontSize: 11,
     fontFamily: 'DMSans',
+    color: '#514346',
+  },
+  toggleTextActive: {
+    color: '#1D1B1A',
+    fontWeight: '600',
   },
   addButton: {
     backgroundColor: PRIMARY_CONTAINER,
@@ -306,11 +320,15 @@ const styles = StyleSheet.create({
     gap: Spacing.sm,
   },
   categoryCard: {
-    width: '47%',
     borderRadius: BorderRadius.card,
     padding: Spacing.md,
     borderLeftWidth: 4,
     gap: 4,
+    shadowColor: '#2C2C2C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 16,
+    elevation: 2,
   },
   categoryEmoji: {
     fontSize: 24,
@@ -320,10 +338,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: 'DMSans',
     fontWeight: '600',
+    color: '#1D1B1A',
   },
   categoryOrders: {
     fontSize: 11,
     fontFamily: 'DMSans',
+    color: '#514346',
   },
   activeBadge: {
     alignSelf: 'flex-start',
@@ -352,10 +372,12 @@ const styles = StyleSheet.create({
     borderTopRightRadius: BorderRadius.xl,
     padding: Spacing.lg,
     gap: Spacing.md,
+    backgroundColor: '#FFF8F5',
   },
   modalTitle: {
     fontSize: 22,
     fontFamily: 'PlayfairDisplay',
+    color: '#1D1B1A',
   },
   input: {
     borderRadius: BorderRadius.md,
@@ -363,13 +385,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontFamily: 'DMSans',
     fontSize: 15,
+    backgroundColor: '#F9F2EF',
     borderWidth: 1,
+    borderColor: '#D5C2C5',
+    color: '#1D1B1A',
   },
   inputLabel: {
     fontSize: 12,
     fontFamily: 'DMSans',
     textTransform: 'uppercase',
     letterSpacing: 1,
+    color: '#514346',
   },
   emojiRow: {
     maxHeight: 44,
@@ -382,6 +408,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.sm,
     marginRight: 6,
     borderWidth: 1,
+    borderColor: '#D5C2C5',
   },
   emojiOptionActive: {
     borderColor: PRIMARY,
@@ -412,10 +439,12 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
+    backgroundColor: '#D5C2C5',
   },
   cancelText: {
     fontFamily: 'DMSans',
     fontWeight: '600',
+    color: '#514346',
   },
   saveButton: {
     flex: 2,

@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   useWindowDimensions,
 } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -125,7 +126,7 @@ export default function ReportsScreen() {
         </ScrollView>
 
         {/* Summary Stats — surfaceLow tiles, adaptive grid */}
-        <View style={[styles.statsGrid, isTablet && { paddingHorizontal: Spacing.md }]}>
+        <Animated.View entering={FadeInDown.delay(0).duration(400)} style={[styles.statsGrid, isTablet && { paddingHorizontal: Spacing.md }]}>
           {[
             { label: 'Revenue', value: report.totalRevenue, prefix: symbol, accentColor: Colors.primary },
             { label: 'Completed', value: report.ordersCompleted, accentColor: Colors.tertiary },
@@ -143,11 +144,11 @@ export default function ReportsScreen() {
               />
             </View>
           ))}
-        </View>
+        </Animated.View>
 
         {/* Highlights — tonal surfaceLow bg, no border */}
         {(report.topCategory || report.topCustomer.name) && (
-          <View style={styles.section}>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
             <Text style={styles.sectionTitle}>Highlights</Text>
             <View style={styles.highlightsCard}>
               {report.topCategory ? (
@@ -165,20 +166,20 @@ export default function ReportsScreen() {
                 </View>
               ) : null}
             </View>
-          </View>
+          </Animated.View>
         )}
 
         {/* Revenue Chart */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
           <Text style={styles.sectionTitle}>Revenue Over Time</Text>
           <RevenueLineChart data={report.revenueByDay} colors={colors} />
-        </View>
+        </Animated.View>
 
         {/* Category Chart */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInDown.delay(300).duration(400)} style={styles.section}>
           <Text style={styles.sectionTitle}>Revenue by Category</Text>
           <RevenueByCategoryChart data={report.revenueByCategory} colors={colors} currencySymbol={symbol} />
-        </View>
+        </Animated.View>
 
         {/* Export Buttons — pill shape, primaryContainer bg */}
         <View style={styles.section}>

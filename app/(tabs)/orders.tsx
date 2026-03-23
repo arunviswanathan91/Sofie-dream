@@ -210,7 +210,7 @@ export default function OrdersScreen() {
           numColumns={numColumns}
           renderItem={({ item, index }) => (
             <Animated.View
-              entering={FadeInDown.delay(index * 40).duration(300)}
+              entering={FadeInDown.delay(index * 60).duration(350)}
               style={isTablet ? styles.tabletItem : undefined}
             >
               <OrderCard order={item} />

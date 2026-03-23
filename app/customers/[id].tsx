@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useCustomers } from '../../hooks/useCustomers';
 import { useOrders } from '../../hooks/useOrders';
 import { OrderCard } from '../../components/OrderCard';
@@ -47,7 +48,7 @@ export default function CustomerProfileScreen() {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero profile block — tonal surfaceLow, no border */}
-        <View style={styles.heroCard}>
+        <Animated.View entering={FadeInDown.delay(0).duration(400)} style={styles.heroCard}>
           {/* Avatar */}
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{customer.name[0].toUpperCase()}</Text>
@@ -73,7 +74,7 @@ export default function CustomerProfileScreen() {
               <Text style={styles.statLabel}>Total Spent</Text>
             </View>
           </View>
-        </View>
+        </Animated.View>
 
         {/* Contact Info — surfaceLowest card, no border */}
         {(customer.address || customer.phone || customer.instagram) && (
@@ -107,8 +108,10 @@ export default function CustomerProfileScreen() {
           <Text style={styles.sectionTitle}>
             All Orders ({customerOrders.length})
           </Text>
-          {customerOrders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+          {customerOrders.map((order, index) => (
+            <Animated.View key={order.id} entering={FadeInDown.delay(index * 60).duration(350)}>
+              <OrderCard order={order} />
+            </Animated.View>
           ))}
           {customerOrders.length === 0 && (
             <View style={styles.emptyOrders}>
