@@ -542,7 +542,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
-    whiteSpace: 'nowrap',
   },
   quickActionSecondary: {
     backgroundColor: T.surfaceHighest,
@@ -555,7 +554,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
-    whiteSpace: 'nowrap',
   },
   // Section headers
   sectionHeaderRow: {
