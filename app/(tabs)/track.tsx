@@ -17,11 +17,20 @@ import { useCategories } from '../../hooks/useCategories';
 import { useTheme } from '../../context/ThemeContext';
 import { useProfile } from '../../hooks/useProfile';
 import { RevenueByCategoryChart } from '../../components/EarningsChart';
-import { Colors, Spacing, BorderRadius, getCurrencySymbol } from '../../lib/theme';
+import { Spacing, BorderRadius, getCurrencySymbol } from '../../lib/theme';
 import type { CraftCategory } from '../../types';
 
+// Stitch "Warm Artisan Editorial" tokens
+const PRIMARY = '#864D5F';
+const PRIMARY_CONTAINER = '#C9879A';
+const ON_PRIMARY = '#FFFFFF';
+const TERTIARY = '#994530';
+const SURFACE_LOW = '#F9F2EF';
+const OUTLINE_VARIANT = '#D5C2C5';
+
 const EMOJI_OPTIONS = ['✦', '◆', '◇', '⌂', '✧', '★', '♦', '❋', '✿', '❀', '✂', '⊕'];
-const COLOR_OPTIONS = [Colors.lilac, Colors.rose, Colors.gold, Colors.sage, Colors.sky, Colors.coral];
+// Category color swatches using Stitch palette
+const COLOR_OPTIONS = [PRIMARY, PRIMARY_CONTAINER, TERTIARY, '#625E5A', '#C9879A', '#994530'];
 
 export default function TrackScreen() {
   const { orders } = useOrders();
@@ -35,7 +44,7 @@ export default function TrackScreen() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmoji, setNewEmoji] = useState('✦');
-  const [newColor, setNewColor] = useState(Colors.lilac);
+  const [newColor, setNewColor] = useState(PRIMARY_CONTAINER);
   const [revenueView, setRevenueView] = useState<'month' | 'all'>('month');
 
   const categoryStats = useMemo(() => {
@@ -76,7 +85,7 @@ export default function TrackScreen() {
       await addCategory({ name: newName.trim(), emoji: newEmoji, color: newColor });
       setNewName('');
       setNewEmoji('✦');
-      setNewColor(Colors.lilac);
+      setNewColor(PRIMARY_CONTAINER);
     } catch (e) {
       Alert.alert('Error', 'Could not add category. Please try again.');
       setShowAddModal(true);
@@ -280,15 +289,15 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
   },
   addButton: {
-    backgroundColor: Colors.rose,
-    borderRadius: BorderRadius.full,
+    backgroundColor: PRIMARY_CONTAINER,
+    borderRadius: BorderRadius.pill,
     paddingHorizontal: 14,
     paddingVertical: 5,
   },
   addButtonText: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: Colors.white,
+    color: ON_PRIMARY,
     fontWeight: '600',
   },
   categoryGrid: {
@@ -298,10 +307,9 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '47%',
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.card,
     padding: Spacing.md,
     borderLeftWidth: 4,
-    borderWidth: 1,
     gap: 4,
   },
   categoryEmoji: {
@@ -330,7 +338,7 @@ const styles = StyleSheet.create({
   },
   categoryRevenue: {
     fontSize: 16,
-    fontFamily: 'DMMono',
+    fontFamily: 'PlayfairDisplay-Bold',
     fontWeight: '600',
     marginTop: 4,
   },
@@ -376,8 +384,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   emojiOptionActive: {
-    borderColor: Colors.rose,
-    backgroundColor: `${Colors.rose}11`,
+    borderColor: PRIMARY,
+    backgroundColor: 'rgba(134,77,95,0.07)',
   },
   emojiText: {
     fontSize: 20,
@@ -393,7 +401,7 @@ const styles = StyleSheet.create({
   },
   colorSwatchActive: {
     borderWidth: 3,
-    borderColor: Colors.bark,
+    borderColor: '#1D1B1A',
   },
   modalActions: {
     flexDirection: 'row',
@@ -412,13 +420,13 @@ const styles = StyleSheet.create({
   saveButton: {
     flex: 2,
     padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    backgroundColor: Colors.rose,
+    borderRadius: BorderRadius.pill,
+    backgroundColor: PRIMARY,
     alignItems: 'center',
   },
   saveText: {
     fontFamily: 'DMSans',
-    color: Colors.white,
+    color: ON_PRIMARY,
     fontWeight: '600',
     fontSize: 15,
   },
