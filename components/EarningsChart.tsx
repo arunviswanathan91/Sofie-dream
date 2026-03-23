@@ -25,7 +25,7 @@ interface BarProps {
   currencySymbol?: string;
 }
 
-export function RevenueLineChart({ data, title, colors }: LineProps) {
+export function RevenueLineChart({ data, title }: LineProps) {
   const { width } = useWindowDimensions();
   const chartWidth = width - 48;
 
@@ -67,7 +67,7 @@ export function RevenueLineChart({ data, title, colors }: LineProps) {
 
   return (
     <View>
-      {title && <Text style={[styles.chartTitle, { color: colors.subText }]}>{title}</Text>}
+      {title && <Text style={[styles.chartTitle, { color: '#514346' }]}>{title}</Text>}
       <LineChart
         data={{
           labels,
@@ -85,7 +85,7 @@ export function RevenueLineChart({ data, title, colors }: LineProps) {
   );
 }
 
-export function RevenueByCategoryChart({ data, title, colors, currencySymbol = '€' }: BarProps) {
+export function RevenueByCategoryChart({ data, title, currencySymbol = '€' }: BarProps) {
   const { width } = useWindowDimensions();
   const chartWidth = width - 48;
 
@@ -122,7 +122,7 @@ export function RevenueByCategoryChart({ data, title, colors, currencySymbol = '
 
   return (
     <View>
-      {title && <Text style={[styles.chartTitle, { color: colors.subText }]}>{title}</Text>}
+      {title && <Text style={[styles.chartTitle, { color: '#514346' }]}>{title}</Text>}
       <BarChart
         data={{
           labels,

@@ -10,6 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { format, addDays } from 'date-fns';
 import { useOrders } from '../../hooks/useOrders';
 import { useCategories } from '../../hooks/useCategories';
+import { useProfile } from '../../hooks/useProfile';
 import { useTheme } from '../../context/ThemeContext';
 import { TagChip } from '../../components/TagChip';
 import { Colors, Spacing, BorderRadius } from '../../lib/theme';
@@ -60,7 +61,8 @@ export default function NewOrderScreen() {
   const insets = useSafeAreaInsets();
   const { categories } = useCategories();
   const { colors } = useTheme();
-  const [form, setForm] = useState<FormState>(INITIAL);
+  const { profile } = useProfile();
+  const [form, setForm] = useState<FormState>({ ...INITIAL, currency: profile.currency || 'EUR' });
   const [customTag, setCustomTag] = useState('');
   const [saving, setSaving] = useState(false);
 

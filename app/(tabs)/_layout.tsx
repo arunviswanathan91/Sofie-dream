@@ -1,22 +1,8 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-
-interface TabIconProps {
-  emoji: string;
-  label: string;
-  focused: boolean;
-}
-
-function TabIcon({ emoji, label, focused }: TabIconProps) {
-  return (
-    <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
-      <Text style={styles.tabEmoji}>{emoji}</Text>
-      <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>{label}</Text>
-    </View>
-  );
-}
 
 export default function TabsLayout() {
   const { colors } = useTheme();
@@ -49,8 +35,11 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: 'Home',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="⌂" label="Home" focused={focused} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
+              <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />
+              <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Home</Text>
+            </View>
           ),
         }}
       />
@@ -58,8 +47,11 @@ export default function TabsLayout() {
         name="orders"
         options={{
           title: 'Orders',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="✦" label="Orders" focused={focused} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
+              <Ionicons name={focused ? 'list' : 'list-outline'} size={size} color={color} />
+              <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Orders</Text>
+            </View>
           ),
         }}
       />
@@ -67,8 +59,11 @@ export default function TabsLayout() {
         name="track"
         options={{
           title: 'Craft',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="◆" label="Craft" focused={focused} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
+              <Ionicons name={focused ? 'color-palette' : 'color-palette-outline'} size={size} color={color} />
+              <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Craft</Text>
+            </View>
           ),
         }}
       />
@@ -76,8 +71,11 @@ export default function TabsLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ focused }) => (
-            <TabIcon emoji="◇" label="Settings" focused={focused} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <View style={[styles.tabIcon, focused && styles.tabIconFocused]}>
+              <Ionicons name={focused ? 'person-circle' : 'person-circle-outline'} size={size} color={color} />
+              <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>Settings</Text>
+            </View>
           ),
         }}
       />
@@ -97,10 +95,6 @@ const styles = StyleSheet.create({
   },
   tabIconFocused: {
     backgroundColor: 'rgba(153,69,48,0.08)',
-  },
-  tabEmoji: {
-    fontSize: 18,
-    lineHeight: 22,
   },
   tabLabel: {
     fontSize: 10,

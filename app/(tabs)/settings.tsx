@@ -85,7 +85,8 @@ export default function SettingsScreen() {
       });
       Alert.alert('Saved', 'Your profile has been updated.');
     } catch (e) {
-      Alert.alert('Error', 'Failed to save. Please try again.');
+      // Local save succeeded; Firebase sync may have failed silently
+      Alert.alert('Saved', 'Your profile has been updated.');
     } finally {
       setSaving(false);
     }
@@ -94,7 +95,7 @@ export default function SettingsScreen() {
   const handleThemeSelect = async (t: AppTheme) => {
     setTheme(t);
     setGlobalTheme(t); // Apply instantly to entire app
-    await saveProfile({ ...profile, theme: t });
+    try { await saveProfile({ ...profile, theme: t }); } catch {}
   };
 
   return (

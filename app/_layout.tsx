@@ -81,7 +81,7 @@ function InnerLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.bg },
+          contentStyle: { backgroundColor: '#FFF8F5' },
           animation: 'slide_from_right',
           gestureEnabled: true,
         }}

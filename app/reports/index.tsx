@@ -10,6 +10,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import Svg, { Circle, G } from 'react-native-svg';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Print from 'expo-print';
 import * as Sharing from 'expo-sharing';
@@ -25,6 +26,63 @@ import { StatTile } from '../../components/StatTile';
 import { generateMonthlyReportHTML } from '../../lib/reports';
 import { Colors, Spacing, BorderRadius } from '../../lib/theme';
 import type { ReportPeriod } from '../../hooks/useReports';
+
+function DonutChart({ inProgress, completed, shipped, total }: {
+  inProgress: number; completed: number; shipped: number; total: number;
+}) {
+  const size = 128;
+  const strokeWidth = 14;
+  const r = (size - strokeWidth) / 2;
+  const cx = size / 2;
+  const cy = size / 2;
+  const circumference = 2 * Math.PI * r;
+
+  const safeTotal = total || 1;
+  const pInProgress = inProgress / safeTotal;
+  const pCompleted = completed / safeTotal;
+  const pShipped = shipped / safeTotal;
+
+  // Offsets: each segment starts after the previous one
+  const offsetInProgress = circumference * 0.25; // start at top (-90°)
+  const offsetCompleted = offsetInProgress - circumference * pInProgress;
+  const offsetShipped = offsetCompleted - circumference * pCompleted;
+
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center', width: size, height: size }}>
+      <Svg width={size} height={size} style={{ position: 'absolute' }}>
+        <G rotation="-90" origin={`${cx},${cy}`}>
+          {/* Track */}
+          <Circle cx={cx} cy={cy} r={r} stroke="#E8E1DE" strokeWidth={strokeWidth} fill="transparent" />
+          {/* In Progress — tertiary */}
+          {inProgress > 0 && (
+            <Circle cx={cx} cy={cy} r={r} stroke="#994530" strokeWidth={strokeWidth} fill="transparent"
+              strokeDasharray={circumference} strokeDashoffset={offsetInProgress - circumference * pInProgress + circumference * (1 - pInProgress - pCompleted - pShipped)}
+              strokeLinecap="round" />
+          )}
+          {/* Completed — primary */}
+          {completed > 0 && (
+            <Circle cx={cx} cy={cy} r={r} stroke="#864D5F" strokeWidth={strokeWidth} fill="transparent"
+              strokeDasharray={`${circumference * pCompleted} ${circumference * (1 - pCompleted)}`}
+              strokeDashoffset={offsetCompleted}
+              strokeLinecap="round" />
+          )}
+          {/* Shipped — outline */}
+          {shipped > 0 && (
+            <Circle cx={cx} cy={cy} r={r} stroke="#D5C2C5" strokeWidth={strokeWidth} fill="transparent"
+              strokeDasharray={`${circumference * pShipped} ${circumference * (1 - pShipped)}`}
+              strokeDashoffset={offsetShipped}
+              strokeLinecap="round" />
+          )}
+        </G>
+      </Svg>
+      {/* Center label */}
+      <View style={{ alignItems: 'center' }}>
+        <Text style={{ fontSize: 22, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: '#1D1B1A' }}>{total}</Text>
+        <Text style={{ fontSize: 9, fontFamily: 'DMSans', fontWeight: '700', color: '#514346', textTransform: 'uppercase', letterSpacing: 0.5 }}>Total</Text>
+      </View>
+    </View>
+  );
+}
 
 const PERIOD_OPTIONS: { label: string; value: ReportPeriod }[] = [
   { label: 'Week', value: 'week' },
@@ -181,6 +239,34 @@ export default function ReportsScreen() {
           <RevenueByCategoryChart data={report.revenueByCategory} colors={colors} currencySymbol={symbol} />
         </Animated.View>
 
+        {/* Order Lifecycle Donut */}
+        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
+          <View style={styles.donutSection}>
+            <Text style={styles.donutSectionTitle}>Order Lifecycle</Text>
+            <View style={styles.donutRow}>
+              <DonutChart
+                inProgress={orders.filter(o => o.status === 'accepted' || o.status === 'request').length}
+                completed={orders.filter(o => o.status === 'delivered').length}
+                shipped={orders.filter(o => o.status === 'shipped').length}
+                total={orders.length}
+              />
+              <View style={styles.donutLegend}>
+                {[
+                  { color: '#994530', label: 'In Progress', count: orders.filter(o => o.status === 'accepted' || o.status === 'request').length },
+                  { color: '#864D5F', label: 'Completed', count: orders.filter(o => o.status === 'delivered').length },
+                  { color: '#D5C2C5', label: 'Shipped', count: orders.filter(o => o.status === 'shipped').length },
+                ].map(item => (
+                  <View key={item.label} style={styles.legendRow}>
+                    <View style={[styles.legendDot, { backgroundColor: item.color }]} />
+                    <Text style={styles.legendLabel}>{item.label}</Text>
+                    <Text style={styles.legendCount}>{item.count}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </View>
+        </Animated.View>
+
         {/* Export Buttons — pill shape, primaryContainer bg */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Export</Text>
@@ -327,4 +413,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  donutSection: { marginHorizontal: 16, marginBottom: 20, backgroundColor: '#F9F2EF', borderRadius: 16, padding: 20 },
+  donutSectionTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: '#1D1B1A', marginBottom: 16 },
+  donutRow: { flexDirection: 'row', alignItems: 'center', gap: 24 },
+  donutLegend: { flex: 1, gap: 14 },
+  legendRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  legendDot: { width: 10, height: 10, borderRadius: 999 },
+  legendLabel: { flex: 1, fontSize: 13, fontFamily: 'DMSans', color: '#514346' },
+  legendCount: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700', color: '#1D1B1A' },
 });

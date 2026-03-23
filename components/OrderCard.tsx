@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 import { useRouter } from 'expo-router';
 import { format } from 'date-fns';
 import { CountdownTimer } from './CountdownTimer';
@@ -41,10 +42,16 @@ export function OrderCard({ order, compact = false }: Props) {
   const isActive = ['accepted', 'request'].includes(order.status);
   const ribbonColor = RIBBON_COLOR[order.status];
 
+  const scale = useSharedValue(1);
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
+
   return (
+    <Animated.View style={animStyle}>
     <TouchableOpacity
       style={[styles.card, compact && styles.cardCompact]}
       onPress={handlePress}
+      onPressIn={() => { scale.value = withSpring(0.97, { damping: 15 }); }}
+      onPressOut={() => { scale.value = withSpring(1, { damping: 15 }); }}
       activeOpacity={0.85}
     >
       {/* 4px absolute-left status ribbon */}
@@ -102,6 +109,7 @@ export function OrderCard({ order, compact = false }: Props) {
         </View>
       </View>
     </TouchableOpacity>
+    </Animated.View>
   );
 }
 
