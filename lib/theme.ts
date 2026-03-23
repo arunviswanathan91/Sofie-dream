@@ -53,10 +53,10 @@ export const StatusTokens = {
 } as const;
 
 export const UrgencyColors = {
-  critical: Colors.coral,
-  high: Colors.rose,
-  medium: Colors.gold,
-  low: Colors.sage,
+  critical: Colors.tertiary,   // '#994530' — urgent < 24h
+  high: Colors.primary,        // '#864D5F' — warning < 72h
+  medium: Colors.primaryContainer, // '#C9879A'
+  low: Colors.subText,         // '#514346' — normal
 } as const;
 
 export const Fonts = {

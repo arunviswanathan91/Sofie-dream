@@ -57,7 +57,7 @@ export function CountdownTimer({ dueDate, style, showIcon = true }: Props) {
 const styles = StyleSheet.create({
   base: {
     fontSize: 12,
-    fontFamily: 'DMMono',
-    letterSpacing: 0.5,
+    fontFamily: 'DMSans',
+    letterSpacing: 0.3,
   },
 });
