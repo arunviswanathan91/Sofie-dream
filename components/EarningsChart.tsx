@@ -1,8 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { LineChart, BarChart } from 'react-native-chart-kit';
-import { Colors, Spacing } from '../lib/theme';
+import { Spacing } from '../lib/theme';
 import type { ThemeColors } from '../context/ThemeContext';
+
+// Stitch "Warm Artisan Editorial" chart tokens
+const CHART_PRIMARY = '#864D5F';
+const CHART_PRIMARY_FILL = 'rgba(134,77,95,0.08)';
+const CHART_BAR = '#C9879A';
+const CHART_SURFACE = '#F9F2EF';
+const CHART_GRID = '#D5C2C5';
+const CHART_LABEL = '#514346';
 
 interface LineProps {
   data: { date: string; amount: number }[];
@@ -31,26 +39,29 @@ export function RevenueLineChart({ data, title, colors }: LineProps) {
 
   if (!hasData) {
     return (
-      <View style={[styles.emptyChart, { backgroundColor: colors.cardBorder }]}>
-        <Text style={[styles.emptyText, { color: colors.subText }]}>No revenue data yet</Text>
+      <View style={[styles.emptyChart, { backgroundColor: CHART_SURFACE }]}>
+        <Text style={[styles.emptyText, { color: CHART_LABEL }]}>No revenue data yet</Text>
       </View>
     );
   }
 
   const chartConfig = {
-    backgroundGradientFrom: colors.card,
-    backgroundGradientTo: colors.card,
-    color: (opacity = 1) => `rgba(201, 123, 90, ${opacity})`,
-    labelColor: () => colors.subText,
+    backgroundGradientFrom: CHART_SURFACE,
+    backgroundGradientTo: CHART_SURFACE,
+    color: (opacity = 1) => `rgba(134,77,95,${opacity})`,
+    fillShadowGradient: CHART_PRIMARY,
+    fillShadowGradientOpacity: 0.08,
+    labelColor: () => CHART_LABEL,
     strokeWidth: 2,
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: Colors.rose,
+      stroke: CHART_PRIMARY,
     },
     propsForBackgroundLines: {
-      stroke: colors.cardBorder,
+      stroke: CHART_GRID,
       strokeDasharray: '4',
+      strokeOpacity: 0.5,
     },
   };
 
@@ -82,8 +93,8 @@ export function RevenueByCategoryChart({ data, title, colors, currencySymbol = '
 
   if (entries.length === 0) {
     return (
-      <View style={[styles.emptyChart, { backgroundColor: colors.cardBorder }]}>
-        <Text style={[styles.emptyText, { color: colors.subText }]}>No category data yet</Text>
+      <View style={[styles.emptyChart, { backgroundColor: CHART_SURFACE }]}>
+        <Text style={[styles.emptyText, { color: CHART_LABEL }]}>No category data yet</Text>
       </View>
     );
   }
@@ -92,19 +103,20 @@ export function RevenueByCategoryChart({ data, title, colors, currencySymbol = '
   const values = entries.map(([, v]) => v);
 
   const barChartConfig = {
-    backgroundGradientFrom: colors.card,
-    backgroundGradientTo: colors.card,
-    color: (opacity = 1) => `rgba(212, 168, 83, ${opacity})`,
-    labelColor: () => colors.subText,
+    backgroundGradientFrom: CHART_SURFACE,
+    backgroundGradientTo: CHART_SURFACE,
+    color: (opacity = 1) => `rgba(201,135,154,${opacity})`,
+    labelColor: () => CHART_LABEL,
     strokeWidth: 2,
     propsForDots: {
       r: '4',
       strokeWidth: '2',
-      stroke: Colors.rose,
+      stroke: CHART_BAR,
     },
     propsForBackgroundLines: {
-      stroke: colors.cardBorder,
+      stroke: CHART_GRID,
       strokeDasharray: '4',
+      strokeOpacity: 0.5,
     },
   };
 
@@ -131,12 +143,13 @@ export function RevenueByCategoryChart({ data, title, colors, currencySymbol = '
 
 const styles = StyleSheet.create({
   chart: {
-    borderRadius: 12,
+    borderRadius: 16,
     marginVertical: Spacing.sm,
   },
   chartTitle: {
     fontSize: 13,
     fontFamily: 'DMSans',
+    color: CHART_LABEL,
     marginBottom: 4,
     letterSpacing: 0.3,
   },
@@ -144,11 +157,13 @@ const styles = StyleSheet.create({
     height: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 12,
+    borderRadius: 16,
     marginVertical: Spacing.sm,
+    backgroundColor: CHART_SURFACE,
   },
   emptyText: {
     fontFamily: 'DMSans',
     fontSize: 13,
+    color: CHART_LABEL,
   },
 });
