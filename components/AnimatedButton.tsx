@@ -54,11 +54,22 @@ const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#864D5F',
+    borderRadius: 999,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    shadowColor: 'rgba(134,77,95,0.25)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   label: {
     fontFamily: 'DMSans',
     fontSize: 15,
     fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   disabled: {
     opacity: 0.5,
