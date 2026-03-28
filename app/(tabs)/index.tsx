@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   useWindowDimensions,
+  Modal,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -90,7 +92,7 @@ function CircularProgress({ progress, size = 80, trackColor, progressColor, labe
 export default function DashboardScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { orders, loading } = useOrders();
+  const { orders, loading, updateOrder } = useOrders();
   const { profile } = useProfile();
   const { colors } = useTheme();
   const { dashboardStats } = useReports(orders, 'month');
@@ -120,6 +122,34 @@ export default function DashboardScreen() {
   }, [orders, shippedCount]);
 
   const c = colors;
+
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [progressEdits, setProgressEdits] = useState<Record<string, number>>({});
+  const [savingProgress, setSavingProgress] = useState(false);
+
+  const activeForProgress = useMemo(
+    () => orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered'),
+    [orders]
+  );
+
+  const openProgressModal = () => {
+    const init: Record<string, number> = {};
+    activeForProgress.forEach((o) => { init[o.id] = o.completionPercent ?? 0; });
+    setProgressEdits(init);
+    setShowProgressModal(true);
+  };
+
+  const saveProgress = async () => {
+    setSavingProgress(true);
+    for (const order of activeForProgress) {
+      const newPct = progressEdits[order.id] ?? order.completionPercent ?? 0;
+      if (newPct !== (order.completionPercent ?? 0)) {
+        await updateOrder(order.id, { completionPercent: newPct });
+      }
+    }
+    setSavingProgress(false);
+    setShowProgressModal(false);
+  };
 
   if (loading) {
     return (
@@ -171,7 +201,7 @@ export default function DashboardScreen() {
               <Text style={[styles.quoteAuthor, { color: c.subText }]}>— {dailyQuote.author}</Text>
             ) : null}
           </View>
-          <View style={styles.circleProgressWrapper}>
+          <TouchableOpacity style={styles.circleProgressWrapper} onPress={openProgressModal} activeOpacity={0.7}>
             <CircularProgress
               progress={progressPercent}
               size={72}
@@ -180,7 +210,7 @@ export default function DashboardScreen() {
               labelColor={c.subText}
             />
             <Text style={[styles.circleProgressValue, { color: c.accent }]}>{progressPercent}%</Text>
-          </View>
+          </TouchableOpacity>
         </Animated.View>
 
         {/* Stats Grid 2x2 */}
@@ -394,6 +424,60 @@ export default function DashboardScreen() {
       </ScrollView>
 
       <FAB onPress={() => router.push('/order/new')} />
+
+      {/* Progress Edit Modal */}
+      <Modal visible={showProgressModal} transparent animationType="slide" onRequestClose={() => setShowProgressModal(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalSheet, { backgroundColor: c.bg }]}>
+            <Text style={[styles.modalTitle, { color: c.text }]}>Update Progress ✦</Text>
+            {activeForProgress.length === 0 ? (
+              <Text style={[styles.modalEmpty, { color: c.subText }]}>No active orders to update.</Text>
+            ) : (
+              <ScrollView showsVerticalScrollIndicator={false} style={{ maxHeight: 320 }}>
+                {activeForProgress.map((o) => (
+                  <View key={o.id} style={[styles.progressRow, { borderBottomColor: c.outlineVariant }]}>
+                    <Text style={[styles.progressOrderName, { color: c.text }]} numberOfLines={1}>{o.orderName}</Text>
+                    <View style={styles.progressControls}>
+                      <TouchableOpacity
+                        style={[styles.progressBtn, { backgroundColor: c.surfaceContainer }]}
+                        onPress={() => setProgressEdits((p) => ({ ...p, [o.id]: Math.max(0, (p[o.id] ?? 0) - 10) }))}
+                      >
+                        <Text style={[styles.progressBtnTxt, { color: c.text }]}>−</Text>
+                      </TouchableOpacity>
+                      <TextInput
+                        style={[styles.progressInput, { backgroundColor: c.surfaceLow, color: c.text }]}
+                        value={String(progressEdits[o.id] ?? 0)}
+                        onChangeText={(v) => setProgressEdits((p) => ({ ...p, [o.id]: Math.min(100, Math.max(0, parseInt(v) || 0)) }))}
+                        keyboardType="number-pad"
+                        selectTextOnFocus
+                      />
+                      <Text style={[styles.progressPctLabel, { color: c.subText }]}>%</Text>
+                      <TouchableOpacity
+                        style={[styles.progressBtn, { backgroundColor: c.surfaceContainer }]}
+                        onPress={() => setProgressEdits((p) => ({ ...p, [o.id]: Math.min(100, (p[o.id] ?? 0) + 10) }))}
+                      >
+                        <Text style={[styles.progressBtnTxt, { color: c.text }]}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </ScrollView>
+            )}
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={[styles.modalCancelBtn, { backgroundColor: c.surfaceHigh }]} onPress={() => setShowProgressModal(false)}>
+                <Text style={[styles.modalCancelTxt, { color: c.subText }]}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalSaveBtn, { backgroundColor: c.primaryContainer }, savingProgress && { opacity: 0.5 }]}
+                onPress={saveProgress}
+                disabled={savingProgress}
+              >
+                <Text style={[styles.modalSaveTxt, { color: c.onPrimary }]}>{savingProgress ? 'Saving…' : 'Save'}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -467,4 +551,20 @@ const styles = StyleSheet.create({
   emptyBody: { fontSize: 14, fontFamily: 'DMSans', textAlign: 'center', lineHeight: 22 },
   emptyButton: { borderRadius: 999, paddingHorizontal: 28, paddingVertical: 14, marginTop: 8 },
   emptyButtonText: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 15, fontWeight: '600' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.45)', justifyContent: 'flex-end' },
+  modalSheet: { borderTopLeftRadius: 28, borderTopRightRadius: 28, padding: 28, paddingBottom: 40 },
+  modalTitle: { fontSize: 22, fontFamily: 'PlayfairDisplay', fontWeight: '700', marginBottom: 20 },
+  modalEmpty: { fontFamily: 'DMSans', fontSize: 14, textAlign: 'center', paddingVertical: 20 },
+  progressRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: StyleSheet.hairlineWidth },
+  progressOrderName: { flex: 1, fontSize: 14, fontFamily: 'DMSans', fontWeight: '600', marginRight: 12 },
+  progressControls: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  progressBtn: { width: 34, height: 34, borderRadius: 17, justifyContent: 'center', alignItems: 'center' },
+  progressBtnTxt: { fontFamily: 'DMSans', fontSize: 18, fontWeight: '700', lineHeight: 20 },
+  progressInput: { width: 52, height: 38, borderRadius: 10, textAlign: 'center', fontFamily: 'DMMono', fontSize: 15, fontWeight: '700' },
+  progressPctLabel: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '600' },
+  modalActions: { flexDirection: 'row', gap: 12, marginTop: 24 },
+  modalCancelBtn: { flex: 1, borderRadius: 999, paddingVertical: 14, alignItems: 'center' },
+  modalCancelTxt: { fontFamily: 'DMSans', fontSize: 14, fontWeight: '600' },
+  modalSaveBtn: { flex: 1, borderRadius: 999, paddingVertical: 14, alignItems: 'center' },
+  modalSaveTxt: { fontFamily: 'DMSans', fontSize: 14, fontWeight: '700' },
 });

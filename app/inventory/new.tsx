@@ -49,6 +49,14 @@ export default function NewInventoryProductScreen() {
   const [matCost, setMatCost] = useState('');
   const [matCurrency, setMatCurrency] = useState('INR');
 
+  // Material edit state
+  const [editingMatId, setEditingMatId] = useState<string | null>(null);
+  const [editMatName, setEditMatName] = useState('');
+  const [editMatQty, setEditMatQty] = useState('1');
+  const [editMatUnit, setEditMatUnit] = useState('pieces');
+  const [editMatCost, setEditMatCost] = useState('');
+  const [editMatCurrency, setEditMatCurrency] = useState('INR');
+
   const c = colors;
   const totalCost = materials.reduce((sum, m) => sum + m.costPerUnit * m.quantity, 0);
   const suggestedPrice = totalCost * (parseFloat(markup) || 1.5);
@@ -63,6 +71,31 @@ export default function NewInventoryProductScreen() {
     setMatName(''); setMatQty('1'); setMatCost('');
     setShowAddMaterial(false);
   }, [matName, matQty, matUnit, matCost, matCurrency]);
+
+  const startEditMaterial = useCallback((m: InventoryMaterial) => {
+    setEditingMatId(m.id);
+    setEditMatName(m.name);
+    setEditMatQty(String(m.quantity));
+    setEditMatUnit(m.unit);
+    setEditMatCost(String(m.costPerUnit));
+    setEditMatCurrency(m.currency);
+  }, []);
+
+  const saveEditMaterial = useCallback(() => {
+    if (!editingMatId) return;
+    setMaterials((prev) => prev.map((m) => {
+      if (m.id !== editingMatId) return m;
+      return {
+        ...m,
+        name: editMatName.trim() || m.name,
+        quantity: Math.max(0.01, parseFloat(editMatQty) || m.quantity),
+        unit: editMatUnit,
+        costPerUnit: parseFloat(editMatCost) || m.costPerUnit,
+        currency: editMatCurrency,
+      };
+    }));
+    setEditingMatId(null);
+  }, [editingMatId, editMatName, editMatQty, editMatUnit, editMatCost, editMatCurrency]);
 
   const removeMaterial = (id: string) => setMaterials((prev) => prev.filter((m) => m.id !== id));
 
@@ -151,17 +184,66 @@ export default function NewInventoryProductScreen() {
           <Block title="Materials & Costs" colors={c}>
             <Text style={[s.hint, { color: c.subText }]}>Add all materials that go into making this product.</Text>
             {materials.map((m) => (
-              <View key={m.id} style={[s.materialRow, { borderBottomColor: c.outlineVariant }]}>
-                <View style={{ flex: 1 }}>
-                  <Text style={[s.matName, { color: c.text }]}>{m.name}</Text>
-                  <Text style={[s.matDetail, { color: c.subText }]}>{m.quantity} {m.unit} × {m.currency} {m.costPerUnit.toFixed(2)}</Text>
-                </View>
-                <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                  <Text style={[s.matTotal, { color: c.primary }]}>{m.currency} {(m.costPerUnit * m.quantity).toFixed(2)}</Text>
-                  <TouchableOpacity onPress={() => removeMaterial(m.id)}>
-                    <Text style={{ color: c.error, fontSize: 11, fontFamily: 'DMSans' }}>Remove</Text>
-                  </TouchableOpacity>
-                </View>
+              <View key={m.id}>
+                {editingMatId === m.id ? (
+                  <View style={[s.editMatForm, { backgroundColor: c.surfaceContainer }]}>
+                    <F label="Material Name *" colors={c}>
+                      <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text }]} value={editMatName} onChangeText={setEditMatName} placeholder="Material name" placeholderTextColor={c.outline} />
+                    </F>
+                    <View style={s.row}>
+                      <View style={{ flex: 1 }}>
+                        <F label="Qty" colors={c}>
+                          <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text, marginBottom: 0 }]} value={editMatQty} onChangeText={setEditMatQty} keyboardType="decimal-pad" placeholder="1" placeholderTextColor={c.outline} />
+                        </F>
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <F label="Cost/unit" colors={c}>
+                          <TextInput style={[s.input, { fontWeight: '700', backgroundColor: c.surfaceLow, color: c.text, marginBottom: 0 }]} value={editMatCost} onChangeText={setEditMatCost} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor={c.outline} />
+                        </F>
+                      </View>
+                    </View>
+                    <F label="Unit" colors={c}>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                        {UNITS.map((u) => (
+                          <TouchableOpacity key={u} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, editMatUnit === u && { backgroundColor: c.primary }]} onPress={() => setEditMatUnit(u)}>
+                            <Text style={[s.miniChipTxt, { color: c.subText }, editMatUnit === u && { color: c.onPrimary }]}>{u}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </F>
+                    <F label="Currency" colors={c}>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                        {CURRENCIES.map((cur) => (
+                          <TouchableOpacity key={cur} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, editMatCurrency === cur && { backgroundColor: c.primary }]} onPress={() => setEditMatCurrency(cur)}>
+                            <Text style={[s.miniChipTxt, { color: c.subText }, editMatCurrency === cur && { color: c.onPrimary }]}>{cur}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </F>
+                    <View style={s.row}>
+                      <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.primaryContainer }]} onPress={saveEditMaterial}><Text style={[s.btnTxt, { color: c.onPrimary }]}>Done</Text></TouchableOpacity>
+                      <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.surfaceHigh }]} onPress={() => setEditingMatId(null)}><Text style={[s.btnTxt, { color: c.subText }]}>Cancel</Text></TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={[s.materialRow, { borderBottomColor: c.outlineVariant }]}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[s.matName, { color: c.text }]}>{m.name}</Text>
+                      <Text style={[s.matDetail, { color: c.subText }]}>{m.quantity} {m.unit} × {m.currency} {m.costPerUnit.toFixed(2)}</Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                      <Text style={[s.matTotal, { color: c.primary }]}>{m.currency} {(m.costPerUnit * m.quantity).toFixed(2)}</Text>
+                      <View style={{ flexDirection: 'row', gap: 10 }}>
+                        <TouchableOpacity onPress={() => startEditMaterial(m)}>
+                          <Text style={{ color: c.primary, fontSize: 11, fontFamily: 'DMSans' }}>Edit</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => removeMaterial(m.id)}>
+                          <Text style={{ color: c.error, fontSize: 11, fontFamily: 'DMSans' }}>Remove</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                )}
               </View>
             ))}
 
@@ -181,40 +263,34 @@ export default function NewInventoryProductScreen() {
                 </F>
                 <View style={s.row}>
                   <View style={{ flex: 1 }}>
-                    <F label="Quantity" colors={c}>
-                      <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text }]} value={matQty} onChangeText={setMatQty} keyboardType="decimal-pad" placeholder="1" placeholderTextColor={c.outline} />
+                    <F label="Qty" colors={c}>
+                      <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text, marginBottom: 0 }]} value={matQty} onChangeText={setMatQty} keyboardType="decimal-pad" placeholder="1" placeholderTextColor={c.outline} />
                     </F>
                   </View>
-                  <View style={{ flex: 1.5 }}>
-                    <F label="Unit" colors={c}>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {UNITS.map((u) => (
-                          <TouchableOpacity key={u} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matUnit === u && { backgroundColor: c.primary }]} onPress={() => setMatUnit(u)}>
-                            <Text style={[s.miniChipTxt, { color: c.subText }, matUnit === u && { color: c.onPrimary }]}>{u}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </F>
-                  </View>
-                </View>
-                <View style={s.row}>
                   <View style={{ flex: 1 }}>
                     <F label="Cost per unit" colors={c}>
-                      <TextInput style={[s.input, { fontWeight: '700', backgroundColor: c.surfaceLow, color: c.text }]} value={matCost} onChangeText={setMatCost} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor={c.outline} />
-                    </F>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <F label="Currency" colors={c}>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        {CURRENCIES.map((cur) => (
-                          <TouchableOpacity key={cur} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matCurrency === cur && { backgroundColor: c.primary }]} onPress={() => setMatCurrency(cur)}>
-                            <Text style={[s.miniChipTxt, { color: c.subText }, matCurrency === cur && { color: c.onPrimary }]}>{cur}</Text>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
+                      <TextInput style={[s.input, { fontWeight: '700', backgroundColor: c.surfaceLow, color: c.text, marginBottom: 0 }]} value={matCost} onChangeText={setMatCost} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor={c.outline} />
                     </F>
                   </View>
                 </View>
+                <F label="Unit" colors={c}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                    {UNITS.map((u) => (
+                      <TouchableOpacity key={u} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matUnit === u && { backgroundColor: c.primary }]} onPress={() => setMatUnit(u)}>
+                        <Text style={[s.miniChipTxt, { color: c.subText }, matUnit === u && { color: c.onPrimary }]}>{u}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </F>
+                <F label="Currency" colors={c}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 8 }}>
+                    {CURRENCIES.map((cur) => (
+                      <TouchableOpacity key={cur} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matCurrency === cur && { backgroundColor: c.primary }]} onPress={() => setMatCurrency(cur)}>
+                        <Text style={[s.miniChipTxt, { color: c.subText }, matCurrency === cur && { color: c.onPrimary }]}>{cur}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                </F>
                 <View style={s.row}>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.primaryContainer }]} onPress={addMaterial}><Text style={[s.btnTxt, { color: c.onPrimary }]}>Add Material</Text></TouchableOpacity>
                   <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.surfaceHigh }]} onPress={() => setShowAddMaterial(false)}><Text style={[s.btnTxt, { color: c.subText }]}>Cancel</Text></TouchableOpacity>
@@ -339,6 +415,7 @@ const s = StyleSheet.create({
   addMatBtn: { borderRadius: 16, paddingVertical: 16, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', marginBottom: 12 },
   addMatBtnTxt: { fontFamily: 'DMSans', fontSize: 14, fontWeight: '500' },
   addMatForm: { borderRadius: 16, padding: 12, marginBottom: 12 },
+  editMatForm: { borderRadius: 16, padding: 12, marginBottom: 12 },
   btn: { borderRadius: 999, paddingVertical: 14, alignItems: 'center', justifyContent: 'center' },
   btnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
   miniChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, marginRight: 6 },

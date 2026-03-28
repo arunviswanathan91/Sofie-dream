@@ -325,35 +325,40 @@ export default function InventoryProductScreen() {
         </View>
 
         {/* Markup */}
-        {editing && (
-          <View style={s.section}>
-            <Text style={[s.sectionTitle, { color: c.text }]}>Pricing & Markup</Text>
-            <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
-              {/* Markup explanation */}
-              <View style={[s.markupExplainer, { backgroundColor: c.surfaceContainer }]}>
-                <Text style={[s.markupExplainerTitle, { color: c.primary }]}>What is markup?</Text>
-                <Text style={[s.markupExplainerBody, { color: c.subText }]}>
-                  Markup multiplies your material cost to set a selling price.{'\n'}
-                  • 1.0 = sell at cost (no profit){'\n'}
-                  • 1.5 = 50% profit above material cost{'\n'}
-                  • 2.0 = double your material cost{'\n'}
-                  For example, if materials cost {currency} 100 and markup is 1.5, suggested price = {currency} 150.
-                </Text>
-              </View>
+        <View style={s.section}>
+          <Text style={[s.sectionTitle, { color: c.text }]}>Pricing & Markup</Text>
+          <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
+            {/* Always show explainer */}
+            <View style={[s.markupExplainer, { backgroundColor: c.surfaceContainer }]}>
+              <Text style={[s.markupExplainerTitle, { color: c.primary }]}>What is markup?</Text>
+              <Text style={[s.markupExplainerBody, { color: c.subText }]}>
+                Markup multiplies your material cost to set a selling price.{'\n'}
+                • 1.0 = sell at cost (no profit){'\n'}
+                • 1.5 = 50% profit above material cost{'\n'}
+                • 2.0 = double your material cost{'\n'}
+                Example: materials cost {currency} 100 × markup 1.5 = {currency} 150 selling price.
+              </Text>
+            </View>
+            {editing ? (
               <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text, marginTop: 8 }]} value={markup} onChangeText={setMarkup} keyboardType="decimal-pad" placeholder="1.5" placeholderTextColor={c.outline} />
-              <View style={[s.pricingInfo, { backgroundColor: c.surfaceContainer }]}>
-                <View style={s.pricingRow}>
-                  <Text style={[s.pricingLabel, { color: c.subText }]}>Material Cost</Text>
-                  <Text style={[s.pricingVal, { color: c.text }]}>{currency} {totalCost.toFixed(2)}</Text>
-                </View>
-                <View style={s.pricingRow}>
-                  <Text style={[s.pricingLabel, { color: c.subText, fontWeight: '700' }]}>Suggested Price</Text>
-                  <Text style={[s.pricingVal, { color: c.accent, fontWeight: '700' }]}>{currency} {suggestedPrice.toFixed(2)}</Text>
-                </View>
+            ) : (
+              <View style={s.pricingRow}>
+                <Text style={[s.pricingLabel, { color: c.subText }]}>Markup</Text>
+                <Text style={[s.pricingVal, { color: c.text, fontWeight: '700' }]}>{product.markup}× ({((product.markup - 1) * 100).toFixed(0)}% profit)</Text>
+              </View>
+            )}
+            <View style={[s.pricingInfo, { backgroundColor: c.surfaceContainer }]}>
+              <View style={s.pricingRow}>
+                <Text style={[s.pricingLabel, { color: c.subText }]}>Material Cost</Text>
+                <Text style={[s.pricingVal, { color: c.text }]}>{currency} {(editing ? totalCost : product.totalMaterialCost).toFixed(2)}</Text>
+              </View>
+              <View style={s.pricingRow}>
+                <Text style={[s.pricingLabel, { color: c.subText, fontWeight: '700' }]}>Suggested Price</Text>
+                <Text style={[s.pricingVal, { color: c.accent, fontWeight: '700' }]}>{currency} {(editing ? suggestedPrice : product.suggestedPrice).toFixed(2)}</Text>
               </View>
             </View>
           </View>
-        )}
+        </View>
 
         {/* Notes */}
         <View style={s.section}>
