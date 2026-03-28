@@ -4,7 +4,7 @@
  * and as a read-cache when offline.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Order, Customer, CraftCategory, NotificationPrefs, BusinessProfile } from '../types';
+import type { Order, Customer, CraftCategory, NotificationPrefs, BusinessProfile, InventoryProduct } from '../types';
 import { DEFAULT_CATEGORIES, DEFAULT_NOTIFICATION_PREFS, DEFAULT_BUSINESS_PROFILE } from '../types';
 
 const KEYS = {
@@ -13,6 +13,7 @@ const KEYS = {
   categories: 'sofi:categories',
   notifPrefs: 'sofi:notif_prefs',
   profile: 'sofi:profile',
+  inventory: 'sofi:inventory',
 };
 
 // ─── Orders ────────────────────────────────────────────────────
@@ -86,6 +87,43 @@ export async function getLocalProfile(): Promise<BusinessProfile> {
 
 export async function saveLocalProfile(profile: BusinessProfile): Promise<void> {
   await AsyncStorage.setItem(KEYS.profile, JSON.stringify(profile));
+}
+
+// ─── Inventory ─────────────────────────────────────────────────
+export async function getLocalInventory(): Promise<InventoryProduct[]> {
+  const raw = await AsyncStorage.getItem(KEYS.inventory);
+  if (!raw) return [];
+  const parsed = JSON.parse(raw) as InventoryProduct[];
+  return parsed.map((p) => ({
+    ...p,
+    createdAt: new Date(p.createdAt),
+    updatedAt: new Date(p.updatedAt),
+    nextReminderDate: p.nextReminderDate ? new Date(p.nextReminderDate) : undefined,
+  }));
+}
+
+export async function saveLocalInventory(products: InventoryProduct[]): Promise<void> {
+  await AsyncStorage.setItem(KEYS.inventory, JSON.stringify(products));
+}
+
+export async function addLocalInventoryProduct(product: InventoryProduct): Promise<void> {
+  const products = await getLocalInventory();
+  products.unshift(product);
+  await saveLocalInventory(products);
+}
+
+export async function updateLocalInventoryProduct(id: string, updates: Partial<InventoryProduct>): Promise<void> {
+  const products = await getLocalInventory();
+  const idx = products.findIndex((p) => p.id === id);
+  if (idx !== -1) {
+    products[idx] = { ...products[idx], ...updates, updatedAt: new Date() };
+    await saveLocalInventory(products);
+  }
+}
+
+export async function deleteLocalInventoryProduct(id: string): Promise<void> {
+  const products = await getLocalInventory();
+  await saveLocalInventory(products.filter((p) => p.id !== id));
 }
 
 // ─── Helpers ───────────────────────────────────────────────────

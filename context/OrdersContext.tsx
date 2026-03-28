@@ -82,6 +82,8 @@ function orderFromFirestore(data: Record<string, unknown>, id: string): Order {
     tags: (data.tags as string[]) ?? [],
     craftCategory: (data.craftCategory as string) ?? '',
     internalNotes: (data.internalNotes as string) || undefined,
+    orderItems: (data.orderItems as import('../types').OrderItem[]) ?? undefined,
+    completionPercent: (data.completionPercent as number) ?? 0,
   };
 }
 
@@ -133,6 +135,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
         createdAt: new Date(),
         photos: formData.photos ?? [],
         tags: formData.tags ?? [],
+        orderItems: formData.orderItems ?? [],
+        completionPercent: formData.completionPercent ?? 0,
       };
       await addLocalOrder(order);
       // Update shared state immediately
@@ -148,6 +152,8 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       dueDate: Timestamp.fromDate(new Date(formData.dueDate)),
       photos: formData.photos ?? [],
       tags: formData.tags ?? [],
+      orderItems: formData.orderItems ?? [],
+      completionPercent: formData.completionPercent ?? 0,
       sourceLink: formData.sourceLink ?? null,
       customerPhone: formData.customerPhone ?? null,
       customerInstagram: formData.customerInstagram ?? null,

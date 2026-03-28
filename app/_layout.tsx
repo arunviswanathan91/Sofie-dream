@@ -8,6 +8,8 @@ import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { OrdersProvider } from '../context/OrdersContext';
 import { ProfileProvider } from '../context/ProfileContext';
+import { NotificationsProvider } from '../context/NotificationsContext';
+import { InventoryProvider } from '../context/InventoryContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { SplashOverlay } from '../components/SplashOverlay';
 
@@ -53,6 +55,9 @@ function InnerLayout() {
         <Stack.Screen name="reports/index" options={{ headerShown: false }} />
         <Stack.Screen name="notifications" options={{ presentation: 'modal', headerShown: false, animation: 'fade_from_bottom' }} />
         <Stack.Screen name="backup/index" options={{ headerShown: false }} />
+        <Stack.Screen name="inventory/index" options={{ headerShown: false }} />
+        <Stack.Screen name="inventory/new" options={{ presentation: 'modal', headerShown: false, animation: 'fade_from_bottom' }} />
+        <Stack.Screen name="inventory/[id]" options={{ headerShown: false }} />
       </Stack>
 
       {/* Animated splash overlay — sits on top of everything */}
@@ -87,7 +92,11 @@ export default function RootLayout() {
     <ThemeProvider>
       <OrdersProvider>
         <ProfileProvider>
-          <InnerLayout />
+          <NotificationsProvider>
+            <InventoryProvider>
+              <InnerLayout />
+            </InventoryProvider>
+          </NotificationsProvider>
         </ProfileProvider>
       </OrdersProvider>
     </ThemeProvider>

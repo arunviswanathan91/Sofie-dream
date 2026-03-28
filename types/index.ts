@@ -1,5 +1,41 @@
 export type OrderStatus = 'request' | 'accepted' | 'shipped' | 'delivered' | 'cancelled';
 
+export interface OrderItem {
+  id: string;
+  name: string;
+  description?: string;
+  quantity: number;
+  price: number; // per unit
+}
+
+// ─── Inventory ──────────────────────────────────────────────────
+export interface InventoryMaterial {
+  id: string;
+  name: string;          // e.g. "Red Yarn"
+  quantity: number;      // amount used per product
+  unit: string;          // "grams" | "meters" | "pieces" | "skeins" | etc.
+  costPerUnit: number;   // cost per 1 unit
+  currency: string;
+}
+
+export interface InventoryProduct {
+  id: string;
+  name: string;          // e.g. "Rope Lamp"
+  description?: string;
+  category?: string;
+  emoji?: string;
+  materials: InventoryMaterial[];
+  totalMaterialCost: number; // auto-calculated
+  markup: number;            // e.g. 1.5 = 50% markup over material cost
+  suggestedPrice: number;    // totalMaterialCost * markup
+  notes?: string;
+  remindInterval?: number;   // numeric part (e.g. 2)
+  remindUnit?: 'days' | 'weeks' | 'months';
+  nextReminderDate?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Order {
   id: string;
   // Core Info
@@ -7,6 +43,9 @@ export interface Order {
   description: string;
   photos: string[];
   sourceLink?: string;
+
+  // Multiple items
+  orderItems?: OrderItem[];
 
   // Customer
   customerName: string;
@@ -37,6 +76,9 @@ export interface Order {
   // Categorization
   tags: string[];
   craftCategory: string;
+
+  // Completion tracking (0-100)
+  completionPercent?: number;
 
   // Notes
   internalNotes?: string;
@@ -122,6 +164,7 @@ export interface OrderFormData {
   description: string;
   photos: string[];
   sourceLink?: string;
+  orderItems?: OrderItem[];
   customerName: string;
   customerAddress: string;
   deliveryTime: string;
@@ -134,6 +177,7 @@ export interface OrderFormData {
   dueDate: Date;
   tags: string[];
   craftCategory: string;
+  completionPercent?: number;
   internalNotes?: string;
 }
 

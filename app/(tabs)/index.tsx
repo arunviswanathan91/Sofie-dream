@@ -148,10 +148,13 @@ export default function DashboardScreen() {
 
   const dailyQuote = getDailyQuote();
 
-  // Circular progress calculation
-  const progressPercent = activeOrders > 0
-    ? Math.min(Math.round((shippedCount / (activeOrders + shippedCount)) * 100), 100)
-    : 0;
+  // Circular progress — average completionPercent of all non-cancelled/delivered orders
+  const progressPercent = useMemo(() => {
+    const active = orders.filter((o) => o.status !== 'cancelled' && o.status !== 'delivered');
+    if (active.length === 0) return shippedCount > 0 ? 100 : 0;
+    const avg = active.reduce((sum, o) => sum + (o.completionPercent ?? 0), 0) / active.length;
+    return Math.min(Math.round(avg), 100);
+  }, [orders, shippedCount]);
 
   if (loading) {
     return (
@@ -164,9 +167,9 @@ export default function DashboardScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       {/* Top bar with notification bell */}
-      <View style={styles.topBar}>
+      <View style={[styles.topBar, { backgroundColor: colors.bg }]}>
         <Text style={styles.topBarTitle}>Artisan Studio</Text>
         <TouchableOpacity
           style={styles.topBarBell}
@@ -275,17 +278,25 @@ export default function DashboardScreen() {
             >
               <Text style={styles.quickActionPrimaryText}>+ New Order</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionSecondary} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={styles.quickActionSecondary}
+              onPress={() => router.push('/order/new')}
+              activeOpacity={0.85}
+            >
               <Text style={styles.quickActionSecondaryText}>Add Customer</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.quickActionSecondary}
-              onPress={() => router.push('/(tabs)/orders')}
+              onPress={() => router.push('/reports')}
               activeOpacity={0.85}
             >
               <Text style={styles.quickActionSecondaryText}>View Reports</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.quickActionSecondary} activeOpacity={0.85}>
+            <TouchableOpacity
+              style={styles.quickActionSecondary}
+              onPress={() => router.push('/backup')}
+              activeOpacity={0.85}
+            >
               <Text style={styles.quickActionSecondaryText}>Export PDF</Text>
             </TouchableOpacity>
           </ScrollView>
@@ -697,13 +708,12 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 280,
   },
-  // Needs attention wrapper with left border
+  // Needs attention wrapper — just a left accent, no radius/overflow to avoid double border
   attentionCardWrapper: {
-    borderLeftWidth: 4,
+    borderLeftWidth: 3,
     borderLeftColor: T.tertiary,
+    marginBottom: 8,
     borderRadius: 16,
-    overflow: 'hidden',
-    marginBottom: 4,
   },
   // Horizontal mini cards
   horizontalScroll: {

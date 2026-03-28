@@ -92,6 +92,23 @@ export function generateInvoiceHTML(
   const invoiceNum = invoiceNumber ?? `INV-${format(new Date(), 'yyyy')}-${order.id.slice(0, 6).toUpperCase()}`;
   const today = format(new Date(), 'MMM d, yyyy');
 
+  // Build item rows — either from orderItems array or single line
+  const hasItems = order.orderItems && order.orderItems.length > 0;
+  const itemRows = hasItems
+    ? order.orderItems!.map((item) => `
+      <tr>
+        <td><strong>${item.name}</strong>${item.description ? `<br/><span style="font-size:11px;color:#8A7B72">${item.description}</span>` : ''}</td>
+        <td style="text-align:center">${item.quantity}</td>
+        <td style="text-align:right;font-family:monospace">${currencySymbol}${item.price.toFixed(2)}</td>
+        <td style="text-align:right;font-family:monospace">${currencySymbol}${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>`).join('')
+    : `<tr>
+        <td><strong>${order.orderName}</strong>${order.description ? `<br/><span style="font-size:11px;color:#8A7B72">${order.description}</span>` : ''}</td>
+        <td style="text-align:center">1</td>
+        <td style="text-align:right;font-family:monospace">${currencySymbol}${order.askingPrice.toFixed(2)}</td>
+        <td style="text-align:right;font-family:monospace">${currencySymbol}${order.askingPrice.toFixed(2)}</td>
+      </tr>`;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -146,24 +163,19 @@ export function generateInvoiceHTML(
     <thead>
       <tr>
         <th>Item</th>
-        <th>Description</th>
-        <th style="text-align:right">Price</th>
+        <th style="text-align:center">Qty</th>
+        <th style="text-align:right">Unit Price</th>
+        <th style="text-align:right">Amount</th>
       </tr>
     </thead>
-    <tbody>
-      <tr>
-        <td><strong>${order.orderName}</strong></td>
-        <td>${order.description ?? ''}</td>
-        <td style="text-align:right; font-family:monospace">${currencySymbol}${order.askingPrice.toFixed(2)}</td>
-      </tr>
-    </tbody>
+    <tbody>${itemRows}</tbody>
     <tfoot>
       <tr class="total-row">
-        <td colspan="2" style="text-align:right; padding-top:16px">Total Due</td>
+        <td colspan="3" style="text-align:right; padding-top:16px">Total Due</td>
         <td style="text-align:right; font-family:monospace">${currencySymbol}${order.askingPrice.toFixed(2)}</td>
       </tr>
       <tr>
-        <td colspan="3" style="text-align:right; padding-top:8px">
+        <td colspan="4" style="text-align:right; padding-top:8px">
           <span class="status-badge ${order.isPaid ? 'status-paid' : 'status-unpaid'}">
             ${order.isPaid ? '● PAID' : '○ UNPAID'}
           </span>
@@ -198,6 +210,7 @@ export function generateMonthlyReportHTML(
     .map(
       (o) => `
     <tr>
+      <td>${o.invoiceNumber ?? '—'}</td>
       <td>${o.orderName}</td>
       <td>${o.customerName}</td>
       <td>${o.craftCategory}</td>
@@ -265,6 +278,7 @@ export function generateMonthlyReportHTML(
   <table>
     <thead>
       <tr>
+        <th>Invoice #</th>
         <th>Order</th>
         <th>Customer</th>
         <th>Category</th>

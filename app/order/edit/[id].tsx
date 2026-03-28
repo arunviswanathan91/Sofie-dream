@@ -45,6 +45,7 @@ interface FormState {
   dueDate: Date;
   dueDateText: string;
   internalNotes: string;
+  completionPercent: number;
 }
 
 export default function EditOrderScreen() {
@@ -77,6 +78,7 @@ export default function EditOrderScreen() {
     dueDate: order ? new Date(order.dueDate) : new Date(),
     dueDateText: order ? format(new Date(order.dueDate), 'yyyy-MM-dd') : '',
     internalNotes: order?.internalNotes ?? '',
+    completionPercent: order?.completionPercent ?? 0,
   }));
 
   const [saving, setSaving] = useState(false);
@@ -108,6 +110,7 @@ export default function EditOrderScreen() {
         dueDate: new Date(order.dueDate),
         dueDateText: format(new Date(order.dueDate), 'yyyy-MM-dd'),
         internalNotes: order.internalNotes ?? '',
+        completionPercent: order.completionPercent ?? 0,
       });
     }
   // Only run once when order first becomes available
@@ -170,6 +173,7 @@ export default function EditOrderScreen() {
         paymentNotes: form.paymentNotes.trim() || undefined,
         dueDate: form.dueDate,
         internalNotes: form.internalNotes.trim() || undefined,
+        completionPercent: form.completionPercent,
       });
       router.back();
     } catch (e) {
@@ -387,6 +391,24 @@ export default function EditOrderScreen() {
               <Text style={styles.dueDatePreview}>
                 Due: {format(form.dueDate, 'EEEE, MMMM d, yyyy')}
               </Text>
+            </Field>
+            <Field label={`Completion: ${form.completionPercent}%`}>
+              <View style={{ marginBottom: 12 }}>
+                <View style={{ height: 8, backgroundColor: '#D5C2C5', borderRadius: 4, marginBottom: 10, overflow: 'hidden' }}>
+                  <View style={{ height: 8, backgroundColor: '#994530', borderRadius: 4, width: `${form.completionPercent}%` }} />
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                  {[0, 25, 50, 75, 100].map((v) => (
+                    <TouchableOpacity
+                      key={v}
+                      style={{ paddingHorizontal: 10, paddingVertical: 7, borderRadius: 999, backgroundColor: form.completionPercent === v ? '#994530' : '#E8E1DE' }}
+                      onPress={() => set('completionPercent', v)}
+                    >
+                      <Text style={{ fontSize: 12, fontFamily: 'DMSans', fontWeight: '600', color: form.completionPercent === v ? '#FFFFFF' : '#514346' }}>{v}%</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
             </Field>
             <Field label="Internal Notes">
               <TextInput

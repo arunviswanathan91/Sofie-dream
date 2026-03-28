@@ -57,7 +57,11 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
       setProfile(next);
       await saveLocalProfile(next);
       if (isFirebaseConfigured) {
-        await setDoc(doc(db, 'settings', 'profile'), next, { merge: true });
+        try {
+          await setDoc(doc(db, 'settings', 'profile'), next, { merge: true });
+        } catch {
+          // Firebase sync failed — local save already succeeded, ignore
+        }
       }
     },
     [profile]

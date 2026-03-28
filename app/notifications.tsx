@@ -53,11 +53,12 @@ const SEC_ICONS: Record<string, { icon: string; bg: string }> = {
 export default function NotificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { prefs, updatePrefs, testNotification } = useNotifications();
+  const { prefs, loading, updatePrefs, testNotification } = useNotifications();
   const { colors } = useTheme();
 
   // Local draft state — only committed on Save
   const [draft, setDraft] = useState({ ...prefs });
+  const [initialized, setInitialized] = useState(false);
 
   // Local text fields
   const [dueAlertTime, setDueAlertTime] = useState(prefs.dueSoonAlerts.time);
@@ -66,15 +67,19 @@ export default function NotificationsScreen() {
   const [shipDays, setShipDays] = useState(String(prefs.shippingReminder.daysAfterAccepted));
   const [payDays, setPayDays] = useState(String(prefs.paymentReminder.daysAfterDelivery));
 
+  // Sync draft once context finishes loading (avoids stale defaults)
   useEffect(() => {
-    setDraft({ ...prefs });
-    setDueAlertTime(prefs.dueSoonAlerts.time);
-    setDigestTime(prefs.dailyDigest.time);
-    setWeeklyTime(prefs.weeklySummary.time);
-    setShipDays(String(prefs.shippingReminder.daysAfterAccepted));
-    setPayDays(String(prefs.paymentReminder.daysAfterDelivery));
+    if (!loading && !initialized) {
+      setDraft({ ...prefs });
+      setDueAlertTime(prefs.dueSoonAlerts.time);
+      setDigestTime(prefs.dailyDigest.time);
+      setWeeklyTime(prefs.weeklySummary.time);
+      setShipDays(String(prefs.shippingReminder.daysAfterAccepted));
+      setPayDays(String(prefs.paymentReminder.daysAfterDelivery));
+      setInitialized(true);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [loading, initialized]);
 
   const set = useCallback(<K extends keyof typeof draft>(key: K, val: (typeof draft)[K]) => {
     setDraft((d) => ({ ...d, [key]: val }));

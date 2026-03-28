@@ -2,14 +2,10 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../context/ThemeContext';
 
-// Design tokens
-const T = {
-  bg: 'rgba(255,248,245,0.95)',
-  borderTop: '#E8E1DC',
-  active: '#994530',
-  inactive: 'rgba(134,77,95,0.4)',
-};
+const ACTIVE = '#994530';
+const INACTIVE = 'rgba(134,77,95,0.4)';
 
 interface TabIconProps {
   name: keyof typeof Ionicons.glyphMap;
@@ -23,7 +19,7 @@ function TabIcon({ name, label, focused }: TabIconProps) {
       <Ionicons
         name={focused ? name : (`${name}-outline` as keyof typeof Ionicons.glyphMap)}
         size={24}
-        color={focused ? T.active : T.inactive}
+        color={focused ? ACTIVE : INACTIVE}
       />
       <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
         {label}
@@ -34,13 +30,15 @@ function TabIcon({ name, label, focused }: TabIconProps) {
 }
 
 export default function TabsLayout() {
+  const { colors } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: T.bg,
-          borderTopColor: T.borderTop,
+          backgroundColor: colors.tabBar,
+          borderTopColor: colors.cardBorder,
           borderTopWidth: 0.5,
           height: 72,
           paddingBottom: 12,
@@ -99,19 +97,19 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     fontFamily: 'DMSans',
-    color: T.inactive,
+    color: INACTIVE,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   tabLabelFocused: {
-    color: T.active,
+    color: ACTIVE,
     fontWeight: '700',
   },
   dot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: T.active,
+    backgroundColor: ACTIVE,
     marginTop: 2,
   },
 });

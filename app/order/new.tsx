@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import {
   View, Text, TextInput, ScrollView, StyleSheet,
   TouchableOpacity, Switch, Alert, KeyboardAvoidingView, Platform, Keyboard,
@@ -12,7 +12,9 @@ import { useOrders } from '../../hooks/useOrders';
 import { useCategories } from '../../hooks/useCategories';
 import { useTheme } from '../../context/ThemeContext';
 import { TagChip } from '../../components/TagChip';
-import { Colors, Spacing, BorderRadius } from '../../lib/theme';
+import type { OrderItem } from '../../types';
+import { generateId } from '../../lib/localStore';
+import { useInventory } from '../../context/InventoryContext';
 
 // Design tokens — Stitch "Warm Artisan Editorial"
 const T = {
@@ -32,6 +34,7 @@ const T = {
   subText: '#514346',
   outline: '#837376',
   outlineVariant: '#D5C2C5',
+  error: '#BA1A1A',
 };
 
 const CURRENCIES = ['EUR', 'GBP', 'USD', 'CHF', 'INR'];
@@ -44,6 +47,7 @@ interface FormState {
   customerInstagram: string; deliveryTime: string; askingPrice: string;
   currency: string; isPaid: boolean; paymentNotes: string;
   dueDateText: string; internalNotes: string;
+  completionPercent: number;
 }
 
 const INITIAL: FormState = {
@@ -52,6 +56,7 @@ const INITIAL: FormState = {
   customerInstagram: '', deliveryTime: '', askingPrice: '', currency: 'EUR',
   isPaid: false, paymentNotes: '',
   dueDateText: format(addDays(new Date(), 7), 'yyyy-MM-dd'), internalNotes: '',
+  completionPercent: 0,
 };
 
 export default function NewOrderScreen() {
@@ -60,9 +65,18 @@ export default function NewOrderScreen() {
   const insets = useSafeAreaInsets();
   const { categories } = useCategories();
   const { colors } = useTheme();
+  const { products: inventoryProducts } = useInventory();
   const [form, setForm] = useState<FormState>(INITIAL);
   const [customTag, setCustomTag] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Multiple order items
+  const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemDesc, setNewItemDesc] = useState('');
+  const [newItemQty, setNewItemQty] = useState('1');
+  const [newItemPrice, setNewItemPrice] = useState('');
 
   const set = useCallback(<K extends keyof FormState>(key: K, val: FormState[K]) => {
     setForm((p) => ({ ...p, [key]: val }));
@@ -79,6 +93,32 @@ export default function NewOrderScreen() {
     if (!r.canceled && r.assets[0]) set('photos', [...form.photos, r.assets[0].uri]);
   }, [form.photos, set]);
 
+  const addItem = useCallback(() => {
+    const name = newItemName.trim();
+    if (!name) { Alert.alert('Required', 'Item name is required.'); return; }
+    const qty = Math.max(1, parseInt(newItemQty) || 1);
+    const price = parseFloat(newItemPrice) || 0;
+    const item: OrderItem = { id: generateId(), name, description: newItemDesc.trim() || undefined, quantity: qty, price };
+    setOrderItems((prev) => [...prev, item]);
+    // Auto-update asking price to sum of items
+    const newTotal = [...orderItems, item].reduce((sum, it) => sum + it.price * it.quantity, 0);
+    if (newTotal > 0) set('askingPrice', newTotal.toFixed(2));
+    setNewItemName('');
+    setNewItemDesc('');
+    setNewItemQty('1');
+    setNewItemPrice('');
+    setShowAddItem(false);
+  }, [newItemName, newItemDesc, newItemQty, newItemPrice, orderItems, set]);
+
+  const removeItem = useCallback((id: string) => {
+    setOrderItems((prev) => {
+      const next = prev.filter((i) => i.id !== id);
+      const newTotal = next.reduce((sum, it) => sum + it.price * it.quantity, 0);
+      if (newTotal > 0) set('askingPrice', newTotal.toFixed(2));
+      return next;
+    });
+  }, [set]);
+
   const parsedDue = (() => { const d = new Date(form.dueDateText); return isNaN(d.getTime()) ? addDays(new Date(), 7) : d; })();
 
   const save = useCallback(async () => {
@@ -91,26 +131,40 @@ export default function NewOrderScreen() {
         orderName: form.orderName.trim(), description: form.description.trim(),
         craftCategory: form.craftCategory, tags: form.tags, photos: form.photos,
         sourceLink: form.sourceLink.trim() || undefined,
+        orderItems: orderItems.length > 0 ? orderItems : undefined,
         customerName: form.customerName.trim(), customerAddress: form.customerAddress.trim(),
         deliveryTime: form.deliveryTime.trim(), customerPhone: form.customerPhone.trim() || undefined,
         customerInstagram: form.customerInstagram.trim() || undefined,
         askingPrice: parseFloat(form.askingPrice) || 0, currency: form.currency,
         isPaid: form.isPaid, paymentNotes: form.paymentNotes.trim() || undefined,
         dueDate: parsedDue, internalNotes: form.internalNotes.trim() || undefined,
+        completionPercent: form.completionPercent,
       });
       router.replace(`/order/${id}`);
     } catch (e) {
       Alert.alert('Error', `Could not save: ${(e as Error).message}`);
       setSaving(false);
     }
-  }, [form, parsedDue, addOrder, router]);
+  }, [form, parsedDue, orderItems, addOrder, router]);
+
+  const itemsTotal = orderItems.reduce((sum, it) => sum + it.price * it.quantity, 0);
+
+  // Find matching inventory product by name (soft match)
+  const inventoryMatch = useMemo(() => {
+    if (!form.orderName.trim()) return null;
+    const q = form.orderName.trim().toLowerCase();
+    return inventoryProducts.find((p) => p.name.toLowerCase().includes(q) || q.includes(p.name.toLowerCase())) ?? null;
+  }, [form.orderName, inventoryProducts]);
+  const inventorySuggestedPrice = inventoryMatch?.suggestedPrice ?? 0;
+  const askingPriceNum = parseFloat(form.askingPrice) || 0;
+  const inventoryWarning = inventoryMatch && askingPriceNum > 0 && askingPriceNum < inventorySuggestedPrice;
 
   return (
-    <SafeAreaView style={s.container}>
+    <SafeAreaView style={[s.container, { backgroundColor: colors.bg }]}>
       {/* Header */}
-      <View style={s.header}>
+      <View style={[s.header, { backgroundColor: colors.bg }]}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={12}>
-          <Text style={s.cancel}>Cancel</Text>
+          <Text style={[s.cancel, { color: colors.subText }]}>Cancel</Text>
         </TouchableOpacity>
         <Text style={s.headerTitle}>New Order</Text>
         <TouchableOpacity onPress={save} style={[s.saveBtn, saving && { opacity: 0.5 }]} disabled={saving}>
@@ -121,7 +175,7 @@ export default function NewOrderScreen() {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView keyboardShouldPersistTaps="always" showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80 }}>
 
-          <Block title="Order Details">
+          <Block title="Order Details" colors={colors}>
             <F label="Order Name *"><TextInput style={s.input} value={form.orderName} onChangeText={(v) => set('orderName', v)} placeholder="e.g. Floral Hoodie Set" placeholderTextColor={T.outline} /></F>
             <F label="Description"><TextInput style={[s.input, s.multi]} value={form.description} onChangeText={(v) => set('description', v)} placeholder="Describe the order…" placeholderTextColor={T.outline} multiline numberOfLines={3} textAlignVertical="top" /></F>
 
@@ -153,7 +207,56 @@ export default function NewOrderScreen() {
             <F label="Source Link (optional)"><TextInput style={s.input} value={form.sourceLink} onChangeText={(v) => set('sourceLink', v)} placeholder="Instagram / WhatsApp link" placeholderTextColor={T.outline} autoCapitalize="none" keyboardType="url" /></F>
           </Block>
 
-          <Block title="Customer Info">
+          {/* Order Items */}
+          <Block title="Order Items" colors={colors}>
+            <Text style={s.hint}>Add multiple items — total auto-fills the price below.</Text>
+            {orderItems.map((item) => (
+              <View key={item.id} style={s.itemRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={s.itemName}>{item.name}</Text>
+                  {item.description ? <Text style={s.itemDesc}>{item.description}</Text> : null}
+                  <Text style={s.itemMeta}>{item.quantity}× · {form.currency} {(item.price).toFixed(2)} each</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                  <Text style={s.itemTotal}>{form.currency} {(item.price * item.quantity).toFixed(2)}</Text>
+                  <TouchableOpacity onPress={() => removeItem(item.id)}>
+                    <Text style={{ color: T.error, fontSize: 12, fontFamily: 'DMSans' }}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
+            {orderItems.length > 0 && (
+              <View style={s.itemsSummary}>
+                <Text style={s.itemsSummaryLabel}>Items Total</Text>
+                <Text style={s.itemsSummaryValue}>{form.currency} {itemsTotal.toFixed(2)}</Text>
+              </View>
+            )}
+
+            {showAddItem ? (
+              <View style={s.addItemForm}>
+                <F label="Item Name *"><TextInput style={s.input} value={newItemName} onChangeText={setNewItemName} placeholder="e.g. Hand-knit scarf" placeholderTextColor={T.outline} /></F>
+                <F label="Description (optional)"><TextInput style={s.input} value={newItemDesc} onChangeText={setNewItemDesc} placeholder="Details…" placeholderTextColor={T.outline} /></F>
+                <View style={s.row}>
+                  <View style={{ flex: 1 }}>
+                    <F label="Qty"><TextInput style={s.input} value={newItemQty} onChangeText={setNewItemQty} keyboardType="number-pad" placeholder="1" placeholderTextColor={T.outline} /></F>
+                  </View>
+                  <View style={{ flex: 2 }}>
+                    <F label="Price each"><TextInput style={[s.input, s.priceInput]} value={newItemPrice} onChangeText={setNewItemPrice} keyboardType="decimal-pad" placeholder="0.00" placeholderTextColor={T.outline} /></F>
+                  </View>
+                </View>
+                <View style={s.row}>
+                  <TouchableOpacity style={[s.addBtn, { flex: 1 }]} onPress={addItem}><Text style={s.addTxt}>Add Item</Text></TouchableOpacity>
+                  <TouchableOpacity style={[s.addBtn, { backgroundColor: T.surfaceHigh, flex: 1 }]} onPress={() => setShowAddItem(false)}><Text style={[s.addTxt, { color: T.subText }]}>Cancel</Text></TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <TouchableOpacity style={s.photoBtn} onPress={() => setShowAddItem(true)}>
+                <Text style={s.photoBtnTxt}>+ Add Item</Text>
+              </TouchableOpacity>
+            )}
+          </Block>
+
+          <Block title="Customer Info" colors={colors}>
             <F label="Customer Name *"><TextInput style={s.input} value={form.customerName} onChangeText={(v) => set('customerName', v)} placeholder="Emma Kowalski" placeholderTextColor={T.outline} /></F>
             <F label="Address"><TextInput style={[s.input, s.multi]} value={form.customerAddress} onChangeText={(v) => set('customerAddress', v)} placeholder="Street, City, Country" placeholderTextColor={T.outline} multiline numberOfLines={2} textAlignVertical="top" /></F>
             <F label="Phone"><TextInput style={s.input} value={form.customerPhone} onChangeText={(v) => set('customerPhone', v)} placeholder="+49 123 456789" placeholderTextColor={T.outline} keyboardType="phone-pad" /></F>
@@ -161,7 +264,7 @@ export default function NewOrderScreen() {
             <F label="Delivery Time"><TextInput style={s.input} value={form.deliveryTime} onChangeText={(v) => set('deliveryTime', v)} placeholder="e.g. 3:00 PM" placeholderTextColor={T.outline} /></F>
           </Block>
 
-          <Block title="Financials">
+          <Block title="Financials" colors={colors}>
             <F label="Currency">
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
                 {CURRENCIES.map((c) => (
@@ -171,24 +274,57 @@ export default function NewOrderScreen() {
                 ))}
               </ScrollView>
             </F>
-            <F label="Price"><TextInput style={[s.input, s.priceInput]} value={form.askingPrice} onChangeText={(v) => set('askingPrice', v)} placeholder="0.00" placeholderTextColor={T.outline} keyboardType="decimal-pad" /></F>
+            <F label="Total Asking Price">
+              <TextInput style={[s.input, s.priceInput]} value={form.askingPrice} onChangeText={(v) => set('askingPrice', v)} placeholder="0.00" placeholderTextColor={T.outline} keyboardType="decimal-pad" />
+              {orderItems.length > 0 && (
+                <Text style={s.hint}>Items total: {form.currency} {itemsTotal.toFixed(2)}{parseFloat(form.askingPrice) < itemsTotal ? ' ⚠ Price is below items total' : ''}</Text>
+              )}
+              {inventoryWarning && (
+                <View style={s.inventoryWarning}>
+                  <Text style={s.inventoryWarningTxt}>
+                    💡 Your inventory suggests at least {inventoryMatch!.materials[0]?.currency ?? form.currency} {inventorySuggestedPrice.toFixed(0)} for "{inventoryMatch!.name}" (material cost: {inventoryMatch!.materials[0]?.currency ?? form.currency} {inventoryMatch!.totalMaterialCost.toFixed(0)})
+                  </Text>
+                </View>
+              )}
+            </F>
             <View style={s.toggleRow}><Text style={s.toggleLbl}>Already paid</Text><Switch value={form.isPaid} onValueChange={(v) => set('isPaid', v)} trackColor={{ false: T.outlineVariant, true: T.primaryContainer }} thumbColor="#FFFFFF" /></View>
             <F label="Payment Notes"><TextInput style={s.input} value={form.paymentNotes} onChangeText={(v) => set('paymentNotes', v)} placeholder="Bank transfer, PayPal…" placeholderTextColor={T.outline} /></F>
           </Block>
 
-          <Block title="Dates & Notes" last>
+          <Block title="Dates & Progress" colors={colors} last>
             <F label="Due Date (YYYY-MM-DD)">
               <TextInput style={s.input} value={form.dueDateText} onChangeText={(v) => set('dueDateText', v)} placeholder="2025-04-15" placeholderTextColor={T.outline} keyboardType="numbers-and-punctuation" />
               <Text style={s.hint}>{format(parsedDue, 'EEEE, MMMM d, yyyy')}</Text>
             </F>
+
+            {/* Completion slider */}
+            <F label={`Completion: ${form.completionPercent}%`}>
+              <View style={s.sliderContainer}>
+                <View style={s.sliderTrack}>
+                  <View style={[s.sliderFill, { width: `${form.completionPercent}%` }]} />
+                </View>
+                <View style={s.sliderBtns}>
+                  {[0, 25, 50, 75, 100].map((v) => (
+                    <TouchableOpacity
+                      key={v}
+                      style={[s.sliderBtn, form.completionPercent === v && s.sliderBtnOn]}
+                      onPress={() => set('completionPercent', v)}
+                    >
+                      <Text style={[s.sliderBtnTxt, form.completionPercent === v && s.sliderBtnTxtOn]}>{v}%</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </F>
+
             <F label="Internal Notes"><TextInput style={[s.input, s.multi]} value={form.internalNotes} onChangeText={(v) => set('internalNotes', v)} placeholder="Private notes…" placeholderTextColor={T.outline} multiline numberOfLines={3} textAlignVertical="top" /></F>
           </Block>
 
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Sticky bottom save button — always visible above Android nav bar */}
-      <View style={[s.stickyBar, { paddingBottom: insets.bottom + 8 }]}>
+      {/* Sticky bottom save button */}
+      <View style={[s.stickyBar, { paddingBottom: insets.bottom + 8, backgroundColor: colors.bg }]}>
         <TouchableOpacity
           onPress={save}
           style={[s.stickySaveBtn, saving && { opacity: 0.5 }]}
@@ -201,10 +337,10 @@ export default function NewOrderScreen() {
   );
 }
 
-function Block({ title, children, last }: { title: string; children: React.ReactNode; last?: boolean }) {
+function Block({ title, children, last, colors }: { title: string; children: React.ReactNode; last?: boolean; colors: any }) {
   return (
     <View style={[s.block, !last && s.blockBorder]}>
-      <Text style={s.blockTitle}>{title}</Text>
+      <Text style={[s.blockTitle, { color: colors.text }]}>{title}</Text>
       {children}
     </View>
   );
@@ -219,193 +355,57 @@ function F({ label, children }: { label: string; children: React.ReactNode }) {
 }
 
 const s = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: T.bg,
-  },
+  container: { flex: 1, backgroundColor: T.bg },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    backgroundColor: T.bg,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 14, backgroundColor: T.bg,
   },
-  cancel: {
-    fontSize: 15,
-    fontFamily: 'DMSans',
-    fontWeight: '500',
-    color: T.subText,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontFamily: 'PlayfairDisplay',
-    fontWeight: '700',
-    color: T.primary,
-  },
-  saveBtn: {
-    backgroundColor: T.primaryContainer,
-    borderRadius: 999,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-  },
-  saveTxt: {
-    color: '#FFFFFF',
-    fontFamily: 'DMSans',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  block: {
-    paddingHorizontal: 16,
-    paddingTop: 24,
-    paddingBottom: 8,
-  },
-  blockBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: T.outlineVariant,
-  },
-  blockTitle: {
-    fontSize: 20,
-    fontFamily: 'PlayfairDisplay',
-    fontWeight: '700',
-    color: T.text,
-    marginBottom: 16,
-  },
-  lbl: {
-    fontSize: 11,
-    fontFamily: 'DMSans',
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    color: T.subText,
-    marginBottom: 6,
-    marginTop: 4,
-  },
-  input: {
-    backgroundColor: T.surfaceLow,
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    fontFamily: 'DMSans',
-    fontSize: 15,
-    color: T.text,
-    marginBottom: 12,
-  },
-  multi: {
-    minHeight: 80,
-    paddingTop: 14,
-    borderRadius: 16,
-  },
-  priceInput: {
-    fontSize: 22,
-    fontWeight: '700',
-  },
-  tagsWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 8,
-    gap: 6,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-    alignItems: 'center',
-  },
-  addBtn: {
-    backgroundColor: T.primaryContainer,
-    borderRadius: 999,
-    paddingHorizontal: 18,
-    paddingVertical: 14,
-    justifyContent: 'center',
-  },
-  addTxt: {
-    color: '#FFFFFF',
-    fontFamily: 'DMSans',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  photoBtn: {
-    backgroundColor: T.surfaceLow,
-    borderRadius: 16,
-    paddingVertical: 16,
-    borderWidth: 1.5,
-    borderStyle: 'dashed',
-    borderColor: T.outlineVariant,
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  photoBtnTxt: {
-    fontFamily: 'DMSans',
-    fontSize: 14,
-    fontWeight: '500',
-    color: T.primary,
-  },
-  chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 999,
-    backgroundColor: T.surfaceHighest,
-    marginRight: 8,
-  },
-  chipOn: {
-    backgroundColor: T.primary,
-  },
-  chipTxt: {
-    fontSize: 13,
-    fontFamily: 'DMSans',
-    fontWeight: '600',
-    color: T.subText,
-  },
-  chipTxtOn: {
-    color: '#FFFFFF',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: T.surfaceLow,
-    borderRadius: 16,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    marginBottom: 12,
-  },
-  toggleLbl: {
-    fontSize: 15,
-    fontFamily: 'DMSans',
-    color: T.text,
-  },
-  hint: {
-    fontSize: 12,
-    fontFamily: 'DMSans',
-    color: T.primaryContainer,
-    marginTop: -8,
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  stickyBar: {
-    backgroundColor: T.bg,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: T.outlineVariant,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-  },
-  stickySaveBtn: {
-    backgroundColor: T.primaryContainer,
-    borderRadius: 999,
-    paddingVertical: 17,
-    alignItems: 'center',
-    shadowColor: T.primaryContainer,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 6,
-  },
-  stickySaveTxt: {
-    color: '#FFFFFF',
-    fontFamily: 'DMSans',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 0.3,
-  },
+  cancel: { fontSize: 15, fontFamily: 'DMSans', fontWeight: '500', color: T.subText },
+  headerTitle: { fontSize: 20, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.primary },
+  saveBtn: { backgroundColor: T.primaryContainer, borderRadius: 999, paddingHorizontal: 18, paddingVertical: 8 },
+  saveTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 14, fontWeight: '700' },
+  block: { paddingHorizontal: 16, paddingTop: 24, paddingBottom: 8 },
+  blockBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.outlineVariant },
+  blockTitle: { fontSize: 20, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.text, marginBottom: 16 },
+  lbl: { fontSize: 11, fontFamily: 'DMSans', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, color: T.subText, marginBottom: 6, marginTop: 4 },
+  input: { backgroundColor: T.surfaceLow, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 14, fontFamily: 'DMSans', fontSize: 15, color: T.text, marginBottom: 12 },
+  multi: { minHeight: 80, paddingTop: 14, borderRadius: 16 },
+  priceInput: { fontSize: 22, fontWeight: '700' },
+  tagsWrap: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: 8, gap: 6 },
+  row: { flexDirection: 'row', gap: 8, marginBottom: 12, alignItems: 'center' },
+  addBtn: { backgroundColor: T.primaryContainer, borderRadius: 999, paddingHorizontal: 18, paddingVertical: 14, justifyContent: 'center', alignItems: 'center' },
+  addTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
+  photoBtn: { backgroundColor: T.surfaceLow, borderRadius: 16, paddingVertical: 16, borderWidth: 1.5, borderStyle: 'dashed', borderColor: T.outlineVariant, alignItems: 'center', marginBottom: 12 },
+  photoBtnTxt: { fontFamily: 'DMSans', fontSize: 14, fontWeight: '500', color: T.primary },
+  chip: { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 999, backgroundColor: T.surfaceHighest, marginRight: 8 },
+  chipOn: { backgroundColor: T.primary },
+  chipTxt: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '600', color: T.subText },
+  chipTxtOn: { color: '#FFFFFF' },
+  toggleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: T.surfaceLow, borderRadius: 16, paddingHorizontal: 20, paddingVertical: 14, marginBottom: 12 },
+  toggleLbl: { fontSize: 15, fontFamily: 'DMSans', color: T.text },
+  hint: { fontSize: 12, fontFamily: 'DMSans', color: T.primaryContainer, marginTop: -8, marginBottom: 12, paddingHorizontal: 4 },
+  inventoryWarning: { backgroundColor: '#FFF3E0', borderRadius: 12, padding: 12, marginBottom: 8 },
+  inventoryWarningTxt: { fontSize: 12, fontFamily: 'DMSans', color: T.tertiary, lineHeight: 18 },
+  // Order items
+  itemRow: { flexDirection: 'row', gap: 12, paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.outlineVariant, alignItems: 'flex-start' },
+  itemName: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700', color: T.text },
+  itemDesc: { fontSize: 12, fontFamily: 'DMSans', color: T.subText, marginTop: 2 },
+  itemMeta: { fontSize: 12, fontFamily: 'DMMono', color: T.subText, marginTop: 2 },
+  itemTotal: { fontSize: 14, fontFamily: 'DMMono', fontWeight: '700', color: T.primary },
+  itemsSummary: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderTopWidth: 1, borderTopColor: T.outlineVariant, marginTop: 4 },
+  itemsSummaryLabel: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '600', color: T.subText },
+  itemsSummaryValue: { fontSize: 15, fontFamily: 'DMMono', fontWeight: '700', color: T.primary },
+  addItemForm: { backgroundColor: T.surfaceContainer, borderRadius: 16, padding: 12, marginBottom: 12 },
+  // Completion slider
+  sliderContainer: { marginBottom: 12 },
+  sliderTrack: { height: 8, backgroundColor: T.outlineVariant, borderRadius: 4, marginBottom: 12, overflow: 'hidden' },
+  sliderFill: { height: 8, backgroundColor: T.tertiary, borderRadius: 4 },
+  sliderBtns: { flexDirection: 'row', justifyContent: 'space-between' },
+  sliderBtn: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, backgroundColor: T.surfaceHighest },
+  sliderBtnOn: { backgroundColor: T.tertiary },
+  sliderBtnTxt: { fontSize: 12, fontFamily: 'DMSans', fontWeight: '600', color: T.subText },
+  sliderBtnTxtOn: { color: '#FFFFFF' },
+  stickyBar: { backgroundColor: T.bg, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: T.outlineVariant, paddingHorizontal: 16, paddingTop: 12 },
+  stickySaveBtn: { backgroundColor: T.primaryContainer, borderRadius: 999, paddingVertical: 17, alignItems: 'center', shadowColor: T.primaryContainer, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.3, shadowRadius: 20, elevation: 6 },
+  stickySaveTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 16, fontWeight: '700', letterSpacing: 0.3 },
 });

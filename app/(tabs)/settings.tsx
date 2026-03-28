@@ -36,13 +36,6 @@ const T = {
   error: '#BA1A1A',
 };
 
-// Stitch design: 3 showcase themes
-const SHOWCASE_THEMES = [
-  { name: 'Rose Petal', bg: '#FFD9E2', dot: '#864D5F', text: '#522232' },
-  { name: 'Sage Linen', bg: '#EAF0EA', dot: '#4A7C59', text: '#2D402D' },
-  { name: 'Midnight Silk', bg: '#2A1F2E', dot: '#C9879A', text: '#F5EDE3' },
-];
-
 const THEMES: { label: string; value: AppTheme; bg: string; text: string; desc: string }[] = [
   { label: 'System Default', value: 'system', bg: '#888888', text: '#FFFFFF', desc: 'Follows device dark/light mode' },
   { label: 'Warm Cream', value: 'warm-cream', bg: '#FAF7F2', text: '#3D2B1F', desc: 'Default warm tone' },
@@ -110,7 +103,7 @@ export default function SettingsScreen() {
   const avatarInitial = (name || 'S').trim().charAt(0).toUpperCase();
 
   return (
-    <SafeAreaView style={s.container}>
+    <SafeAreaView style={[s.container, { backgroundColor: colors.bg }]}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           keyboardShouldPersistTaps="always"
@@ -118,7 +111,7 @@ export default function SettingsScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         >
           {/* Page title */}
-          <Text style={s.pageTitle}>Settings</Text>
+          <Text style={[s.pageTitle, { color: colors.text }]}>Settings</Text>
 
           {/* Profile Hero Header */}
           <View style={s.profileHero}>
@@ -176,19 +169,9 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </Sec>
 
-          {/* App Theme — with 3 showcase cards */}
+          {/* App Theme */}
           <Sec title="App Theme" icon="🎨" iconBg={T.tertiaryFixed}>
             <Text style={s.themeHint}>Tap to apply instantly — changes the whole app</Text>
-
-            {/* 3 showcase cards (Rose Petal / Sage Linen / Midnight Silk) */}
-            <View style={s.showcaseRow}>
-              {SHOWCASE_THEMES.map((t) => (
-                <View key={t.name} style={[s.showcaseCard, { backgroundColor: t.bg }]}>
-                  <View style={[s.showcaseDot, { backgroundColor: t.dot }]} />
-                  <Text style={[s.showcaseName, { color: t.text }]}>{t.name}</Text>
-                </View>
-              ))}
-            </View>
 
             {/* Full theme grid */}
             <View style={[s.themeGrid, isTablet && s.themeGridTablet]}>
@@ -249,6 +232,7 @@ export default function SettingsScreen() {
           <Sec title="More" icon="⬡" iconBg={T.surfaceHigh}>
             <SRow label="Notification Preferences" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/notifications')} />
             <SRow label="Craft Categories" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/(tabs)/track')} />
+            <SRow label="Inventory" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/inventory')} />
             <SRow label="Reports & Export" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/reports')} />
             <SRow label="Data Backup" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/backup')} />
           </Sec>
@@ -480,30 +464,6 @@ const s = StyleSheet.create({
     color: '#FFFFFF',
     fontFamily: 'DMSans',
     fontSize: 15,
-    fontWeight: '700',
-  },
-  // Showcase theme cards
-  showcaseRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 16,
-  },
-  showcaseCard: {
-    flex: 1,
-    borderRadius: 14,
-    padding: 12,
-    height: 72,
-    justifyContent: 'flex-end',
-    gap: 6,
-  },
-  showcaseDot: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-  },
-  showcaseName: {
-    fontSize: 11,
-    fontFamily: 'DMSans',
     fontWeight: '700',
   },
   // Full theme grid
