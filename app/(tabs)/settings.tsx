@@ -10,7 +10,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNotifications } from '../../hooks/useNotifications';
 import { useProfile } from '../../hooks/useProfile';
 import { useTheme } from '../../context/ThemeContext';
-import { Colors, Spacing, BorderRadius } from '../../lib/theme';
 import type { AppTheme } from '../../types';
 
 // Design tokens — Stitch "Warm Artisan Editorial"
@@ -23,8 +22,11 @@ const T = {
   surfaceLowest: '#FFFFFF',
   primary: '#864D5F',
   primaryContainer: '#C9879A',
+  primaryFixed: '#FFD9E2',
   onPrimary: '#FFFFFF',
+  onPrimaryContainer: '#522232',
   tertiary: '#994530',
+  tertiaryFixed: '#FFDAD2',
   secondary: '#625E5A',
   secondaryContainer: '#E8E1DC',
   text: '#1D1B1A',
@@ -33,6 +35,13 @@ const T = {
   outlineVariant: '#D5C2C5',
   error: '#BA1A1A',
 };
+
+// Stitch design: 3 showcase themes
+const SHOWCASE_THEMES = [
+  { name: 'Rose Petal', bg: '#FFD9E2', dot: '#864D5F', text: '#522232' },
+  { name: 'Sage Linen', bg: '#EAF0EA', dot: '#4A7C59', text: '#2D402D' },
+  { name: 'Midnight Silk', bg: '#2A1F2E', dot: '#C9879A', text: '#F5EDE3' },
+];
 
 const THEMES: { label: string; value: AppTheme; bg: string; text: string; desc: string }[] = [
   { label: 'System Default', value: 'system', bg: '#888888', text: '#FFFFFF', desc: 'Follows device dark/light mode' },
@@ -93,9 +102,12 @@ export default function SettingsScreen() {
 
   const handleThemeSelect = async (t: AppTheme) => {
     setTheme(t);
-    setGlobalTheme(t); // Apply instantly to entire app
+    setGlobalTheme(t);
     await saveProfile({ ...profile, theme: t });
   };
+
+  // Get avatar initial
+  const avatarInitial = (name || 'S').trim().charAt(0).toUpperCase();
 
   return (
     <SafeAreaView style={s.container}>
@@ -105,10 +117,35 @@ export default function SettingsScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         >
-          <Text style={s.title}>Settings</Text>
+          {/* Page title */}
+          <Text style={s.pageTitle}>Settings</Text>
+
+          {/* Profile Hero Header */}
+          <View style={s.profileHero}>
+            <View style={s.profileHeroBg} />
+            <View style={s.profileHeroContent}>
+              {/* Avatar circle */}
+              <View style={s.avatar}>
+                <Text style={s.avatarText}>{avatarInitial}</Text>
+              </View>
+              <View style={s.profileHeroInfo}>
+                <Text style={s.profileHeroName}>{name || 'Sofi Dream'}</Text>
+                <Text style={s.profileHeroTagline}>
+                  {tagline || 'Handmade with love ✦'}
+                </Text>
+              </View>
+              <TouchableOpacity
+                style={s.profileEditBtn}
+                onPress={handleSave}
+                activeOpacity={0.8}
+              >
+                <Text style={s.profileEditBtnText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Business Profile */}
-          <Sec title="Business Profile" icon="🏪">
+          <Sec title="Business Profile" icon="🏪" iconBg={T.primaryFixed}>
             <Lbl>Business Name</Lbl>
             <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Your business name" placeholderTextColor={T.outline} />
             <Lbl>Tagline</Lbl>
@@ -139,14 +176,31 @@ export default function SettingsScreen() {
             </TouchableOpacity>
           </Sec>
 
-          {/* App Theme */}
-          <Sec title="App Theme" icon="🎨">
+          {/* App Theme — with 3 showcase cards */}
+          <Sec title="App Theme" icon="🎨" iconBg={T.tertiaryFixed}>
             <Text style={s.themeHint}>Tap to apply instantly — changes the whole app</Text>
+
+            {/* 3 showcase cards (Rose Petal / Sage Linen / Midnight Silk) */}
+            <View style={s.showcaseRow}>
+              {SHOWCASE_THEMES.map((t) => (
+                <View key={t.name} style={[s.showcaseCard, { backgroundColor: t.bg }]}>
+                  <View style={[s.showcaseDot, { backgroundColor: t.dot }]} />
+                  <Text style={[s.showcaseName, { color: t.text }]}>{t.name}</Text>
+                </View>
+              ))}
+            </View>
+
+            {/* Full theme grid */}
             <View style={[s.themeGrid, isTablet && s.themeGridTablet]}>
               {THEMES.map((t) => (
                 <TouchableOpacity
                   key={t.value}
-                  style={[s.themeCard, isTablet && s.themeCardTablet, { backgroundColor: t.bg }, (theme === t.value || activeTheme === t.value) && s.themeCardOn]}
+                  style={[
+                    s.themeCard,
+                    isTablet && s.themeCardTablet,
+                    { backgroundColor: t.bg },
+                    (theme === t.value || activeTheme === t.value) && s.themeCardOn,
+                  ]}
                   onPress={() => handleThemeSelect(t.value)}
                   activeOpacity={0.85}
                 >
@@ -161,15 +215,30 @@ export default function SettingsScreen() {
           </Sec>
 
           {/* Notifications */}
-          <Sec title="Notifications" icon="🔔">
+          <Sec title="Notifications" icon="🔔" iconBg="#E8E1DC">
             <SRow label="Enable Notifications" right={
-              <Switch value={prefs.enabled} onValueChange={(v) => updatePrefs({ enabled: v })} trackColor={{ false: T.outlineVariant, true: T.primaryContainer }} thumbColor="#FFFFFF" />
+              <Switch
+                value={prefs.enabled}
+                onValueChange={(v) => updatePrefs({ enabled: v })}
+                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                thumbColor="#FFFFFF"
+              />
             } />
             <SRow label="Daily Digest" right={
-              <Switch value={prefs.dailyDigest.enabled} onValueChange={(v) => updatePrefs({ dailyDigest: { ...prefs.dailyDigest, enabled: v } })} trackColor={{ false: T.outlineVariant, true: T.primaryContainer }} thumbColor="#FFFFFF" />
+              <Switch
+                value={prefs.dailyDigest.enabled}
+                onValueChange={(v) => updatePrefs({ dailyDigest: { ...prefs.dailyDigest, enabled: v } })}
+                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                thumbColor="#FFFFFF"
+              />
             } />
             <SRow label="Due Date Alerts" right={
-              <Switch value={prefs.dueSoonAlerts.enabled} onValueChange={(v) => updatePrefs({ dueSoonAlerts: { ...prefs.dueSoonAlerts, enabled: v } })} trackColor={{ false: T.outlineVariant, true: T.primaryContainer }} thumbColor="#FFFFFF" />
+              <Switch
+                value={prefs.dueSoonAlerts.enabled}
+                onValueChange={(v) => updatePrefs({ dueSoonAlerts: { ...prefs.dueSoonAlerts, enabled: v } })}
+                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                thumbColor="#FFFFFF"
+              />
             } />
             <TouchableOpacity style={s.testBtn} onPress={testNotification}>
               <Text style={s.testTxt}>Send Test Notification</Text>
@@ -177,7 +246,7 @@ export default function SettingsScreen() {
           </Sec>
 
           {/* Quick Links */}
-          <Sec title="More" icon="⬡">
+          <Sec title="More" icon="⬡" iconBg={T.surfaceHigh}>
             <SRow label="Notification Preferences" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/notifications')} />
             <SRow label="Craft Categories" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/(tabs)/track')} />
             <SRow label="Reports & Export" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/reports')} />
@@ -185,7 +254,7 @@ export default function SettingsScreen() {
           </Sec>
 
           {/* About */}
-          <Sec title="About" icon="ℹ">
+          <Sec title="About" icon="ℹ" iconBg={T.surfaceContainer}>
             <SRow label="Version" right={<Text style={s.meta}>1.0.0</Text>} />
             <SRow label="Made with" right={<Text style={s.meta}>✦ for Sofie</Text>} />
           </Sec>
@@ -203,23 +272,28 @@ export default function SettingsScreen() {
   );
 }
 
-function Sec({ title, icon, children }: { title: string; icon?: string; children: React.ReactNode }) {
+function Sec({ title, icon, iconBg, children }: { title: string; icon?: string; iconBg?: string; children: React.ReactNode }) {
   return (
     <View style={s.section}>
       <View style={s.secHeaderRow}>
-        {icon && <Text style={s.secIcon}>{icon}</Text>}
+        {icon && (
+          <View style={[s.secIconBg, { backgroundColor: iconBg ?? T.surfaceContainer }]}>
+            <Text style={s.secIcon}>{icon}</Text>
+          </View>
+        )}
         <Text style={s.secTitle}>{title}</Text>
       </View>
-      {/* Tonal container for rows */}
       <View style={s.secCard}>
         {children}
       </View>
     </View>
   );
 }
+
 function Lbl({ children }: { children: string }) {
   return <Text style={s.lbl}>{children}</Text>;
 }
+
 function SRow({ label, right, onPress }: { label: string; right: React.ReactNode; onPress?: () => void }) {
   return (
     <TouchableOpacity style={s.sRow} onPress={onPress} disabled={!onPress} activeOpacity={onPress ? 0.7 : 1}>
@@ -234,7 +308,7 @@ const s = StyleSheet.create({
     flex: 1,
     backgroundColor: T.bg,
   },
-  title: {
+  pageTitle: {
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
@@ -243,6 +317,80 @@ const s = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 8,
   },
+  // Profile hero header
+  profileHero: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 20,
+    overflow: 'hidden',
+    backgroundColor: T.primaryFixed,
+    padding: 20,
+  },
+  profileHeroBg: {
+    position: 'absolute',
+    top: -30,
+    right: -30,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: T.primary,
+    opacity: 0.05,
+  },
+  profileHeroContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: T.primaryContainer,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexShrink: 0,
+    shadowColor: T.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  avatarText: {
+    fontSize: 24,
+    fontFamily: 'PlayfairDisplay',
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  profileHeroInfo: {
+    flex: 1,
+  },
+  profileHeroName: {
+    fontSize: 18,
+    fontFamily: 'PlayfairDisplay',
+    fontWeight: '700',
+    color: T.onPrimaryContainer,
+    marginBottom: 2,
+  },
+  profileHeroTagline: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    color: T.subText,
+    fontStyle: 'italic',
+  },
+  profileEditBtn: {
+    backgroundColor: T.primary,
+    borderRadius: 999,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    flexShrink: 0,
+  },
+  profileEditBtnText: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: '#FFFFFF',
+  },
+  // Section
   section: {
     paddingHorizontal: 16,
     marginBottom: 24,
@@ -250,13 +398,19 @@ const s = StyleSheet.create({
   secHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
     marginBottom: 10,
     paddingHorizontal: 4,
   },
+  secIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   secIcon: {
-    fontSize: 18,
-    color: T.primary,
+    fontSize: 16,
   },
   secTitle: {
     fontSize: 18,
@@ -328,6 +482,31 @@ const s = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
+  // Showcase theme cards
+  showcaseRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 16,
+  },
+  showcaseCard: {
+    flex: 1,
+    borderRadius: 14,
+    padding: 12,
+    height: 72,
+    justifyContent: 'flex-end',
+    gap: 6,
+  },
+  showcaseDot: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  showcaseName: {
+    fontSize: 11,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+  },
+  // Full theme grid
   themeHint: {
     fontSize: 12,
     fontFamily: 'DMSans',

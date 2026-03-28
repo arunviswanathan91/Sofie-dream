@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -8,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { OrdersProvider } from '../context/OrdersContext';
 import { ProfileProvider } from '../context/ProfileContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { SplashOverlay } from '../components/SplashOverlay';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -15,6 +17,7 @@ SplashScreen.preventAutoHideAsync();
 function InnerLayout() {
   const router = useRouter();
   const { colors } = useTheme();
+  const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
@@ -32,7 +35,7 @@ function InnerLayout() {
   }, [router]);
 
   return (
-    <>
+    <View style={{ flex: 1 }}>
       <StatusBar style={colors.isDark ? 'light' : 'dark'} backgroundColor={colors.header} />
       <Stack
         screenOptions={{
@@ -51,7 +54,12 @@ function InnerLayout() {
         <Stack.Screen name="notifications" options={{ presentation: 'modal', headerShown: false, animation: 'fade_from_bottom' }} />
         <Stack.Screen name="backup/index" options={{ headerShown: false }} />
       </Stack>
-    </>
+
+      {/* Animated splash overlay — sits on top of everything */}
+      {showSplash && (
+        <SplashOverlay onFinish={() => setShowSplash(false)} />
+      )}
+    </View>
   );
 }
 

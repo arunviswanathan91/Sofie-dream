@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sofi Dream - Artisan Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#4a4643",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fff8f5",
+                        "surface": "#fff8f5",
+                        "secondary-fixed-dim": "#cbc5c1",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#e8e1dc",
+                        "surface-container": "#f3ecea",
+                        "background": "#fff8f5",
+                        "on-secondary-container": "#686460",
+                        "inverse-surface": "#33302e",
+                        "tertiary-fixed-dim": "#ffb4a2",
+                        "tertiary-fixed": "#ffdad2",
+                        "primary-fixed": "#ffd9e2",
+                        "tertiary-container": "#e37e65",
+                        "outline": "#837376",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#fbb3c7",
+                        "surface-variant": "#e8e1de",
+                        "surface-container-high": "#ede7e4",
+                        "on-primary-fixed-variant": "#6b3647",
+                        "on-primary-fixed": "#360b1c",
+                        "on-surface": "#1d1b1a",
+                        "surface-dim": "#dfd9d6",
+                        "secondary-fixed": "#e8e1dc",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1d1b1a",
+                        "on-tertiary-container": "#5f1a08",
+                        "surface-container-highest": "#e8e1de",
+                        "on-surface-variant": "#514346",
+                        "on-tertiary-fixed-variant": "#7b2e1b",
+                        "on-secondary-fixed": "#1e1b18",
+                        "outline-variant": "#d5c2c5",
+                        "tertiary": "#994530",
+                        "primary": "#864d5f",
+                        "secondary": "#625e5a",
+                        "primary-container": "#c9879a",
+                        "on-primary-container": "#522232",
+                        "surface-container-low": "#f9f2ef",
+                        "inverse-primary": "#fbb3c7",
+                        "surface-tint": "#864d5f",
+                        "inverse-on-surface": "#f6efec",
+                        "surface-container-lowest": "#ffffff",
+                        "cardBorder": "#E8E1DC", // Design system token
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"],
+                        "artisan": ["Playfair Display"],
+                        "functional": ["DM Sans"]
+                    },
+                    borderRadius: { 
+                        "DEFAULT": "1rem", 
+                        "lg": "2rem", // ~20dp radius
+                        "xl": "3rem", 
+                        "full": "9999px" 
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+        .linen-overlay {
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBxhBhtK3wKfK0zpEWD7rbVlo44RiY_qDR0goZg9YTm_DdjCElVLCbLUt468ryTUZhxYo1csqmZG1tEBvW1cml2suwaQYb1iCyKYgYVcJBqkkQ3pFfK7meojb-nPvWJMQINZFKUy9VcbKyP9THU0dcFqk4OYhO9PTVDyORj--T0PDf-6f705pPVYqrKul_Tm23A3_lSC4NDd9P1cjg98X1bWbvgeOXiLR6p7kp2cqyugUO0BrwapWyE-cmYUxNKr3ZuaI6L-11y2me_);
+            opacity: 0.03
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-surface dark:bg-inverse-surface text-on-surface dark:text-inverse-on-surface font-body selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center px-6 h-16">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-300">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-artisan text-2xl tracking-wide font-bold text-primary dark:text-primary-fixed-dim">Artisan Studio</h1>
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 duration-300">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-4 max-w-2xl mx-auto relative min-h-screen">
+<div class="absolute inset-0 linen-overlay pointer-events-none"></div>
+<div class="space-y-6 relative z-10">
+<!-- Business Profile Section -->
+<section class="bg-surface-container-low dark:bg-surface-dark/10 border border-cardBorder dark:border-outline/20 rounded-lg p-6">
+<div class="flex flex-col items-center mb-6">
+<div class="relative mb-4">
+<div class="w-24 h-24 rounded-full overflow-hidden border-4 border-surface dark:border-surface-dim shadow-md">
+<img alt="Elena Rossi" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpon_-Ll77MkDzXBmBFGRjtqnsGtCrhx2R9Wi71kJYQwawC3QfwGCZV_De45G_uuWacm2f3GmHvmk8KxjLeL1KRvSvN-SrugpOj6nyXh3uUHGdfCzDnsRc55_ikd6JkuUCZkaFoFA0AdIl0RfKlitRgXJewR_ss_y_qNNhbqVAQi6d1_hQx_Fccnw2awn3oDyNx7tnZ7nMa4zmtI-g37tun_oR1E4d7xB7gLkhyt4p_uDD9_FHhJZ4Zf8P5IRUq1Ignz1y0dfn98vA"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-1.5 rounded-full shadow-md active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-xs">camera_alt</span>
+</button>
+</div>
+<h3 class="font-headline text-lg font-bold">Business Settings</h3>
+</div>
+<div class="space-y-4">
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant dark:text-outline-variant px-1 uppercase tracking-wider">Business Name</label>
+<input class="w-full bg-surface-container-lowest dark:bg-surface-dim border-transparent focus:border-primary dark:focus:border-primary-fixed-dim rounded-xl p-3 text-sm focus:ring-0 transition-all outline-none" type="text" value="Sofi Dream Studio"/>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant dark:text-outline-variant px-1 uppercase tracking-wider">Tagline</label>
+<input class="w-full bg-surface-container-lowest dark:bg-surface-dim border-transparent focus:border-primary dark:focus:border-primary-fixed-dim rounded-xl p-3 text-sm focus:ring-0 transition-all outline-none" type="text" value="Master Embroiderer"/>
+</div>
+<div class="space-y-1">
+<label class="text-xs font-bold text-on-surface-variant dark:text-outline-variant px-1 uppercase tracking-wider">Address</label>
+<textarea class="w-full bg-surface-container-lowest dark:bg-surface-dim border-transparent focus:border-primary dark:focus:border-primary-fixed-dim rounded-xl p-3 text-sm focus:ring-0 transition-all outline-none resize-none" rows="2">Via della Seta 42, Florence, Italy</textarea>
+</div>
+<button class="w-full bg-primary dark:bg-primary-container text-on-primary dark:text-on-primary-container font-bold py-3.5 rounded-xl mt-2 active:scale-95 transition-transform shadow-sm">
+                        Save Changes
+                    </button>
+</div>
+</section>
+<!-- Currency Section -->
+<section class="bg-surface-container-low dark:bg-surface-dark/10 border border-cardBorder dark:border-outline/20 rounded-lg p-6">
+<h3 class="font-headline text-lg font-bold mb-4">Default Currency</h3>
+<div class="flex flex-wrap gap-2">
+<button class="flex-1 min-w-[80px] py-3 px-2 rounded-xl border-2 border-primary bg-primary/10 text-primary dark:text-primary-fixed-dim font-bold flex flex-col items-center gap-1">
+<span class="text-xl">€</span>
+<span class="text-[10px] uppercase tracking-tighter">EUR</span>
+</button>
+<button class="flex-1 min-w-[80px] py-3 px-2 rounded-xl border-2 border-transparent bg-surface-container-lowest dark:bg-surface-dim text-on-surface-variant dark:text-outline-variant font-bold flex flex-col items-center gap-1">
+<span class="text-xl">$</span>
+<span class="text-[10px] uppercase tracking-tighter">USD</span>
+</button>
+<button class="flex-1 min-w-[80px] py-3 px-2 rounded-xl border-2 border-transparent bg-surface-container-lowest dark:bg-surface-dim text-on-surface-variant dark:text-outline-variant font-bold flex flex-col items-center gap-1">
+<span class="text-xl">£</span>
+<span class="text-[10px] uppercase tracking-tighter">GBP</span>
+</button>
+<button class="flex-1 min-w-[80px] py-3 px-2 rounded-xl border-2 border-transparent bg-surface-container-lowest dark:bg-surface-dim text-on-surface-variant dark:text-outline-variant font-bold flex flex-col items-center gap-1">
+<span class="text-xl">¥</span>
+<span class="text-[10px] uppercase tracking-tighter">JPY</span>
+</button>
+</div>
+</section>
+<!-- Theme Section -->
+<section class="bg-surface-container-low dark:bg-surface-dark/10 border border-cardBorder dark:border-outline/20 rounded-lg p-6 overflow-hidden">
+<h3 class="font-headline text-lg font-bold mb-4">App Theme</h3>
+<div class="flex gap-4 overflow-x-auto pb-2 hide-scrollbar snap-x">
+<div class="snap-center shrink-0 w-32 aspect-[3/4] bg-[#FFF8F5] border-4 border-primary rounded-xl p-3 flex flex-col justify-between">
+<div class="space-y-1">
+<div class="w-full h-2 bg-[#864D5F] rounded-full opacity-20"></div>
+<div class="w-2/3 h-2 bg-[#864D5F] rounded-full opacity-10"></div>
+</div>
+<span class="text-[10px] font-bold text-[#864D5F]">Rose Petal</span>
+</div>
+<div class="snap-center shrink-0 w-32 aspect-[3/4] bg-[#F0F4F2] border border-outline-variant/30 rounded-xl p-3 flex flex-col justify-between">
+<div class="space-y-1">
+<div class="w-full h-2 bg-[#4D866E] rounded-full opacity-20"></div>
+<div class="w-2/3 h-2 bg-[#4D866E] rounded-full opacity-10"></div>
+</div>
+<span class="text-[10px] font-bold text-[#4D866E]">Sage Linen</span>
+</div>
+<div class="snap-center shrink-0 w-32 aspect-[3/4] bg-[#1D1B1A] border border-outline-variant/30 rounded-xl p-3 flex flex-col justify-between">
+<div class="space-y-1">
+<div class="w-full h-2 bg-[#FBB3C7] rounded-full opacity-20"></div>
+<div class="w-2/3 h-2 bg-[#FBB3C7] rounded-full opacity-10"></div>
+</div>
+<span class="text-[10px] font-bold text-[#FBB3C7]">Midnight Silk</span>
+</div>
+</div>
+</section>
+<!-- Reports & Exports Section -->
+<section class="bg-surface-container-low dark:bg-surface-dark/10 border border-cardBorder dark:border-outline/20 rounded-lg p-2">
+<div class="p-4 border-b border-cardBorder dark:border-outline/10">
+<h3 class="font-headline text-lg font-bold">Reports &amp; Exports</h3>
+</div>
+<div class="space-y-1">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-lowest dark:hover:bg-surface-dim rounded-xl transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary-fixed-dim/20 flex items-center justify-center text-primary dark:text-primary-fixed-dim">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<span class="font-medium">View Performance Reports</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-lowest dark:hover:bg-surface-dim rounded-xl transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined">download</span>
+</div>
+<span class="font-medium">Export Data (CSV)</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-lowest dark:hover:bg-surface-dim rounded-xl transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">cloud_upload</span>
+</div>
+<span class="font-medium">Backup &amp; Restore</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pt-4 flex flex-col items-center gap-4">
+<button class="flex items-center gap-2 text-error font-bold px-6 py-3 rounded-full hover:bg-error/10 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                    Sign Out
+                </button>
+<p class="text-[10px] text-outline text-center">Version 2.4.0 (Build 1024)<br/>Made with craftsmanship in Florence</p>
+</section>
+</div>
+</main>
+<!-- NavigationDrawer (Desktop Only) -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-[280px] bg-surface dark:bg-surface-dim shadow-2xl flex-col py-10 rounded-r-lg z-[60] border-r border-cardBorder dark:border-outline/20">
+<div class="px-8 mb-10">
+<h1 class="font-artisan text-2xl text-primary font-bold italic">Artisan Studio</h1>
+</div>
+<div class="px-6 space-y-2 flex-1">
+<div class="flex items-center gap-4 p-4 text-secondary hover:bg-secondary-container/40 rounded-full transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-functional text-base">Studio Dashboard</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-secondary hover:bg-secondary-container/40 rounded-full transition-all">
+<span class="material-symbols-outlined">draw</span>
+<span class="font-functional text-base">Embroidery Patterns</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-secondary hover:bg-secondary-container/40 rounded-full transition-all">
+<span class="material-symbols-outlined">group</span>
+<span class="font-functional text-base">Client List</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-secondary hover:bg-secondary-container/40 rounded-full transition-all">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-functional text-base">Inventory</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 bg-primary/10 text-primary font-bold rounded-full transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-functional text-base">Settings</span>
+</div>
+</div>
+<div class="px-8 mt-auto flex items-center gap-4">
+<img class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn9BnUN-OS7YTgbzGcpfLfDzOJKEaoTyl2lAwSrZ6DtDb0BDRJhRS6Dl62fPpuXVzcJoX0B5U5DFVfJ9A-5n1MqSMUCEpAFt1q8-P_8n3QHFxYDwZsZ1QepD5u1GjoVQyT-On5YQGgmxo1thgPHIT62NsA3ERO81VsijPh20ltlIy4yPuaErpr3Pn79l5KkNOLG_yZY2lfZFythtGl__G0nsP2tHbXflLkwyyq6Cvuqbhjv0Ueb7dEpnx1ZSc17kzibem4E0g7AhDM"/>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface text-sm">Elena Rossi</span>
+<span class="text-xs text-on-surface-variant">Master Embroiderer</span>
+</div>
+</div>
+</aside>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4 bg-surface/90 dark:bg-inverse-surface/90 backdrop-blur-md rounded-t-lg shadow-[0_-8px_32px_rgba(44,44,44,0.06)] border-t border-cardBorder dark:border-outline/20 z-50 md:hidden">
+<div class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">home_app_logo</span>
+<span class="font-functional text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-functional text-[10px] font-medium uppercase tracking-tighter">Orders</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant/50 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-functional text-[10px] font-medium uppercase tracking-tighter">Reports</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-primary after:rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-functional text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</div>
+</nav>
+</body></html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sofi Dream - Artisan Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#4a4643",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fff8f5",
+                        "surface": "#fff8f5",
+                        "secondary-fixed-dim": "#cbc5c1",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#e8e1dc",
+                        "surface-container": "#f3ecea",
+                        "background": "#fff8f5",
+                        "on-secondary-container": "#686460",
+                        "inverse-surface": "#33302e",
+                        "tertiary-fixed-dim": "#ffb4a2",
+                        "tertiary-fixed": "#ffdad2",
+                        "primary-fixed": "#ffd9e2",
+                        "tertiary-container": "#e37e65",
+                        "outline": "#837376",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#fbb3c7",
+                        "surface-variant": "#e8e1de",
+                        "surface-container-high": "#ede7e4",
+                        "on-primary-fixed-variant": "#6b3647",
+                        "on-primary-fixed": "#360b1c",
+                        "on-surface": "#1d1b1a",
+                        "surface-dim": "#dfd9d6",
+                        "secondary-fixed": "#e8e1dc",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1d1b1a",
+                        "on-tertiary-container": "#5f1a08",
+                        "surface-container-highest": "#e8e1de",
+                        "on-surface-variant": "#514346",
+                        "on-tertiary-fixed-variant": "#7b2e1b",
+                        "on-secondary-fixed": "#1e1b18",
+                        "outline-variant": "#d5c2c5",
+                        "tertiary": "#994530",
+                        "primary": "#864d5f",
+                        "secondary": "#625e5a",
+                        "primary-container": "#c9879a",
+                        "on-primary-container": "#522232",
+                        "surface-container-low": "#f9f2ef",
+                        "inverse-primary": "#fbb3c7",
+                        "surface-tint": "#864d5f",
+                        "inverse-on-surface": "#f6efec",
+                        "surface-container-lowest": "#ffffff",
+                    },
+                    fontFamily: {
+                        "headline": ["Noto Serif"],
+                        "body": ["Plus Jakarta Sans"],
+                        "label": ["Plus Jakarta Sans"],
+                        "artisan": ["Playfair Display"],
+                        "functional": ["DM Sans"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.linen-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBxhBhtK3wKfK0zpEWD7rbVlo44RiY_qDR0goZg9YTm_DdjCElVLCbLUt468ryTUZhxYo1csqmZG1tEBvW1cml2suwaQYb1iCyKYgYVcJBqkkQ3pFfK7meojb-nPvWJMQINZFKUy9VcbKyP9THU0dcFqk4OYhO9PTVDyORj--T0PDf-6f705pPVYqrKul_Tm23A3_lSC4NDd9P1cjg98X1bWbvgeOXiLR6p7kp2cqyugUO0BrwapWyE-cmYUxNKr3ZuaI6L-11y2me_);
+    opacity: 0.03
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#FFF8F5]/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(134,77,95,0.05)] after:content-[''] after:block after:h-[1px] after:bg-[#E8E1DC]/30 flex justify-between items-center px-6 h-16">
+<button class="text-[#864D5F] hover:opacity-80 transition-opacity active:scale-95 duration-300 ease-in-out">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Playfair_Display'] text-2xl tracking-wide font-bold text-[#864D5F]">Artisan Studio</h1>
+<button class="text-[#864D5F] hover:opacity-80 transition-opacity active:scale-95 duration-300 ease-in-out">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-2xl mx-auto relative min-h-screen">
+<div class="absolute inset-0 linen-overlay pointer-events-none"></div>
+<!-- Profile Header -->
+<section class="mb-12 text-center">
+<div class="relative inline-block mb-6">
+<div class="w-32 h-32 rounded-full overflow-hidden border-4 border-surface-container shadow-lg">
+<img alt="Elena Rossi" class="w-full h-full object-cover" data-alt="A portrait of a smiling woman with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpon_-Ll77MkDzXBmBFGRjtqnsGtCrhx2R9Wi71kJYQwawC3QfwGCZV_De45G_uuWacm2f3GmHvmk8KxjLeL1KRvSvN-SrugpOj6nyXh3uUHGdfCzDnsRc55_ikd6JkuUCZkaFoFA0AdIl0RfKlitRgXJewR_ss_y_qNNhbqVAQi6d1_hQx_Fccnw2awn3oDyNx7tnZ7nMa4zmtI-g37tun_oR1E4d7xB7gLkhyt4p_uDD9_FHhJZ4Zf8P5IRUq1Ignz1y0dfn98vA"/>
+</div>
+<button class="absolute bottom-0 right-0 bg-primary text-on-primary p-2 rounded-full shadow-md active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-sm">edit</span>
+</button>
+</div>
+<h2 class="font-headline text-3xl font-bold text-on-surface mb-1">Elena Rossi</h2>
+<p class="font-functional text-sm uppercase tracking-widest text-tertiary font-medium">Master Embroiderer</p>
+</section>
+<!-- Settings Groups -->
+<div class="space-y-10">
+<!-- Business Profile Group -->
+<section>
+<h3 class="font-headline text-lg font-bold mb-4 px-2 text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">storefront</span>
+                    Business Profile
+                </h3>
+<div class="bg-surface-container-low rounded-lg p-2 space-y-1">
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-bright transition-colors group">
+<div class="flex flex-col">
+<span class="text-xs text-on-surface-variant font-semibold uppercase tracking-tighter">Business Name</span>
+<span class="text-on-surface font-medium">Sofi Dream Studio</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-bright transition-colors group">
+<div class="flex flex-col">
+<span class="text-xs text-on-surface-variant font-semibold uppercase tracking-tighter">Instagram Handle</span>
+<span class="text-tertiary font-medium">@sofi.dream.art</span>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Preferences Group -->
+<section>
+<h3 class="font-headline text-lg font-bold mb-4 px-2 text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">settings_heart</span>
+                    App Preferences
+                </h3>
+<div class="bg-surface-container-low rounded-lg p-2 space-y-1">
+<!-- Currency Selector -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="font-medium text-on-surface">Currency</span>
+</div>
+<div class="relative">
+<select class="appearance-none bg-surface-container px-6 py-2 pr-10 rounded-full text-sm font-bold text-on-surface border-none focus:ring-2 focus:ring-primary/20">
+<option value="EUR">€ (EUR)</option>
+<option value="USD">$ (USD)</option>
+<option value="GBP">£ (GBP)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-sm pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Dark Mode Toggle -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">dark_mode</span>
+</div>
+<span class="font-medium text-on-surface">Dark Mode</span>
+</div>
+<button class="w-12 h-6 bg-outline-variant/30 rounded-full relative transition-colors p-1">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm translate-x-0"></div>
+</button>
+</div>
+<!-- Notification Settings -->
+<div class="flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl group cursor-pointer">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<div class="flex flex-col">
+<span class="font-medium text-on-surface">Notifications</span>
+<span class="text-xs text-on-surface-variant">Push, Email, In-app</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="pt-4">
+<button class="w-full p-4 flex items-center justify-center gap-2 text-error font-semibold hover:bg-error-container/20 rounded-xl transition-colors">
+<span class="material-symbols-outlined">logout</span>
+                    Sign Out
+                </button>
+</section>
+</div>
+</main>
+<!-- NavigationDrawer (Sidebar for Desktop - Hidden on Mobile) -->
+<aside class="hidden lg:flex fixed left-0 top-0 h-full w-[280px] bg-[#FFF8F5] shadow-2xl flex-col py-10 rounded-r-[2.75rem] z-[60]">
+<div class="px-8 mb-10">
+<h1 class="font-['Playfair_Display'] text-2xl text-[#864D5F] font-bold italic">Artisan Studio</h1>
+</div>
+<div class="px-6 space-y-2 flex-1">
+<div class="flex items-center gap-4 p-4 text-[#864D5F] hover:bg-[#E8E1DC]/20 rounded-full transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-['DM_Sans'] text-base tracking-tight">Studio Dashboard</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-[#864D5F] hover:bg-[#E8E1DC]/20 rounded-full transition-all">
+<span class="material-symbols-outlined">draw</span>
+<span class="font-['DM_Sans'] text-base tracking-tight">Embroidery Patterns</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-[#864D5F] hover:bg-[#E8E1DC]/20 rounded-full transition-all">
+<span class="material-symbols-outlined">group</span>
+<span class="font-['DM_Sans'] text-base tracking-tight">Client List</span>
+</div>
+<div class="flex items-center gap-4 p-4 text-[#864D5F] hover:bg-[#E8E1DC]/20 rounded-full transition-all">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-['DM_Sans'] text-base tracking-tight">Inventory</span>
+</div>
+<div class="flex items-center gap-4 px-4 py-3 bg-[#E8E1DC]/40 text-[#994530] font-semibold rounded-full transition-all">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-['DM_Sans'] text-base tracking-tight">Settings</span>
+</div>
+</div>
+<div class="px-8 mt-auto flex items-center gap-4">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="Profile miniature" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAn9BnUN-OS7YTgbzGcpfLfDzOJKEaoTyl2lAwSrZ6DtDb0BDRJhRS6Dl62fPpuXVzcJoX0B5U5DFVfJ9A-5n1MqSMUCEpAFt1q8-P_8n3QHFxYDwZsZ1QepD5u1GjoVQyT-On5YQGgmxo1thgPHIT62NsA3ERO81VsijPh20ltlIy4yPuaErpr3Pn79l5KkNOLG_yZY2lfZFythtGl__G0nsP2tHbXflLkwyyq6Cvuqbhjv0Ueb7dEpnx1ZSc17kzibem4E0g7AhDM"/>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface text-sm">Elena Rossi</span>
+<span class="text-xs text-on-surface-variant">Master Embroiderer</span>
+</div>
+</div>
+</aside>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4 bg-[#FFF8F5]/90 backdrop-blur-md rounded-t-[2.75rem] shadow-[0_-8px_32px_rgba(44,44,44,0.06)] border-t border-[#E8E1DC]/20 z-50 md:hidden">
+<div class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500">
+<span class="material-symbols-outlined">home_app_logo</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Orders</span>
+</div>
+<div class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Reports</span>
+</div>
+<!-- Active Tab: Profile -->
+<div class="flex flex-col items-center justify-center text-[#994530] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#994530] after:rounded-full active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</div>
+</nav>
+</body></html>

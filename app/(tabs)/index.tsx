@@ -12,16 +12,15 @@ import { useRouter } from 'expo-router';
 import { format } from 'date-fns';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Circle } from 'react-native-svg';
 import { useOrders } from '../../hooks/useOrders';
 import { useReports } from '../../hooks/useReports';
 import { useProfile } from '../../hooks/useProfile';
 import { useTheme } from '../../context/ThemeContext';
 import { OrderCard } from '../../components/OrderCard';
 import { CountdownTimer } from '../../components/CountdownTimer';
-import { StatTile } from '../../components/StatTile';
-import { SectionHeader } from '../../components/SectionHeader';
 import { FAB } from '../../components/FAB';
-import { Colors, Spacing, BorderRadius, getCurrencySymbol } from '../../lib/theme';
+import { getCurrencySymbol } from '../../lib/theme';
 
 // Design tokens — Stitch "Warm Artisan Editorial"
 const T = {
@@ -33,14 +32,18 @@ const T = {
   surfaceLowest: '#FFFFFF',
   primary: '#864D5F',
   primaryContainer: '#C9879A',
+  primaryFixed: '#FFD9E2',
   onPrimary: '#FFFFFF',
   tertiary: '#994530',
+  tertiaryFixed: '#FFDAD2',
   secondary: '#625E5A',
   secondaryContainer: '#E8E1DC',
+  secondaryFixed: '#E8E1DC',
   text: '#1D1B1A',
   subText: '#514346',
   outline: '#837376',
   outlineVariant: '#D5C2C5',
+  error: '#BA1A1A',
 };
 
 const QUOTES = [
@@ -77,10 +80,48 @@ function getGreeting(): string {
   return 'Good night';
 }
 
-/** Extract a first name from a business name, falling back to the full name */
 function firstName(name: string): string {
   const words = name.trim().split(/\s+/);
   return words[0] ?? name;
+}
+
+// Circular Progress SVG component
+function CircularProgress({ progress, size = 80 }: { progress: number; size?: number }) {
+  const strokeWidth = 6;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <View style={{ alignItems: 'center', gap: 4 }}>
+      <Svg width={size} height={size}>
+        {/* Background circle */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={T.outlineVariant}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeOpacity={0.3}
+        />
+        {/* Progress arc */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={T.tertiary}
+          strokeWidth={strokeWidth}
+          fill="none"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${size / 2} ${size / 2})`}
+        />
+      </Svg>
+      <Text style={styles.circleProgressLabel}>TODAY</Text>
+    </View>
+  );
 }
 
 export default function DashboardScreen() {
@@ -100,7 +141,17 @@ export default function DashboardScreen() {
     [orders]
   );
 
+  const requestCount = useMemo(
+    () => orders.filter((o) => o.status === 'request').length,
+    [orders]
+  );
+
   const dailyQuote = getDailyQuote();
+
+  // Circular progress calculation
+  const progressPercent = activeOrders > 0
+    ? Math.min(Math.round((shippedCount / (activeOrders + shippedCount)) * 100), 100)
+    : 0;
 
   if (loading) {
     return (
@@ -114,12 +165,19 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Glassmorphism-style header bar */}
+      {/* Top bar with notification bell */}
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Artisan Studio</Text>
-        <View style={styles.topBarBell}>
+        <TouchableOpacity
+          style={styles.topBarBell}
+          onPress={() => router.push('/notifications')}
+          activeOpacity={0.7}
+        >
           <Text style={styles.topBarBellIcon}>🔔</Text>
-        </View>
+          {requestCount > 0 && (
+            <View style={styles.bellDot} />
+          )}
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -133,15 +191,24 @@ export default function DashboardScreen() {
             {getGreeting()}, {firstName(profile.name)} ☀️
           </Text>
           <Text style={styles.greetingSubtitle}>Your atelier is ready for today's creations.</Text>
+          {/* Thin gradient divider */}
+          <View style={styles.greetingDivider} />
         </Animated.View>
 
-        {/* Daily Quote Card */}
-        <Animated.View entering={FadeInDown.delay(50).duration(400)}>
+        {/* Quote Card + Circular Progress row */}
+        <Animated.View entering={FadeInDown.delay(50).duration(400)} style={styles.quoteProgressRow}>
           <View style={styles.quoteCard}>
+            {/* Decorative large quotation mark */}
+            <Text style={styles.quoteDecorChar}>"</Text>
             <Text style={styles.quoteText}>"{dailyQuote.text}"</Text>
             {dailyQuote.author ? (
               <Text style={styles.quoteAuthor}>— {dailyQuote.author}</Text>
             ) : null}
+          </View>
+          {/* Circular progress */}
+          <View style={styles.circleProgressWrapper}>
+            <CircularProgress progress={progressPercent} size={72} />
+            <Text style={styles.circleProgressValue}>{progressPercent}%</Text>
           </View>
         </Animated.View>
 
@@ -150,43 +217,46 @@ export default function DashboardScreen() {
           entering={FadeInDown.delay(100).duration(400)}
           style={[styles.statsGrid, isTablet && styles.statsGridTablet]}
         >
+          {/* Active Orders — primaryFixed tonal */}
           <TouchableOpacity
-            style={[styles.statCard, styles.statCardTertiary]}
+            style={[styles.statCard, { backgroundColor: T.primaryFixed }]}
             onPress={() => router.push('/(tabs)/orders')}
             activeOpacity={0.85}
           >
-            <View style={styles.statCardTop}>
-              <Text style={styles.statIconTertiary}>◈</Text>
-              <View style={styles.statBadgeTertiary}><Text style={styles.statBadgeText}>ACTIVE</Text></View>
-            </View>
-            <Text style={styles.statValue}>{activeOrders}</Text>
-            <Text style={styles.statLabel}>ACTIVE ORDERS</Text>
+            <Text style={[styles.statIcon, { color: T.primary }]}>✏</Text>
+            <Text style={[styles.statValue, { color: '#360B1C' }]}>{activeOrders}</Text>
+            <Text style={[styles.statLabel, { color: '#360B1C' }]}>ACTIVE ORDERS</Text>
           </TouchableOpacity>
 
+          {/* Due This Week — tertiaryFixed tonal */}
           <TouchableOpacity
-            style={[styles.statCard, styles.statCardPrimary]}
+            style={[styles.statCard, { backgroundColor: T.tertiaryFixed }]}
             onPress={() => router.push('/(tabs)/orders')}
             activeOpacity={0.85}
           >
-            <Text style={styles.statIconPrimary}>₿</Text>
-            <Text style={styles.statValue}>{getCurrencySymbol(profile.currency)}{monthRevenue.toFixed(0)}</Text>
-            <Text style={styles.statLabel}>REVENUE THIS MONTH</Text>
+            <Text style={[styles.statIcon, { color: T.tertiary }]}>⏱</Text>
+            <Text style={[styles.statValue, { color: '#3C0700' }]}>{String(dueThisWeek).padStart(2, '0')}</Text>
+            <Text style={[styles.statLabel, { color: '#3C0700' }]}>DUE THIS WEEK</Text>
           </TouchableOpacity>
 
+          {/* Shipped — secondaryFixed tonal */}
           <TouchableOpacity
-            style={styles.statCard}
+            style={[styles.statCard, { backgroundColor: T.secondaryFixed }]}
             onPress={() => router.push('/(tabs)/orders')}
             activeOpacity={0.85}
           >
-            <Text style={styles.statIconSecondary}>✓</Text>
-            <Text style={styles.statValue}>{String(shippedCount).padStart(2, '0')}</Text>
-            <Text style={styles.statLabel}>COMPLETED THIS WEEK</Text>
+            <Text style={[styles.statIcon, { color: T.secondary }]}>📦</Text>
+            <Text style={[styles.statValue, { color: '#1E1B18' }]}>{String(shippedCount).padStart(2, '0')}</Text>
+            <Text style={[styles.statLabel, { color: '#1E1B18' }]}>SHIPPED</Text>
           </TouchableOpacity>
 
-          <View style={styles.statCard}>
-            <Text style={styles.statIconSecondary}>⬡</Text>
-            <Text style={styles.statValue}>{String(dueThisWeek).padStart(2, '0')}</Text>
-            <Text style={styles.statLabel}>DUE THIS WEEK</Text>
+          {/* Revenue — surfaceHigh tonal */}
+          <View style={[styles.statCard, { backgroundColor: T.surfaceHigh }]}>
+            <Text style={[styles.statIcon, { color: T.outline }]}>💰</Text>
+            <Text style={[styles.statValue, { color: T.text }]}>
+              {getCurrencySymbol(profile.currency)}{monthRevenue.toFixed(0)}
+            </Text>
+            <Text style={[styles.statLabel, { color: T.subText }]}>REVENUE</Text>
           </View>
         </Animated.View>
 
@@ -221,27 +291,34 @@ export default function DashboardScreen() {
           </ScrollView>
         </Animated.View>
 
-        {/* Urgent / Needs Attention */}
+        {/* Needs Attention section */}
         {urgentOrders.length > 0 && (
           <Animated.View entering={FadeInDown.delay(200).duration(400)}>
             <View style={styles.sectionHeaderRow}>
               <Text style={styles.sectionTitle}>Needs Attention</Text>
             </View>
             <View style={[styles.section, isTablet && styles.sectionTablet]}>
-              {urgentOrders.map((order, i) => (
-                <Animated.View
-                  key={order.id}
-                  entering={FadeInDown.delay(250 + i * 60).duration(350)}
-                  style={isTablet ? styles.tabletCard : undefined}
-                >
-                  <OrderCard order={order} />
-                </Animated.View>
-              ))}
+              {urgentOrders.map((order, i) => {
+                const isOverdue = new Date(order.dueDate) < new Date();
+                return (
+                  <Animated.View
+                    key={order.id}
+                    entering={FadeInDown.delay(250 + i * 60).duration(350)}
+                    style={[
+                      styles.attentionCardWrapper,
+                      { borderLeftColor: isOverdue ? T.error + '40' : T.tertiary },
+                      isTablet ? styles.tabletCard : undefined,
+                    ]}
+                  >
+                    <OrderCard order={order} />
+                  </Animated.View>
+                );
+              })}
             </View>
           </Animated.View>
         )}
 
-        {/* Active Orders Horizontal Scroll */}
+        {/* In Progress horizontal strip */}
         {activeAccepted.length > 0 && (
           <Animated.View entering={FadeInDown.delay(300).duration(400)}>
             <View style={styles.sectionHeaderRow}>
@@ -263,9 +340,21 @@ export default function DashboardScreen() {
                   activeOpacity={0.85}
                 >
                   {/* Left status ribbon */}
-                  <View style={styles.miniCardRibbon} />
+                  <View style={[styles.miniCardRibbon, { backgroundColor: T.primary }]} />
                   <View style={styles.miniCardContent}>
-                    <Text style={styles.miniCategory}>{order.craftCategory ?? '✦'}</Text>
+                    {/* Category badge */}
+                    {order.craftCategory ? (
+                      <View style={styles.miniCategoryBadge}>
+                        <Text style={styles.miniCategoryEmoji}>
+                          {order.craftCategory.charAt(0)}
+                        </Text>
+                        <Text style={styles.miniCategoryText} numberOfLines={1}>
+                          {order.craftCategory}
+                        </Text>
+                      </View>
+                    ) : (
+                      <Text style={styles.miniCategory}>✦</Text>
+                    )}
                     <Text style={styles.miniName} numberOfLines={2}>
                       {order.orderName}
                     </Text>
@@ -278,7 +367,7 @@ export default function DashboardScreen() {
           </Animated.View>
         )}
 
-        {/* Recent Orders section header + recent list */}
+        {/* Recent Orders */}
         {orders.length > 0 && (
           <Animated.View entering={FadeInDown.delay(350).duration(400)}>
             <View style={styles.sectionHeaderRow}>
@@ -302,7 +391,7 @@ export default function DashboardScreen() {
                     <View style={styles.recentCardBody}>
                       <View style={styles.recentCardLeft}>
                         <Text style={styles.recentOrderName} numberOfLines={1}>{order.orderName}</Text>
-                        <Text style={styles.recentOrderSub}>#{order.id.slice(-6)} • {order.customerName}</Text>
+                        <Text style={styles.recentOrderSub}>#{order.id.slice(-6)} · {order.customerName}</Text>
                       </View>
                       <View style={styles.recentCardRight}>
                         <Text style={styles.recentPrice}>{getCurrencySymbol(order.currency)}{order.askingPrice.toFixed(2)}</Text>
@@ -363,15 +452,27 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   topBarBell: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: T.surfaceLow,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative',
   },
   topBarBellIcon: {
     fontSize: 16,
+  },
+  bellDot: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: T.tertiary,
+    borderWidth: 1.5,
+    borderColor: T.bg,
   },
   scroll: {
     flex: 1,
@@ -409,11 +510,24 @@ const styles = StyleSheet.create({
     color: T.subText,
     fontWeight: '500',
     letterSpacing: -0.2,
+    marginBottom: 12,
   },
-  // Quote card
-  quoteCard: {
+  greetingDivider: {
+    height: 1,
+    backgroundColor: T.outlineVariant,
+    opacity: 0.3,
+    borderRadius: 1,
+  },
+  // Quote + progress row
+  quoteProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginHorizontal: 16,
     marginBottom: 20,
+    gap: 12,
+  },
+  quoteCard: {
+    flex: 1,
     borderRadius: 16,
     padding: 16,
     backgroundColor: T.surfaceLow,
@@ -423,6 +537,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.03,
     shadowRadius: 8,
     elevation: 2,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  quoteDecorChar: {
+    position: 'absolute',
+    top: -16,
+    left: 8,
+    fontFamily: 'PlayfairDisplay',
+    fontSize: 80,
+    color: T.primary,
+    opacity: 0.06,
+    lineHeight: 80,
   },
   quoteText: {
     fontSize: 13,
@@ -436,6 +562,29 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
     letterSpacing: 0.5,
     color: T.subText,
+  },
+  // Circular progress
+  circleProgressWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    width: 80,
+  },
+  circleProgressLabel: {
+    fontSize: 8,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: T.subText,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  circleProgressValue: {
+    position: 'absolute',
+    top: 22,
+    fontSize: 14,
+    fontFamily: 'DMMono',
+    fontWeight: '700',
+    color: T.tertiary,
   },
   // Stats 2x2 grid
   statsGrid: {
@@ -451,7 +600,6 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     minWidth: '45%',
-    backgroundColor: T.surfaceLow,
     borderRadius: 16,
     padding: 16,
     gap: 4,
@@ -461,59 +609,20 @@ const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 2,
   },
-  statCardTertiary: {
-    backgroundColor: T.surfaceLow,
-  },
-  statCardPrimary: {
-    backgroundColor: T.surfaceLowest,
-    shadowColor: T.primary,
-    shadowOpacity: 0.08,
-  },
-  statCardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statIconTertiary: {
+  statIcon: {
     fontSize: 22,
-    color: T.tertiary,
-  },
-  statIconPrimary: {
-    fontSize: 22,
-    color: T.primary,
-    marginBottom: 8,
-  },
-  statIconSecondary: {
-    fontSize: 22,
-    color: T.subText,
-    marginBottom: 8,
-  },
-  statBadgeTertiary: {
-    backgroundColor: T.tertiary,
-    borderRadius: 999,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  statBadgeText: {
-    fontSize: 9,
-    fontFamily: 'DMSans',
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 1,
+    marginBottom: 4,
   },
   statValue: {
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
     lineHeight: 34,
   },
   statLabel: {
     fontSize: 10,
     fontFamily: 'DMSans',
     fontWeight: '600',
-    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: -0.3,
   },
@@ -542,7 +651,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
-    whiteSpace: 'nowrap',
   },
   quickActionSecondary: {
     backgroundColor: T.surfaceHighest,
@@ -555,7 +663,6 @@ const styles = StyleSheet.create({
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
-    whiteSpace: 'nowrap',
   },
   // Section headers
   sectionHeaderRow: {
@@ -590,6 +697,14 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 280,
   },
+  // Needs attention wrapper with left border
+  attentionCardWrapper: {
+    borderLeftWidth: 4,
+    borderLeftColor: T.tertiary,
+    borderRadius: 16,
+    overflow: 'hidden',
+    marginBottom: 4,
+  },
   // Horizontal mini cards
   horizontalScroll: {
     paddingHorizontal: 16,
@@ -598,7 +713,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   miniCard: {
-    width: 148,
+    width: 200,
     borderRadius: 16,
     backgroundColor: T.surfaceLowest,
     overflow: 'hidden',
@@ -611,32 +726,52 @@ const styles = StyleSheet.create({
   },
   miniCardRibbon: {
     width: 4,
-    backgroundColor: T.primary,
   },
   miniCardContent: {
     flex: 1,
     padding: 12,
+    gap: 4,
+  },
+  miniCategoryBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3ECEA',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    gap: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+    maxWidth: '100%',
+  },
+  miniCategoryEmoji: {
+    fontSize: 12,
+  },
+  miniCategoryText: {
+    fontSize: 10,
+    fontFamily: 'DMSans',
+    color: T.subText,
+    fontWeight: '600',
   },
   miniCategory: {
-    fontSize: 20,
-    marginBottom: 6,
+    fontSize: 18,
+    marginBottom: 4,
   },
   miniName: {
     fontSize: 13,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
     color: T.text,
-    marginBottom: 4,
     lineHeight: 18,
   },
   miniCustomer: {
     fontSize: 11,
     fontFamily: 'DMSans',
     color: T.subText,
-    marginBottom: 6,
   },
   miniCountdown: {
     fontSize: 11,
+    color: T.tertiary,
   },
   // Recent orders list
   recentOrdersList: {
@@ -687,7 +822,7 @@ const styles = StyleSheet.create({
   },
   recentPrice: {
     fontSize: 15,
-    fontFamily: 'DMSans',
+    fontFamily: 'DMMono',
     fontWeight: '700',
     color: T.text,
     marginBottom: 2,

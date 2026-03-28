@@ -12,11 +12,43 @@ import { useTheme } from '../context/ThemeContext';
 import { DEFAULT_NOTIFICATION_PREFS } from '../types';
 import { Colors, Spacing, BorderRadius } from '../lib/theme';
 
+// Design tokens — Stitch "Warm Artisan Editorial"
+const T = {
+  bg: '#FFF8F5',
+  surfaceLow: '#F9F2EF',
+  surfaceContainer: '#F3ECEA',
+  surfaceHigh: '#EDE7E4',
+  surfaceLowest: '#FFFFFF',
+  primary: '#864D5F',
+  primaryContainer: '#C9879A',
+  primaryFixed: '#FFD9E2',
+  onPrimary: '#FFFFFF',
+  onPrimaryContainer: '#522232',
+  tertiary: '#994530',
+  tertiaryFixed: '#FFDAD2',
+  secondary: '#625E5A',
+  secondaryContainer: '#E8E1DC',
+  text: '#1D1B1A',
+  subText: '#514346',
+  outline: '#837376',
+  outlineVariant: '#D5C2C5',
+};
+
 const DAY_OPTIONS = [
   { label: 'Sun', value: 0 }, { label: 'Mon', value: 1 }, { label: 'Tue', value: 2 },
   { label: 'Wed', value: 3 }, { label: 'Thu', value: 4 }, { label: 'Fri', value: 5 },
   { label: 'Sat', value: 6 },
 ];
+
+// Section icon color configs
+const SEC_ICONS: Record<string, { icon: string; bg: string }> = {
+  Master: { icon: '🔔', bg: T.primaryFixed },
+  'Due-Date Alerts': { icon: '⏱', bg: T.tertiaryFixed },
+  'Daily Digest': { icon: '☀️', bg: '#FFF3E0' },
+  'Weekly Summary': { icon: '📅', bg: T.surfaceHigh },
+  'Shipping Reminders': { icon: '📦', bg: T.secondaryContainer },
+  'Payment Reminders': { icon: '💰', bg: T.surfaceContainer },
+};
 
 export default function NotificationsScreen() {
   const router = useRouter();
@@ -24,17 +56,16 @@ export default function NotificationsScreen() {
   const { prefs, updatePrefs, testNotification } = useNotifications();
   const { colors } = useTheme();
 
-  // ── Local draft state ── only committed on Save ──────────────
+  // Local draft state — only committed on Save
   const [draft, setDraft] = useState({ ...prefs });
 
-  // Local text fields (avoids appending bug and prevents save-on-every-keystroke)
+  // Local text fields
   const [dueAlertTime, setDueAlertTime] = useState(prefs.dueSoonAlerts.time);
   const [digestTime, setDigestTime] = useState(prefs.dailyDigest.time);
   const [weeklyTime, setWeeklyTime] = useState(prefs.weeklySummary.time);
   const [shipDays, setShipDays] = useState(String(prefs.shippingReminder.daysAfterAccepted));
   const [payDays, setPayDays] = useState(String(prefs.paymentReminder.daysAfterDelivery));
 
-  // Sync from prefs if they change from outside (e.g. Firebase listener)
   useEffect(() => {
     setDraft({ ...prefs });
     setDueAlertTime(prefs.dueSoonAlerts.time);
@@ -43,7 +74,7 @@ export default function NotificationsScreen() {
     setShipDays(String(prefs.shippingReminder.daysAfterAccepted));
     setPayDays(String(prefs.paymentReminder.daysAfterDelivery));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);   // only on mount — don't re-sync on every remote update while editing
+  }, []);
 
   const set = useCallback(<K extends keyof typeof draft>(key: K, val: (typeof draft)[K]) => {
     setDraft((d) => ({ ...d, [key]: val }));
@@ -102,12 +133,24 @@ export default function NotificationsScreen() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} style={s.backPill} hitSlop={12}>
-          <Text style={s.back}>← Back</Text>
+          <Text style={s.backChevron}>‹</Text>
+          <Text style={s.back}>Back</Text>
         </TouchableOpacity>
         <Text style={s.headerTitle}>Notifications</Text>
         <TouchableOpacity onPress={handleSave} style={s.saveHeaderBtn} hitSlop={8}>
           <Text style={s.saveHeaderTxt}>Save</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Decorative hoop motif at top of content */}
+      <View style={s.hoopMotifRow}>
+        <View style={s.hoopCircle}>
+          <Text style={s.hoopEmoji}>🪡</Text>
+        </View>
+        <View style={s.hoopMotifText}>
+          <Text style={s.hoopMotifTitle}>Notification Preferences</Text>
+          <Text style={s.hoopMotifSub}>Stay on top of every stitch</Text>
+        </View>
       </View>
 
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -152,7 +195,7 @@ export default function NotificationsScreen() {
                   value={dueAlertTime}
                   onChangeText={setDueAlertTime}
                   placeholder="09:00"
-                  placeholderTextColor={Colors.outline}
+                  placeholderTextColor={T.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -175,7 +218,7 @@ export default function NotificationsScreen() {
                   value={digestTime}
                   onChangeText={setDigestTime}
                   placeholder="08:00"
-                  placeholderTextColor={Colors.outline}
+                  placeholderTextColor={T.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -210,7 +253,7 @@ export default function NotificationsScreen() {
                   value={weeklyTime}
                   onChangeText={setWeeklyTime}
                   placeholder="09:00"
-                  placeholderTextColor={Colors.outline}
+                  placeholderTextColor={T.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -233,7 +276,7 @@ export default function NotificationsScreen() {
                   onChangeText={setShipDays}
                   keyboardType="number-pad"
                   placeholder="3"
-                  placeholderTextColor={Colors.outline}
+                  placeholderTextColor={T.outline}
                 />
               </>
             )}
@@ -255,7 +298,7 @@ export default function NotificationsScreen() {
                   onChangeText={setPayDays}
                   keyboardType="number-pad"
                   placeholder="2"
-                  placeholderTextColor={Colors.outline}
+                  placeholderTextColor={T.outline}
                 />
               </>
             )}
@@ -285,10 +328,15 @@ export default function NotificationsScreen() {
 }
 
 function Sec({ title, children }: { title: string; children: React.ReactNode }) {
+  const iconConfig = SEC_ICONS[title] ?? { icon: '⚙', bg: T.surfaceContainer };
   return (
     <View style={s.section}>
-      <Text style={s.sectionTitle}>{title}</Text>
-      {/* surfaceLowest card, no border */}
+      <View style={s.secHeaderRow}>
+        <View style={[s.secIconBg, { backgroundColor: iconConfig.bg }]}>
+          <Text style={s.secIconEmoji}>{iconConfig.icon}</Text>
+        </View>
+        <Text style={s.sectionTitle}>{title}</Text>
+      </View>
       <View style={s.card}>{children}</View>
     </View>
   );
@@ -306,8 +354,8 @@ function Row({ label, sublabel, value, onChange }: {
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: Colors.outlineVariant, true: Colors.primaryContainer }}
-        thumbColor={Colors.surfaceLowest}
+        trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+        thumbColor={T.surfaceLowest}
       />
     </View>
   );
@@ -318,43 +366,134 @@ function Lbl({ children }: { children: string }) {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: T.bg,
+  },
 
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md,
+    paddingHorizontal: 16,
     paddingVertical: 12,
   },
   backPill: {
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: BorderRadius.pill,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 7,
+    gap: 2,
   },
-  back: { fontSize: 13, fontFamily: 'DMSans', color: Colors.primary, fontWeight: '600' },
-  headerTitle: { fontSize: 20, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: Colors.text },
-  saveHeaderBtn: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    backgroundColor: Colors.primaryContainer,
-    borderRadius: BorderRadius.pill,
+  backChevron: {
+    fontSize: 20,
+    color: T.primary,
+    lineHeight: 20,
+    fontWeight: '300',
+    marginTop: -1,
   },
-  saveHeaderTxt: { color: Colors.onPrimary, fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
-
-  section: { paddingHorizontal: Spacing.md, marginTop: Spacing.lg },
-  sectionTitle: {
+  back: {
+    fontSize: 13,
+    fontFamily: 'DMSans',
+    color: T.primary,
+    fontWeight: '600',
+  },
+  headerTitle: {
     fontSize: 20,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
-    marginBottom: Spacing.sm,
+    color: T.text,
+  },
+  saveHeaderBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    backgroundColor: T.primaryContainer,
+    borderRadius: 999,
+  },
+  saveHeaderTxt: {
+    color: T.onPrimary,
+    fontFamily: 'DMSans',
+    fontSize: 13,
+    fontWeight: '700',
+  },
+
+  // Hoop motif
+  hoopMotifRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    gap: 14,
+  },
+  hoopCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: T.primaryFixed,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: '#D7B49E',
+    shadowColor: T.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  hoopEmoji: {
+    fontSize: 24,
+  },
+  hoopMotifText: {
+    flex: 1,
+  },
+  hoopMotifTitle: {
+    fontSize: 16,
+    fontFamily: 'PlayfairDisplay',
+    fontWeight: '700',
+    color: T.text,
+    marginBottom: 2,
+  },
+  hoopMotifSub: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    color: T.subText,
+    fontStyle: 'italic',
+  },
+
+  // Section
+  section: {
+    paddingHorizontal: 16,
+    marginTop: 16,
+  },
+  secHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 8,
+  },
+  secIconBg: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  secIconEmoji: {
+    fontSize: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: 'PlayfairDisplay',
+    fontWeight: '700',
+    color: T.text,
   },
   card: {
-    borderRadius: BorderRadius.card,
-    padding: Spacing.md,
-    backgroundColor: Colors.surfaceLowest,
+    borderRadius: 16,
+    padding: 16,
+    backgroundColor: T.surfaceLowest,
     gap: 8,
     shadowColor: 'rgba(0,0,0,0.03)',
     shadowOffset: { width: 0, height: 2 },
@@ -363,14 +502,28 @@ const s = StyleSheet.create({
     elevation: 2,
   },
 
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 4 },
-  rowLabel: { fontSize: 14, fontFamily: 'DMSans', color: Colors.text },
-  rowSub: { fontSize: 12, fontFamily: 'DMSans', marginTop: 2, color: Colors.subText },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  rowLabel: {
+    fontSize: 14,
+    fontFamily: 'DMSans',
+    color: T.text,
+  },
+  rowSub: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    marginTop: 2,
+    color: T.subText,
+  },
 
   fieldLbl: {
     fontSize: 11,
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginTop: 8,
@@ -379,54 +532,87 @@ const s = StyleSheet.create({
 
   // pill-shaped time input
   input: {
-    borderRadius: BorderRadius.pill,
+    borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 11,
     fontFamily: 'DMMono',
     fontSize: 15,
-    backgroundColor: Colors.surfaceContainer,
-    color: Colors.text,
+    backgroundColor: T.surfaceContainer,
+    color: T.text,
   },
 
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 8,
+  },
   chip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: BorderRadius.pill,
-    backgroundColor: Colors.surfaceContainer,
+    borderRadius: 999,
+    backgroundColor: T.surfaceContainer,
   },
-  chipOn: { backgroundColor: Colors.primaryContainer },
-  chipTxt: { fontSize: 12, fontFamily: 'DMMono', color: Colors.subText },
-  chipTxtOn: { color: Colors.onPrimary, fontWeight: '600' },
+  chipOn: {
+    backgroundColor: T.primaryContainer,
+  },
+  chipTxt: {
+    fontSize: 12,
+    fontFamily: 'DMMono',
+    color: T.subText,
+  },
+  chipTxtOn: {
+    color: T.onPrimary,
+    fontWeight: '600',
+  },
 
-  actions: { paddingHorizontal: Spacing.md, marginTop: Spacing.lg, gap: 10 },
+  actions: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+    gap: 10,
+  },
   testBtn: {
-    borderRadius: BorderRadius.pill,
-    padding: Spacing.md,
+    borderRadius: 999,
+    padding: 16,
     alignItems: 'center',
-    backgroundColor: Colors.surfaceContainer,
+    backgroundColor: T.surfaceContainer,
   },
-  testTxt: { color: Colors.primary, fontFamily: 'DMSans', fontSize: 14, fontWeight: '600' },
+  testTxt: {
+    color: T.primary,
+    fontFamily: 'DMSans',
+    fontSize: 14,
+    fontWeight: '600',
+  },
   resetBtn: {
-    borderRadius: BorderRadius.pill,
-    padding: Spacing.md,
+    borderRadius: 999,
+    padding: 16,
     alignItems: 'center',
-    backgroundColor: Colors.surfaceHigh,
+    backgroundColor: T.surfaceHigh,
   },
-  resetTxt: { color: Colors.subText, fontFamily: 'DMSans', fontSize: 14, fontWeight: '600' },
+  resetTxt: {
+    color: T.subText,
+    fontFamily: 'DMSans',
+    fontSize: 14,
+    fontWeight: '600',
+  },
 
   stickyBar: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: Colors.outlineVariant,
-    paddingHorizontal: Spacing.md,
+    borderTopColor: T.outlineVariant,
+    paddingHorizontal: 16,
     paddingTop: 10,
-    backgroundColor: Colors.background,
+    backgroundColor: T.bg,
   },
   stickySave: {
-    backgroundColor: Colors.primaryContainer,
-    borderRadius: BorderRadius.pill,
+    backgroundColor: T.primaryContainer,
+    borderRadius: 999,
     paddingVertical: 15,
     alignItems: 'center',
   },
-  stickySaveTxt: { color: Colors.onPrimary, fontFamily: 'DMSans', fontSize: 15, fontWeight: '700' },
+  stickySaveTxt: {
+    color: T.onPrimary,
+    fontFamily: 'DMSans',
+    fontSize: 15,
+    fontWeight: '700',
+  },
 });

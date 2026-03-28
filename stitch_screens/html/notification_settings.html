@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notification Settings - Artisan Studio</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Noto+Serif:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#4a4643",
+              "surface-container-lowest": "#ffffff",
+              "secondary": "#625e5a",
+              "tertiary": "#994530",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "on-error-container": "#93000a",
+              "surface-tint": "#864d5f",
+              "surface-container-low": "#f9f2ef",
+              "background": "#fff8f5",
+              "surface-container-high": "#ede7e4",
+              "outline": "#837376",
+              "inverse-surface": "#33302e",
+              "primary-fixed-dim": "#fbb3c7",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed": "#360b1c",
+              "on-tertiary-fixed": "#3c0700",
+              "on-secondary-container": "#686460",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-error": "#ffffff",
+              "on-tertiary-container": "#5f1a08",
+              "tertiary-fixed": "#ffdad2",
+              "surface": "#fff8f5",
+              "surface-container-highest": "#e8e1de",
+              "on-secondary-fixed": "#1e1b18",
+              "inverse-primary": "#fbb3c7",
+              "surface-bright": "#fff8f5",
+              "on-surface": "#1d1b1a",
+              "surface-dim": "#dfd9d6",
+              "secondary-fixed-dim": "#cbc5c1",
+              "secondary-container": "#e8e1dc",
+              "error": "#ba1a1a",
+              "primary-container": "#c9879a",
+              "surface-variant": "#e8e1de",
+              "on-primary-container": "#522232",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "primary-fixed": "#ffd9e2",
+              "primary": "#864d5f",
+              "outline-variant": "#d5c2c5",
+              "on-background": "#1d1b1a",
+              "secondary-fixed": "#e8e1dc",
+              "surface-container": "#f3ecea",
+              "on-primary": "#ffffff",
+              "inverse-on-surface": "#f6efec",
+              "on-surface-variant": "#514346",
+              "on-tertiary": "#ffffff",
+              "tertiary-container": "#e37e65",
+              "error-container": "#ffdad6"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["Plus Jakarta Sans", "sans-serif"],
+              "playfair": ["Playfair Display", "serif"],
+              "dmsans": ["DM Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.artisan-glass {
+    background: rgba(255, 248, 245, 0.85);
+    backdrop-filter: blur(12px)
+    }
+.linen-overlay {
+    position: relative
+    }
+.linen-overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDtjwhnzvm1vvBNTVZABAt1g9VOJQDB-Ioiz6OMhRwgOPdxkjre1RJDaf6RsUqEKJiYANXNmTlqkaQjX1TPOsO1Mm94B7P8CFxyA84K5ncW-JMfMF-9Iixi1vHzmd-TfGqMIhTK7Z00O0i_KXdQDqg1dEIyllBPvy8SLW-9JvXy2QvPLAVKgOJHGqwi5ky0gJRP-iJzLCmACDDFCFjWqn3Tx6QQ8clRKwzBwp2mD4iX6g3_gl5NHp-pH8QjiMC8Kob3BI8Y2L3ESLaO);
+    opacity: 0.03;
+    pointer-events: none
+    }
+/* Custom Toggle Styling */
+.toggle-checkbox:checked {
+    right: 0;
+    background-color: #c9879a
+    }
+.toggle-checkbox:checked + .toggle-label {
+    background-color: #ede7e4
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container min-h-screen flex items-center justify-center p-4 sm:p-8 linen-overlay">
+<!-- Top Navigation Anchor (Shared Component Mapping) -->
+<header class="fixed top-0 w-full z-50 bg-[#FFF8F5]/80 backdrop-blur-xl flex justify-between items-center px-6 h-16 w-full after:content-[''] after:block after:h-[1px] after:bg-[#E8E1DC]/30 shadow-[0_4px_20px_-2px_rgba(134,77,95,0.05)]">
+<div class="flex items-center gap-4">
+<button class="text-[#864D5F] hover:opacity-80 transition-opacity active:scale-95 duration-300 ease-in-out">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Playfair_Display'] text-2xl tracking-wide font-bold italic text-[#864D5F]">Artisan Studio</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#864D5F] hover:opacity-80 transition-opacity active:scale-95 duration-300 ease-in-out">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Modal Container -->
+<main class="mt-20 mb-28 w-full max-w-2xl bg-surface-container-low rounded-xl shadow-[0_12px_32px_rgba(44,44,44,0.06)] overflow-hidden relative border border-outline-variant/10">
+<!-- Modal Header -->
+<div class="px-8 pt-10 pb-6 text-center">
+<h2 class="font-playfair text-4xl font-bold tracking-tight text-primary mb-2">Notification Settings</h2>
+<p class="font-dmsans text-on-surface-variant/70 text-sm italic">Tailor your studio heartbeat and stay in flow</p>
+</div>
+<!-- Master Switch Section -->
+<div class="px-8 mb-6">
+<div class="bg-surface-container-lowest rounded-lg p-6 flex items-center justify-between shadow-sm border border-outline-variant/5">
+<div>
+<h3 class="font-dmsans font-semibold text-lg text-on-surface">Enable all notifications</h3>
+<p class="font-dmsans text-xs text-on-surface-variant">The master toggle for all studio alerts</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-14 h-7 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Settings Groups -->
+<div class="px-8 space-y-6 pb-12">
+<!-- Due-Date Alerts -->
+<section class="bg-surface-container-lowest rounded-lg p-6 shadow-sm border border-outline-variant/5">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">event_busy</span>
+<h4 class="font-dmsans font-medium text-on-surface">Due-Date Alerts</h4>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="space-y-4">
+<p class="text-xs font-dmsans text-on-surface-variant">Remind me before due dates</p>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-primary text-white shadow-sm">1d</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-secondary-container text-on-secondary-container hover:bg-primary-container/30">2d</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-secondary-container text-on-secondary-container hover:bg-primary-container/30">3d</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-secondary-container text-on-secondary-container hover:bg-primary-container/30">5d</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-secondary-container text-on-secondary-container hover:bg-primary-container/30">7d</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-dmsans transition-all bg-secondary-container text-on-secondary-container hover:bg-primary-container/30">14d</button>
+</div>
+<div class="flex items-center justify-between pt-2">
+<span class="text-xs font-dmsans text-on-surface-variant">Alert Time</span>
+<input class="bg-surface-container border-none text-sm rounded-full px-4 py-1 font-dmsans text-primary focus:ring-1 focus:ring-primary/20" type="time" value="09:00"/>
+</div>
+</div>
+</section>
+<!-- Daily Digest -->
+<section class="bg-surface-container-lowest rounded-lg p-6 shadow-sm border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">wb_sunny</span>
+<h4 class="font-dmsans font-medium text-on-surface">Daily Digest</h4>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<p class="text-xs font-dmsans text-on-surface-variant">Morning summary "Send at"</p>
+<input class="bg-surface-container border-none text-sm rounded-full px-4 py-1 font-dmsans text-primary focus:ring-1 focus:ring-primary/20" type="time" value="08:30"/>
+</div>
+</section>
+<!-- Weekly Summary -->
+<section class="bg-surface-container-lowest rounded-lg p-6 shadow-sm border border-outline-variant/5">
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">calendar_view_week</span>
+<h4 class="font-dmsans font-medium text-on-surface">Weekly Summary</h4>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="space-y-4">
+<div class="flex flex-wrap gap-2">
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">M</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">T</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">W</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">T</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">F</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-primary text-white flex items-center justify-center shadow-md">S</button>
+<button class="w-10 h-10 rounded-full text-xs font-dmsans bg-secondary-container text-on-secondary-container flex items-center justify-center">S</button>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-xs font-dmsans text-on-surface-variant">Weekly recap "Send at"</span>
+<input class="bg-surface-container border-none text-sm rounded-full px-4 py-1 font-dmsans text-primary focus:ring-1 focus:ring-primary/20" type="time" value="18:00"/>
+</div>
+</div>
+</section>
+<!-- Shipping Reminders -->
+<section class="bg-surface-container-lowest rounded-lg p-6 shadow-sm border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">local_shipping</span>
+<h4 class="font-dmsans font-medium text-on-surface">Shipping Reminders</h4>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="flex items-center justify-between gap-4">
+<p class="text-xs font-dmsans text-on-surface-variant">Remind me to ship accepted orders after (days):</p>
+<input class="w-16 bg-surface-container border-none text-sm rounded-full px-4 py-1 font-dmsans text-primary focus:ring-1 focus:ring-primary/20 text-center" type="number" value="2"/>
+</div>
+</section>
+<!-- Payment Reminders -->
+<section class="bg-surface-container-lowest rounded-lg p-6 shadow-sm border border-outline-variant/5">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">payments</span>
+<h4 class="font-dmsans font-medium text-on-surface">Payment Reminders</h4>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+<div class="flex items-center justify-between gap-4">
+<p class="text-xs font-dmsans text-on-surface-variant">Remind me about unpaid orders after delivery (days):</p>
+<input class="w-16 bg-surface-container border-none text-sm rounded-full px-4 py-1 font-dmsans text-primary focus:ring-1 focus:ring-primary/20 text-center" type="number" value="7"/>
+</div>
+</section>
+<!-- Action Buttons -->
+<div class="pt-8 flex flex-col gap-3">
+<button class="w-full bg-tertiary text-white font-dmsans font-semibold py-4 rounded-xl shadow-[0_8px_20px_rgba(153,69,48,0.2)] hover:opacity-90 active:scale-[0.98] transition-all">
+                    Save Preferences
+                </button>
+<button class="w-full text-on-surface-variant font-dmsans text-sm py-2 hover:text-primary transition-colors">
+                    Reset to Defaults
+                </button>
+</div>
+</div>
+<!-- Artisan Decoration (Hoop Motif) -->
+<div class="absolute -bottom-10 -right-10 w-32 h-32 border-8 border-primary-container/10 rounded-full pointer-events-none"></div>
+<div class="absolute -bottom-5 -right-5 w-20 h-20 border-4 border-tertiary/5 rounded-full pointer-events-none"></div>
+</main>
+<!-- Bottom Navigation (Shared Component Mapping) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4 bg-[#FFF8F5]/90 backdrop-blur-md border-t border-[#E8E1DC]/20 shadow-[0_-8px_32px_rgba(44,44,44,0.06)] rounded-t-[2.75rem] z-50">
+<a class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500" href="#">
+<span class="material-symbols-outlined">home_app_logo</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500" href="#">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Orders</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#864D5F]/50 hover:text-[#994530] transition-colors active:scale-90 duration-500" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Reports</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#994530] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#994530] after:rounded-full active:scale-90 duration-500" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</a>
+</nav>
+<!-- Background Decoration -->
+<div class="fixed top-20 left-10 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl -z-10"></div>
+<div class="fixed bottom-20 right-10 w-96 h-96 bg-tertiary-container/5 rounded-full blur-3xl -z-10"></div>
+</body></html>

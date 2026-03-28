@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Artisan Studio Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#522232",
+              "surface-variant": "#e8e1de",
+              "surface-dim": "#dfd9d6",
+              "secondary-fixed-dim": "#cbc5c1",
+              "on-surface-variant": "#514346",
+              "surface-bright": "#fff8f5",
+              "on-error": "#ffffff",
+              "on-surface": "#1d1b1a",
+              "surface-tint": "#864d5f",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-background": "#1d1b1a",
+              "primary-fixed": "#ffd9e2",
+              "inverse-on-surface": "#f6efec",
+              "secondary-fixed": "#e8e1dc",
+              "secondary-container": "#e8e1dc",
+              "error": "#ba1a1a",
+              "outline-variant": "#d5c2c5",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "outline": "#837376",
+              "on-tertiary-container": "#5f1a08",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "on-secondary-fixed": "#1e1b18",
+              "surface": "#fff8f5",
+              "secondary": "#625e5a",
+              "primary": "#864d5f",
+              "on-tertiary-fixed": "#3c0700",
+              "surface-container-highest": "#e8e1de",
+              "tertiary-fixed": "#ffdad2",
+              "primary-container": "#c9879a",
+              "surface-container": "#f3ecea",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-primary": "#ffffff",
+              "on-secondary-container": "#686460",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#ede7e4",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#fbb3c7",
+              "primary-fixed-dim": "#fbb3c7",
+              "tertiary-container": "#e37e65",
+              "background": "#fff8f5",
+              "inverse-surface": "#33302e",
+              "on-secondary-fixed-variant": "#4a4643",
+              "surface-container-low": "#f9f2ef",
+              "tertiary": "#994530",
+              "on-primary-fixed": "#360b1c"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"],
+              "playfair": ["Playfair Display"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.linen-texture {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAPrHkDYikFh9r1LrYpArd2-pen7zhLoe1C0SN3URl_2CM_ASZWBq2Kjw5zIZ4QFJjyJwB6VBI6tCPv1WxiMVLSNnd4-HKk99lULzieDerr6RDpKeZiOBb34WVM5eDrkLxW7ZHjt03BdrSl2TBgV8QKyao5sx2BCYBZhgF12orrG97bP43-sBjUTsSPvD0fuA1pvnS9H0aaYF6K8tpiU4US0c02qNGvVQ0I5VL6aIkXe0CGaSfR5M4FWkLJO44YHxoowGjpwE8gHRPn)
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container/30">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-[#FFF8F5]/80 dark:bg-[#1D1B1A]/80 backdrop-blur-xl shadow-[0_4px_20px_-2px_rgba(134,77,95,0.05)] after:content-[''] after:block after:h-[1px] after:bg-[#E8E1DC]/30">
+<div class="flex justify-between items-center px-6 h-16 w-full">
+<button class="text-[#864D5F] dark:text-[#C9879A] active:scale-95 duration-300 ease-in-out">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-playfair text-2xl tracking-wide font-bold text-[#864D5F] dark:text-[#C9879A]">Artisan Studio</h1>
+<button class="text-[#864D5F] dark:text-[#C9879A] active:scale-95 duration-300 ease-in-out relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-tertiary rounded-full"></span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-6 max-w-5xl mx-auto space-y-10">
+<!-- Header Greeting -->
+<section class="flex justify-between items-end">
+<div class="space-y-1">
+<h2 class="font-playfair text-4xl font-bold text-on-surface">Good morning, Sofie ☀️</h2>
+<p class="text-on-surface-variant font-medium tracking-tight">Your atelier is ready for today's creations.</p>
+</div>
+<div class="hidden md:block">
+<img alt="Sofie Profile" class="w-14 h-14 rounded-full object-cover shadow-lg border-2 border-surface-container-highest" data-alt="Close up portrait of a smiling woman artisan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArRXJGVWMoaJX1TW_QaeIdgh5fYD3TGHlvmXDmxvgEAwoWoEqSTd-yY-xrEHvcscwWlRojjWz7VQmdJWye4csvHROzOuU5FWAHCwx_7L2sVO10eEqcsnGrlIWAZQonIjvibTJ0D5aGygEoZZG_3T5ZKiuGxLOB3cRDfUeNFUheOtW5OKhCexcg8TyRADdKrSUYmUaoLtWYnhu5rS5T_32y_Rs3Do94KWyPqSsZdDEWI0cqz2qyIhAbxgQDg2V5_1w4Dnunl5v52H_5"/>
+</div>
+</section>
+<!-- Summary Cards 2x2 Grid -->
+<section class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+<!-- Active Orders -->
+<div class="bg-surface-container-low p-6 rounded-lg shadow-[0_8px_32px_rgba(44,44,44,0.04)] space-y-4">
+<div class="flex justify-between items-start">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">architecture</span>
+<span class="bg-tertiary text-on-tertiary text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">Active</span>
+</div>
+<div>
+<p class="text-3xl font-bold font-playfair text-on-surface">12</p>
+<p class="text-xs font-semibold text-on-surface-variant uppercase tracking-tighter">Active Orders</p>
+</div>
+</div>
+<!-- Revenue -->
+<div class="bg-surface-container-lowest p-6 rounded-lg shadow-[0_8px_32px_rgba(134,77,95,0.08)] border border-outline-variant/10 space-y-4">
+<span class="material-symbols-outlined text-primary">payments</span>
+<div>
+<p class="text-3xl font-bold font-playfair text-on-surface">€4,280</p>
+<p class="text-xs font-semibold text-on-surface-variant uppercase tracking-tighter">Revenue This Month</p>
+</div>
+</div>
+<!-- Completed -->
+<div class="bg-surface-container-low p-6 rounded-lg shadow-[0_8px_32px_rgba(44,44,44,0.04)] space-y-4">
+<span class="material-symbols-outlined text-on-surface-variant">check_circle</span>
+<div>
+<p class="text-3xl font-bold font-playfair text-on-surface">08</p>
+<p class="text-xs font-semibold text-on-surface-variant uppercase tracking-tighter">Completed This Week</p>
+</div>
+</div>
+<!-- Pending -->
+<div class="bg-surface-container-low p-6 rounded-lg shadow-[0_8px_32px_rgba(44,44,44,0.04)] space-y-4">
+<span class="material-symbols-outlined text-on-surface-variant">local_shipping</span>
+<div>
+<p class="text-3xl font-bold font-playfair text-on-surface">03</p>
+<p class="text-xs font-semibold text-on-surface-variant uppercase tracking-tighter">Pending Delivery</p>
+</div>
+</div>
+</section>
+<!-- Quick Actions Pill Row -->
+<section class="flex overflow-x-auto pb-4 gap-3 no-scrollbar -mx-6 px-6">
+<button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-3 rounded-full font-semibold text-sm shadow-lg whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">add</span>
+                New Order
+            </button>
+<button class="flex items-center gap-2 bg-surface-container-highest text-on-surface px-6 py-3 rounded-full font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">person_add</span>
+                Add Customer
+            </button>
+<button class="flex items-center gap-2 bg-surface-container-highest text-on-surface px-6 py-3 rounded-full font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">analytics</span>
+                View Reports
+            </button>
+<button class="flex items-center gap-2 bg-surface-container-highest text-on-surface px-6 py-3 rounded-full font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-sm">ios_share</span>
+                Export PDF
+            </button>
+</section>
+<!-- Recent Orders List -->
+<section class="space-y-6">
+<div class="flex justify-between items-center px-2">
+<h3 class="font-playfair text-2xl font-bold">Recent Orders</h3>
+<button class="text-primary font-bold text-sm hover:underline">View All</button>
+</div>
+<div class="space-y-4">
+<!-- Order Card 1 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4 relative overflow-hidden">
+<!-- Status Ribbon -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-tertiary"></div>
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-variant">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Detailed embroidery pattern on natural linen fabric" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDc9Jg__QVSX50TawxZ-UkA6-U4YjUOmfj7G8ljSEIxNiZ4iRSZfok0R2H2i84RhtLbXix_o8v8SY0Sk9Q8Dv2-EAJ6g8N1lGEemyEFaJglDHFIlkhjA7L6B9_aJAzshn8J-9xRbds_wYal-t7ud3cL4qWsNFq4BJn1hL7vxpCetl30FYp4x28uFPJxxi2HYzfnGwB7XOTLBCd5UEozag3gTY3kVFRHiPG-fTwcbdskYEGN9Y2IMlfC_UEQNTo7drRrYlrg1eGeJiwL"/>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-bold text-on-surface truncate">Custom Floral Napkins</h4>
+<p class="text-sm text-on-surface-variant">Order #ART-2940 • Client: Marcelle V.</p>
+</div>
+<div class="text-right flex-shrink-0">
+<p class="font-bold text-on-surface">€320.00</p>
+<p class="text-[10px] font-bold text-tertiary uppercase tracking-wider">In Progress</p>
+</div>
+</div>
+<!-- Order Card 2 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4 relative overflow-hidden">
+<!-- Status Ribbon -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-variant">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Close up of silk threads and embroidery hoop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSYZ0ijAcs2-1KywiUxdAVP4NzbC0dh_c7D3Niq-CcJVdEIMSf3UN--oECKJ5BWXydYuD3t0iZgnCEV1Tws0hJlJutk7QyWnlnkpSy4_JpNRe6UPOV4CEPSuc1n6R3A6ZY4rDC-4K2GBS-gdVSQjOerDtxKCo1dpIhD5_pJInOevDTLdCr7Tf_a3u_6eF8c39A9XdsonfCqvxpAcG2YsJgbIeyY7sKEsxtubJPfxah7837FA24CUMwmdIS0uig9B_d_FfgE6DxC_YX"/>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-bold text-on-surface truncate">Heirloom Handkerchiefs</h4>
+<p class="text-sm text-on-surface-variant">Order #ART-2938 • Client: Julian R.</p>
+</div>
+<div class="text-right flex-shrink-0">
+<p class="font-bold text-on-surface">€185.00</p>
+<p class="text-[10px] font-bold text-primary uppercase tracking-wider">Shipped</p>
+</div>
+</div>
+<!-- Order Card 3 -->
+<div class="bg-surface-container-lowest p-5 rounded-lg shadow-[0_4px_16px_rgba(0,0,0,0.03)] flex items-center gap-4 relative overflow-hidden">
+<!-- Status Ribbon -->
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-surface-dim"></div>
+<div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-surface-variant">
+<img alt="Product" class="w-full h-full object-cover" data-alt="Abstract embroidery artwork on canvas" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4pLU294uaW-J2zp9X-46DfGqOIqNwliQKDWNcqFd7w37IeU1Cm77r6jewHaIHUV9baLF8AlahaDHp2aWXDLS52fM72eC93Dgy8H9NYQFgTsWRLmeLeHWFnev2cLSO-zsBryBJ_izZAcwW3bjH1N0OsolMjx9l4Hk5xtaxNn5pfk0rRxuZH6YGeI5q_7mPoXMphnDiP0wTdhuJw82hlRGc4zt2hBOL8HBQNIobcdezq8_NIuW-L0lj_c_UDKsWzGm_rlX4T0x42s1t"/>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-bold text-on-surface truncate">Wall Art: Summer Tides</h4>
+<p class="text-sm text-on-surface-variant">Order #ART-2935 • Client: Gallery O.</p>
+</div>
+<div class="text-right flex-shrink-0">
+<p class="font-bold text-on-surface">€1,150.00</p>
+<p class="text-[10px] font-bold text-on-surface-variant uppercase tracking-wider opacity-60">Pending</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 rounded-t-[2.75rem] bg-[#FFF8F5]/90 dark:bg-[#1D1B1A]/90 backdrop-blur-md shadow-[0_-8px_32px_rgba(44,44,44,0.06)] border-t border-[#E8E1DC]/20">
+<div class="fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center text-[#994530] dark:text-[#C9879A] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#994530] after:rounded-full active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_app_logo</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter mt-1">Home</span>
+</button>
+<!-- Orders -->
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter mt-1">Orders</span>
+</button>
+<!-- Reports -->
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter mt-1">Reports</span>
+</button>
+<!-- Profile -->
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter mt-1">Profile</span>
+</button>
+</div>
+</nav>
+<!-- Contextual FAB (Suppressed on Home according to shell logic if strictly dashboard, but usually FAB is on Home for 'New Order') -->
+<!-- Suppression rule says only render if primary purpose aligns perfectly. 'New Order' fits. -->
+<button class="fixed right-6 bottom-24 bg-tertiary text-on-tertiary w-14 h-14 rounded-full shadow-[0px_12px_32px_rgba(153,69,48,0.3)] flex items-center justify-center active:scale-95 transition-all z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

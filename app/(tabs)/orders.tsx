@@ -16,7 +16,6 @@ import { useOrders } from '../../hooks/useOrders';
 import { useTheme } from '../../context/ThemeContext';
 import { OrderCard } from '../../components/OrderCard';
 import { FAB } from '../../components/FAB';
-import { Colors, Spacing, BorderRadius } from '../../lib/theme';
 import type { OrderStatus } from '../../types';
 
 // Design tokens — Stitch "Warm Artisan Editorial"
@@ -73,6 +72,12 @@ export default function OrdersScreen() {
   const [statusFilter, setStatusFilter] = useState<FilterValue>('all');
   const [sortBy, setSortBy] = useState<SortOption>('dueDate');
 
+  // Count new requests for badge
+  const requestCount = useMemo(
+    () => orders.filter((o) => o.status === 'request').length,
+    [orders]
+  );
+
   const filtered = useMemo(() => {
     let result = [...orders];
 
@@ -112,7 +117,17 @@ export default function OrdersScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Search bar — pill shape, bg surfaceLow, no border */}
+      {/* Header row */}
+      <View style={styles.headerRow}>
+        <Text style={styles.headerTitle}>Orders ✦</Text>
+        {requestCount > 0 && (
+          <View style={styles.requestBadge}>
+            <Text style={styles.requestBadgeText}>{requestCount} new</Text>
+          </View>
+        )}
+      </View>
+
+      {/* Search bar — pill shape, surfaceLow bg */}
       <View style={styles.searchContainer}>
         <View style={styles.searchBar}>
           <Text style={styles.searchIcon}>🔍</Text>
@@ -175,7 +190,7 @@ export default function OrdersScreen() {
                   sortBy === s.value && styles.sortOptionActive,
                 ]}
               >
-                {s.label}
+                {sortBy === s.value ? '⇅ ' : ''}{s.label}
               </Text>
             </TouchableOpacity>
           ))}
@@ -234,10 +249,39 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: T.bg,
   },
+  // Header row
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 4,
+    gap: 12,
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontFamily: 'PlayfairDisplay',
+    fontWeight: '700',
+    color: T.text,
+    flex: 1,
+  },
+  requestBadge: {
+    backgroundColor: T.tertiary,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+  },
+  requestBadgeText: {
+    fontSize: 11,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: '#FFFFFF',
+    letterSpacing: 0.5,
+  },
   // Search
   searchContainer: {
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 8,
     paddingBottom: 8,
   },
   searchBar: {
@@ -308,6 +352,8 @@ const styles = StyleSheet.create({
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
     color: T.primary,
+    flexShrink: 0,
+    marginRight: 8,
   },
   sortContent: {
     gap: 4,

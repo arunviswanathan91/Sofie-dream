@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -7,31 +7,74 @@ import {
   ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { format } from 'date-fns';
+import { format, differenceInHours } from 'date-fns';
 import { CountdownTimer } from './CountdownTimer';
-import { StatusBadge } from './StatusBadge';
 import { TagChip } from './TagChip';
-import { useTheme } from '../context/ThemeContext';
-import { Colors, StatusTokens, Spacing, BorderRadius, getCurrencySymbol } from '../lib/theme';
+import { getCurrencySymbol } from '../lib/theme';
 import type { Order } from '../types';
+
+// Design tokens
+const T = {
+  bg: '#FFF8F5',
+  surfaceLowest: '#FFFFFF',
+  surfaceContainer: '#F3ECEA',
+  primary: '#864D5F',
+  primaryContainer: '#C9879A',
+  tertiary: '#994530',
+  secondary: '#625E5A',
+  secondaryContainer: '#E8E1DC',
+  text: '#1D1B1A',
+  subText: '#514346',
+  outline: '#837376',
+  outlineVariant: '#D5C2C5',
+};
+
+// Status ribbon colors
+const RIBBON_COLOR: Record<Order['status'], string> = {
+  request: T.secondary,
+  accepted: T.primaryContainer,
+  shipped: T.primary,
+  delivered: T.tertiary,
+  cancelled: T.outlineVariant,
+};
+
+// Status badge config
+const STATUS_BADGE: Record<Order['status'], { bg: string; text: string }> = {
+  request: { bg: T.secondaryContainer, text: T.secondary },
+  accepted: { bg: T.primaryContainer, text: '#522232' },
+  shipped: { bg: '#EDE7E4', text: T.primary },
+  delivered: { bg: '#FFDAD2', text: T.tertiary },
+  cancelled: { bg: '#E8E1DE', text: T.outline },
+};
+
+// Category emoji map
+const CATEGORY_EMOJI: Record<string, string> = {
+  'Embroidery': '🪡',
+  'Knitting': '🧶',
+  'Crochet': '🧵',
+  'Macramé': '🪢',
+  'Weaving': '🧵',
+  'Cross-stitch': '✂️',
+  'Quilting': '🪡',
+  'Sewing': '🧵',
+};
+
+function getCategoryEmoji(category: string): string {
+  for (const key of Object.keys(CATEGORY_EMOJI)) {
+    if (category.toLowerCase().includes(key.toLowerCase())) {
+      return CATEGORY_EMOJI[key];
+    }
+  }
+  return '✦';
+}
 
 interface Props {
   order: Order;
   compact?: boolean;
 }
 
-// 4px left status ribbon color per status
-const RIBBON_COLOR: Record<Order['status'], string> = {
-  request:   Colors.secondary,
-  accepted:  Colors.primaryContainer,
-  shipped:   Colors.primary,
-  delivered: Colors.tertiary,
-  cancelled: Colors.outline,
-};
-
 export function OrderCard({ order, compact = false }: Props) {
   const router = useRouter();
-  const { colors } = useTheme();
 
   const handlePress = () => {
     router.push(`/order/${order.id}`);
@@ -39,7 +82,12 @@ export function OrderCard({ order, compact = false }: Props) {
 
   const symbol = getCurrencySymbol(order.currency);
   const isActive = ['accepted', 'request'].includes(order.status);
-  const ribbonColor = RIBBON_COLOR[order.status];
+  const hoursUntilDue = differenceInHours(new Date(order.dueDate), new Date());
+  const isUrgent = isActive && hoursUntilDue < 48 && hoursUntilDue >= 0;
+
+  const ribbonColor = isUrgent ? T.tertiary : RIBBON_COLOR[order.status];
+  const badgeConfig = STATUS_BADGE[order.status];
+  const categoryEmoji = order.craftCategory ? getCategoryEmoji(order.craftCategory) : '✦';
 
   return (
     <TouchableOpacity
@@ -47,59 +95,76 @@ export function OrderCard({ order, compact = false }: Props) {
       onPress={handlePress}
       activeOpacity={0.85}
     >
-      {/* 4px absolute-left status ribbon */}
-      <View style={[styles.ribbon, { backgroundColor: ribbonColor }]} />
+      {/* 4px left accent bar */}
+      <View style={[styles.accentBar, { backgroundColor: ribbonColor }]} />
 
-      {/* Top row */}
-      <View style={styles.topRow}>
-        <View style={styles.titleGroup}>
-          <Text style={styles.orderName} numberOfLines={1}>
-            {order.orderName}
-          </Text>
-          <Text style={styles.customerName} numberOfLines={1}>
-            {order.customerName}
-          </Text>
+      {/* Card body */}
+      <View style={styles.body}>
+        {/* Top row: title + badge */}
+        <View style={styles.topRow}>
+          <View style={styles.titleGroup}>
+            <Text style={styles.orderName} numberOfLines={1}>
+              {order.orderName}
+            </Text>
+            <Text style={styles.orderMeta} numberOfLines={1}>
+              #{order.id.slice(-6)} · {order.customerName}
+            </Text>
+          </View>
+          {/* Status badge pill */}
+          <View style={[styles.badge, { backgroundColor: badgeConfig.bg }]}>
+            <Text style={[styles.badgeText, { color: badgeConfig.text }]}>
+              {order.status.toUpperCase()}
+            </Text>
+          </View>
         </View>
-        <View style={styles.priceGroup}>
-          <Text style={styles.price}>
-            {symbol}{order.askingPrice.toFixed(0)}
-          </Text>
-          {order.isPaid ? (
-            <Text style={styles.paidLabel}>paid</Text>
-          ) : (
-            <Text style={styles.unpaidLabel}>unpaid</Text>
-          )}
-        </View>
-      </View>
 
-      {/* Category + Tags */}
-      {!compact && (
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tagsRow}
-          keyboardShouldPersistTaps="always"
-        >
+        {/* Middle row: category chip + price + deadline */}
+        <View style={styles.middleRow}>
           {order.craftCategory ? (
-            <TagChip label={order.craftCategory} color={Colors.primaryContainer} />
+            <View style={styles.categoryChip}>
+              <Text style={styles.categoryEmoji}>{categoryEmoji}</Text>
+              <Text style={styles.categoryLabel} numberOfLines={1}>
+                {order.craftCategory}
+              </Text>
+            </View>
           ) : null}
-          {order.tags.slice(0, 3).map((tag) => (
-            <TagChip key={tag} label={tag} />
-          ))}
-        </ScrollView>
-      )}
-
-      {/* Bottom row */}
-      <View style={styles.bottomRow}>
-        <StatusBadge status={order.status} size="sm" />
-        <View style={styles.dateGroup}>
-          <Text style={styles.dueLabel}>
-            Due {format(new Date(order.dueDate), 'MMM d')}
-          </Text>
-          {isActive && (
-            <CountdownTimer dueDate={order.dueDate} style={styles.countdown} />
-          )}
+          <View style={{ flex: 1 }} />
+          <View style={styles.priceDeadlineGroup}>
+            <Text style={styles.price}>
+              {symbol}{order.askingPrice.toFixed(0)}
+            </Text>
+            <Text style={styles.dueDate}>
+              Due {format(new Date(order.dueDate), 'MMM d')}
+            </Text>
+          </View>
         </View>
+
+        {/* Countdown timer if urgent */}
+        {isActive && (
+          <View style={styles.countdownRow}>
+            {isUrgent ? (
+              <Text style={styles.urgentCountdown}>
+                ⚡ Urgent — <CountdownTimer dueDate={order.dueDate} style={styles.urgentCountdownTimer} />
+              </Text>
+            ) : (
+              <CountdownTimer dueDate={order.dueDate} style={styles.countdown} />
+            )}
+          </View>
+        )}
+
+        {/* Tags scroll (non-compact only) */}
+        {!compact && order.tags && order.tags.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.tagsRow}
+            keyboardShouldPersistTaps="always"
+          >
+            {order.tags.slice(0, 4).map((tag) => (
+              <TagChip key={tag} label={tag} />
+            ))}
+          </ScrollView>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -107,95 +172,128 @@ export function OrderCard({ order, compact = false }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: BorderRadius.card,
-    padding: Spacing.md,
-    paddingLeft: Spacing.md + 4 + 8, // leave room for ribbon
-    marginBottom: Spacing.sm,
-    backgroundColor: Colors.surfaceLowest,
+    flexDirection: 'row',
+    borderRadius: 16,
+    backgroundColor: T.surfaceLowest,
     overflow: 'hidden',
-    shadowColor: 'rgba(0,0,0,0.03)',
+    marginBottom: 12,
+    shadowColor: '#1D1B1A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.04,
     shadowRadius: 8,
     elevation: 2,
   },
   cardCompact: {
-    padding: Spacing.sm,
-    paddingLeft: Spacing.sm + 4 + 8,
-    marginBottom: Spacing.xs,
+    marginBottom: 8,
   },
-  ribbon: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
+  accentBar: {
     width: 4,
+    alignSelf: 'stretch',
   },
+  body: {
+    flex: 1,
+    padding: 16,
+    gap: 10,
+  },
+  // Top row
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: Spacing.sm,
+    gap: 8,
   },
   titleGroup: {
     flex: 1,
-    marginRight: Spacing.sm,
+    gap: 2,
   },
   orderName: {
-    fontSize: 16,
+    fontSize: 17,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 2,
+    color: T.text,
+    lineHeight: 22,
   },
-  customerName: {
+  orderMeta: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
   },
-  priceGroup: {
-    alignItems: 'flex-end',
+  // Status badge
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+    alignSelf: 'flex-start',
+    flexShrink: 0,
   },
-  price: {
-    fontSize: 15,
+  badgeText: {
+    fontSize: 10,
     fontFamily: 'DMSans',
-    color: Colors.primary,
     fontWeight: '700',
+    letterSpacing: 0.8,
   },
-  paidLabel: {
-    fontSize: 9,
-    fontFamily: 'DMSans',
-    color: Colors.tertiary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 1,
-  },
-  unpaidLabel: {
-    fontSize: 9,
-    fontFamily: 'DMSans',
-    color: Colors.outline,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginTop: 1,
-  },
-  tagsRow: {
-    marginBottom: Spacing.sm,
-  },
-  bottomRow: {
+  // Middle row
+  middleRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
-  dateGroup: {
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F3ECEA',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    gap: 4,
+    maxWidth: 140,
+  },
+  categoryEmoji: {
+    fontSize: 13,
+  },
+  categoryLabel: {
+    fontSize: 11,
+    fontFamily: 'DMSans',
+    color: T.subText,
+    fontWeight: '600',
+  },
+  priceDeadlineGroup: {
     alignItems: 'flex-end',
     gap: 2,
   },
-  dueLabel: {
-    fontSize: 11,
+  price: {
+    fontSize: 16,
+    fontFamily: 'DMMono',
+    fontWeight: '700',
+    color: T.primary,
+  },
+  dueDate: {
+    fontSize: 12,
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
+  },
+  // Countdown
+  countdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  urgentCountdown: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    fontWeight: '600',
+    color: T.tertiary,
+  },
+  urgentCountdownTimer: {
+    fontSize: 12,
+    color: T.tertiary,
+    fontWeight: '600',
   },
   countdown: {
-    fontSize: 11,
+    fontSize: 12,
+    color: T.subText,
+  },
+  // Tags
+  tagsRow: {
+    marginTop: 2,
   },
 });

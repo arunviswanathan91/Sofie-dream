@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sofi Dream Splash Screen</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&amp;family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=DM+Sans:ital,wght@0,400;0,500;1,400&amp;family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#ffffff",
+              "on-surface-variant": "#514346",
+              "outline-variant": "#d5c2c5",
+              "on-surface": "#1d1b1a",
+              "surface-container": "#f3ecea",
+              "secondary-fixed": "#e8e1dc",
+              "primary": "#864d5f",
+              "on-secondary-container": "#686460",
+              "tertiary-fixed": "#ffdad2",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1d1b1a",
+              "surface-variant": "#e8e1de",
+              "on-secondary-fixed": "#1e1b18",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#360b1c",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#522232",
+              "inverse-on-surface": "#f6efec",
+              "tertiary": "#994530",
+              "secondary-fixed-dim": "#cbc5c1",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "surface-dim": "#dfd9d6",
+              "surface-bright": "#fff8f5",
+              "surface-container-high": "#ede7e4",
+              "outline": "#837376",
+              "on-tertiary-container": "#5f1a08",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#fbb3c7",
+              "tertiary-container": "#e37e65",
+              "secondary-container": "#e8e1dc",
+              "on-secondary": "#ffffff",
+              "inverse-surface": "#33302e",
+              "background": "#fff8f5",
+              "surface-container-highest": "#e8e1de",
+              "secondary": "#625e5a",
+              "primary-fixed-dim": "#fbb3c7",
+              "surface-container-low": "#f9f2ef",
+              "surface": "#fff8f5",
+              "surface-tint": "#864d5f",
+              "on-tertiary-fixed": "#3c0700",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "primary-container": "#c9879a",
+              "primary-fixed": "#ffd9e2",
+              "on-secondary-fixed-variant": "#4a4643",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Playfair Display", "Noto Serif", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["DM Sans", "Plus Jakarta Sans", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .linen-texture {
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.03;
+        pointer-events: none;
+      }
+      .hoop-glow {
+        box-shadow: 0 0 60px 10px rgba(134, 77, 95, 0.1);
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen relative overflow-hidden flex flex-col items-center justify-center">
+<!-- Linen Texture Overlay -->
+<div class="fixed inset-0 linen-texture z-0"></div>
+<!-- Main Content Shell -->
+<main class="relative z-10 flex flex-col items-center justify-between h-[751px] w-full max-w-md px-8 text-center">
+<!-- Center Brand Cluster -->
+<div class="flex-1 flex flex-col items-center justify-center space-y-8">
+<!-- Animated Look Hoop Logo -->
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- Outer Wooden Hoop -->
+<div class="absolute inset-0 rounded-full border-[10px] border-[#D7B49E] dark:border-[#5C4B40] hoop-glow"></div>
+<!-- Inner Fabric Content -->
+<div class="w-[88%] h-[88%] rounded-full bg-surface-container-low flex items-center justify-center overflow-hidden">
+<img alt="Embroidery hoop with a delicate floral design being stitched" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="Delicate floral embroidery inside a wooden hoop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLg-Efu6Tjp8px1T8miUMLuFOdUFpYYw4cc5Zusgh18zVXxx1zgQW9J1Hf6RaShOvnsqep5WPwcbrlUxRcpD8xAISa586LUDkufJKVBtnIWiGueoYWrmGs_mAa_zEtCr3mAuWsi2POYNltRzt_9Q0HyhgjrhrJ3OIBqDYfGy_XCX1Yp_yCeedy7fgsSMCDqOyJ72Fr51JyjrnJu55l60MG282DoSmStwcsOh9DRLWZk-ctdqP9dUvqN52fNKp1G-OyjEiS0UM5Z5FS"/>
+</div>
+<!-- Decorative Needle Accent -->
+<div class="absolute -right-4 top-1/2 -translate-y-1/2 rotate-[35deg] bg-outline-variant w-[2px] h-20 after:content-[''] after:absolute after:top-0 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-outline after:rounded-full"></div>
+</div>
+<div class="space-y-3">
+<h1 class="font-headline text-[32px] leading-tight text-[#3D2B1F] dark:text-primary-fixed tracking-tight">
+                    Sofi Dream ✦
+                </h1>
+<p class="font-label italic text-sm text-on-surface-variant tracking-wider opacity-70">
+                    Handmade with love ✦
+                </p>
+</div>
+</div>
+<!-- Bottom Quote Card -->
+<div class="w-full mb-12 transform transition-all duration-700 ease-out">
+<div class="bg-primary-fixed/30 dark:bg-primary-container/20 backdrop-blur-sm p-8 rounded-lg border border-primary-fixed/10 shadow-sm relative overflow-hidden group">
+<!-- Soft Rose Accent -->
+<div class="absolute top-0 right-0 w-24 h-24 bg-tertiary-fixed/20 rounded-full -mr-12 -mt-12 blur-2xl"></div>
+<span class="material-symbols-outlined text-primary mb-3 block text-xl opacity-60">format_quote</span>
+<p class="font-headline italic text-lg text-on-primary-container leading-relaxed">
+                    Every stitch tells a story.
+                </p>
+<div class="mt-4 flex justify-center gap-1">
+<div class="h-[2px] w-8 bg-primary/20 rounded-full"></div>
+<div class="h-[2px] w-2 bg-primary rounded-full"></div>
+<div class="h-[2px] w-2 bg-primary/20 rounded-full"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- Suppressed Navigation (As per Contextual Rule for Splash/Onboarding) -->
+<!-- The BottomNavBar and TopAppBar are excluded to prioritize the focus on the branding experience -->
+<!-- Decorative Corner Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="fixed bottom-[-5%] right-[-5%] w-[30%] h-[30%] bg-tertiary/5 rounded-full blur-[80px] pointer-events-none"></div>
+</body></html>

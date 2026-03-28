@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error": "#ffffff",
+              "on-surface-variant": "#514346",
+              "outline-variant": "#d5c2c5",
+              "on-surface": "#1d1b1a",
+              "surface-container": "#f3ecea",
+              "secondary-fixed": "#e8e1dc",
+              "primary": "#864d5f",
+              "on-secondary-container": "#686460",
+              "tertiary-fixed": "#ffdad2",
+              "surface-container-lowest": "#ffffff",
+              "on-background": "#1d1b1a",
+              "surface-variant": "#e8e1de",
+              "on-secondary-fixed": "#1e1b18",
+              "error": "#ba1a1a",
+              "on-primary-fixed": "#360b1c",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#522232",
+              "inverse-on-surface": "#f6efec",
+              "tertiary": "#994530",
+              "secondary-fixed-dim": "#cbc5c1",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "surface-dim": "#dfd9d6",
+              "surface-bright": "#fff8f5",
+              "surface-container-high": "#ede7e4",
+              "outline": "#837376",
+              "on-tertiary-container": "#5f1a08",
+              "on-tertiary": "#ffffff",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#fbb3c7",
+              "tertiary-container": "#e37e65",
+              "secondary-container": "#e8e1dc",
+              "on-secondary": "#ffffff",
+              "inverse-surface": "#33302e",
+              "background": "#fff8f5",
+              "surface-container-highest": "#e8e1de",
+              "secondary": "#625e5a",
+              "primary-fixed-dim": "#fbb3c7",
+              "surface-container-low": "#f9f2ef",
+              "surface": "#fff8f5",
+              "surface-tint": "#864d5f",
+              "on-tertiary-fixed": "#3c0700",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "primary-container": "#c9879a",
+              "primary-fixed": "#ffd9e2",
+              "on-secondary-fixed-variant": "#4a4643",
+              "on-error-container": "#93000a"
+            },
+            fontFamily: {
+              "headline": ["Playfair Display", "serif"],
+              "body": ["Plus Jakarta Sans", "sans-serif"],
+              "label": ["DM Sans", "sans-serif"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.urgent-pulse {
+    box-shadow: 0 0 0 0 rgba(153, 69, 48, 0.4);
+    animation: pulse-ring 2s infinite
+    }
+@keyframes pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(153, 69, 48, 0.4);
+        } 70% {
+        box-shadow: 0 0 0 10px rgba(153, 69, 48, 0);
+        } 100% {
+        box-shadow: 0 0 0 0 rgba(153, 69, 48, 0);
+        }
+    }
+.linen-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBMfB7Ahj1KazuDDKQeIQbJOs-3d_vSgJl5oSVLlbCPBS-3_r2GeVUhd42A7qyDnFaxOSd5MprGSS3KqvRyTshiUhypaNxBc-gA6gjNcwm7MHW46p6-3gR1Mbr6uYt9xCQYD2L5uf9L3EMjr-U-lfDaqNaVgvWrYX4qnQbZzNiiXqI4s01OM0Yz4L9LMgb7QMz2R2kVBnGebRBaGSxNhkAap8HiOcQVmDD8pOHUg6uiE02LB9TJoDMb4SKJ8oKpQ_YY0003pH_KfoqE);
+    opacity: 0.03;
+    pointer-events: none
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen pb-24">
+<div class="fixed inset-0 linen-overlay z-[-1]"></div>
+<!-- TopAppBar from JSON -->
+<header class="bg-[#FFF8F5]/80 dark:bg-[#1D1B1A]/80 backdrop-blur-xl fixed top-0 w-full z-50 shadow-[0_4px_20px_-2px_rgba(134,77,95,0.05)] after:content-[''] after:block after:h-[1px] after:bg-[#E8E1DC]/30 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="text-[#864D5F] dark:text-[#C9879A] active:scale-95 duration-300 ease-in-out hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-['Playfair_Display'] text-2xl tracking-wide font-bold text-[#864D5F] dark:text-[#C9879A]">Artisan Studio</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-[#864D5F] dark:text-[#C9879A] active:scale-95 duration-300 ease-in-out hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-20 px-6 max-w-2xl mx-auto space-y-8">
+<!-- Search Bar Section -->
+<section class="mt-4">
+<div class="relative group">
+<div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full h-14 pl-14 pr-6 bg-surface-container-low border-none rounded-full focus:ring-2 focus:ring-primary/40 focus:bg-surface-container transition-all text-on-surface-variant placeholder:text-outline/60 shadow-sm" placeholder="Search orders, clients, or patterns..." type="text"/>
+</div>
+</section>
+<!-- Status Filter Chips -->
+<section class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
+<button class="h-10 px-6 bg-primary text-on-primary rounded-full flex items-center gap-2 whitespace-nowrap shadow-md transition-transform active:scale-95">
+<span class="text-sm font-semibold">Accepted</span>
+<span class="bg-on-primary/20 px-2 py-0.5 rounded-full text-[10px] font-bold">3</span>
+</button>
+<button class="h-10 px-6 bg-surface-container-highest text-on-surface-variant rounded-full flex items-center gap-2 whitespace-nowrap transition-transform active:scale-95 hover:bg-surface-variant">
+<span class="text-sm font-semibold">In Progress</span>
+<span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-[10px] font-bold">12</span>
+</button>
+<button class="h-10 px-6 bg-surface-container-highest text-on-surface-variant rounded-full flex items-center gap-2 whitespace-nowrap transition-transform active:scale-95 hover:bg-surface-variant">
+<span class="text-sm font-semibold">Awaiting Pickup</span>
+<span class="bg-on-surface-variant/10 px-2 py-0.5 rounded-full text-[10px] font-bold">5</span>
+</button>
+<button class="h-10 px-6 bg-surface-container-highest text-on-surface-variant rounded-full flex items-center gap-2 whitespace-nowrap transition-transform active:scale-95 hover:bg-surface-variant">
+<span class="text-sm font-semibold">Completed</span>
+</button>
+</section>
+<!-- Sort Row -->
+<div class="flex justify-between items-center">
+<h2 class="font-headline text-lg text-primary font-bold">Recent Orders</h2>
+<button class="flex items-center gap-2 px-4 py-2 bg-secondary-container/50 rounded-full text-xs font-label font-bold text-on-secondary-fixed-variant uppercase tracking-wider">
+<span class="material-symbols-outlined text-sm">swap_vert</span>
+                Latest First
+            </button>
+</div>
+<!-- Order List -->
+<div class="space-y-6">
+<!-- Order Card 1: Urgent -->
+<div class="relative bg-surface-container-lowest rounded-lg urgent-pulse border border-tertiary/10 flex items-stretch overflow-hidden shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] group transition-all hover:translate-y-[-2px]">
+<div class="w-1 bg-tertiary"></div>
+<div class="p-5 flex-1 space-y-3">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-xl font-bold text-on-surface">Golden Silk Peonies</h3>
+<p class="text-sm text-outline font-medium">Order #8832 • Elena Rossi</p>
+</div>
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Urgent</span>
+</div>
+<div class="flex flex-wrap gap-2 items-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+<span>🧵</span> Embroidery
+                        </span>
+<div class="flex-1"></div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-tertiary font-bold text-lg">$450.00</span>
+<span class="text-[10px] text-tertiary font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">timer</span> 2h 45m left
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Card 2: Regular -->
+<div class="relative bg-surface-container-lowest rounded-lg border border-outline-variant/5 flex items-stretch overflow-hidden shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-all hover:translate-y-[-2px]">
+<div class="w-1 bg-primary"></div>
+<div class="p-5 flex-1 space-y-3">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-xl font-bold text-on-surface">Velvet Rose Tapestry</h3>
+<p class="text-sm text-outline font-medium">Order #8831 • Marco Valenti</p>
+</div>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Accepted</span>
+</div>
+<div class="flex flex-wrap gap-2 items-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+<span>🎨</span> Custom Pattern
+                        </span>
+<div class="flex-1"></div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-primary font-bold text-lg">$1,280.00</span>
+<span class="text-[10px] text-outline font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">calendar_today</span> Due Jul 24
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Card 3: Regular -->
+<div class="relative bg-surface-container-lowest rounded-lg border border-outline-variant/5 flex items-stretch overflow-hidden shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-all hover:translate-y-[-2px]">
+<div class="w-1 bg-primary"></div>
+<div class="p-5 flex-1 space-y-3">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-xl font-bold text-on-surface">Linen Monogram Set</h3>
+<p class="text-sm text-outline font-medium">Order #8829 • Sofia Chen</p>
+</div>
+<span class="bg-primary-container text-on-primary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Accepted</span>
+</div>
+<div class="flex flex-wrap gap-2 items-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+<span>✨</span> Monogram
+                        </span>
+<div class="flex-1"></div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-primary font-bold text-lg">$185.00</span>
+<span class="text-[10px] text-outline font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">calendar_today</span> Due Jul 26
+                            </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Order Card 4: Regular -->
+<div class="relative bg-surface-container-lowest rounded-lg border border-outline-variant/5 flex items-stretch overflow-hidden shadow-[0_8px_24px_-4px_rgba(0,0,0,0.04)] transition-all hover:translate-y-[-2px]">
+<div class="w-1 bg-[#625E5A]"></div>
+<div class="p-5 flex-1 space-y-3">
+<div class="flex justify-between items-start">
+<div class="space-y-1">
+<h3 class="font-headline text-xl font-bold text-on-surface">Rustic Wool Scarf</h3>
+<p class="text-sm text-outline font-medium">Order #8825 • Liam O'Donnell</p>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Draft</span>
+</div>
+<div class="flex flex-wrap gap-2 items-center">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+<span>🧶</span> Hand-Knit
+                        </span>
+<div class="flex-1"></div>
+<div class="flex flex-col items-end">
+<span class="font-mono text-secondary font-bold text-lg">$95.00</span>
+<span class="text-[10px] text-outline font-medium flex items-center gap-1">
+<span class="material-symbols-outlined text-xs">edit</span> Drafted 1h ago
+                            </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-24 right-6 h-14 pl-5 pr-7 bg-tertiary text-on-tertiary rounded-full flex items-center gap-3 shadow-[0_12px_32px_rgba(153,69,48,0.3)] hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined">add</span>
+<span class="font-bold text-sm uppercase tracking-widest">New Order</span>
+</button>
+<!-- BottomNavBar from JSON -->
+<nav class="bg-[#FFF8F5]/90 dark:bg-[#1D1B1A]/90 backdrop-blur-md fixed bottom-0 left-0 w-full flex justify-around items-center pt-3 pb-8 px-4 z-50 rounded-t-[2.75rem] border-t border-[#E8E1DC]/20 shadow-[0_-8px_32px_rgba(44,44,44,0.06)]">
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">home_app_logo</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#994530] dark:text-[#C9879A] relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-[#994530] after:rounded-full active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">architecture</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter text-[#994530] dark:text-[#C9879A]">Orders</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Reports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#864D5F]/50 dark:text-[#E8E1DC]/40 hover:text-[#994530] dark:hover:text-[#C9879A] active:scale-90 transition-transform duration-500">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-['DM_Sans'] text-[10px] font-medium uppercase tracking-tighter">Profile</span>
+</button>
+</nav>
+</body></html>

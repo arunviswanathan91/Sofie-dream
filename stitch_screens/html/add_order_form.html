@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#522232",
+              "surface-variant": "#e8e1de",
+              "surface-dim": "#dfd9d6",
+              "secondary-fixed-dim": "#cbc5c1",
+              "on-surface-variant": "#514346",
+              "surface-bright": "#fff8f5",
+              "on-error": "#ffffff",
+              "on-surface": "#1d1b1a",
+              "surface-tint": "#864d5f",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-background": "#1d1b1a",
+              "primary-fixed": "#ffd9e2",
+              "inverse-on-surface": "#f6efec",
+              "secondary-fixed": "#e8e1dc",
+              "secondary-container": "#e8e1dc",
+              "error": "#ba1a1a",
+              "outline-variant": "#d5c2c5",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "outline": "#837376",
+              "on-tertiary-container": "#5f1a08",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "on-secondary-fixed": "#1e1b18",
+              "surface": "#fff8f5",
+              "secondary": "#625e5a",
+              "primary": "#864d5f",
+              "on-tertiary-fixed": "#3c0700",
+              "surface-container-highest": "#e8e1de",
+              "tertiary-fixed": "#ffdad2",
+              "primary-container": "#c9879a",
+              "surface-container": "#f3ecea",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-primary": "#ffffff",
+              "on-secondary-container": "#686460",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#ede7e4",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#fbb3c7",
+              "primary-fixed-dim": "#fbb3c7",
+              "tertiary-container": "#e37e65",
+              "background": "#fff8f5",
+              "inverse-surface": "#33302e",
+              "on-secondary-fixed-variant": "#4a4643",
+              "surface-container-low": "#f9f2ef",
+              "tertiary": "#994530",
+              "on-primary-fixed": "#360b1c"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["DM Sans"]
+            },
+            borderRadius: {
+                "DEFAULT": "1rem", 
+                "lg": "2rem", 
+                "xl": "3rem", 
+                "full": "9999px",
+                "artisan": "24px"
+            },
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+        .linen-overlay {
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCHMBJkIs4yhyuoar6W68Xednla6hsleXakbNiw4i_sSc7CRo6fFJjK-WI_WVjLBRvsxw5JE19zXNqhXzTH-l_U5qqpwvbLNWm0MsDeFZQ6HPXXetN0YMjyy2mrVSVFa16d6oqdVfDeSeYN3tl8Ty9CIbFnjqsDm5OI9HrFghUfdMyliJc3pBo337VLdmlZGS06K4uOsvJGYyXCzGa5td28w3meSgkwa2ealcfdxkIv-VFqq0ftmKFh-IXugZN3Urt5nv1qICf8aoqm);
+            opacity: 0.03;
+            pointer-events: none
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        body {
+            min-height: max(884px, 100dvh);
+        }
+        .artisan-label {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #837376;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex items-end">
+<!-- Background Content Layer (Simulating Workspace Behind Modal) -->
+<div class="fixed inset-0 z-0 overflow-hidden bg-surface flex flex-col items-center justify-start p-8 opacity-40">
+<div class="w-full max-w-md space-y-8">
+<div class="h-64 w-full bg-surface-container rounded-artisan border-2 border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-outline">architecture</span>
+</div>
+<div class="space-y-4">
+<div class="h-4 w-3/4 bg-surface-container-highest rounded-full"></div>
+<div class="h-4 w-full bg-surface-container-highest rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Backdrop Overlay -->
+<div class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-10"></div>
+<!-- Bottom Sheet Modal Container -->
+<div class="relative z-20 w-full max-w-2xl mx-auto bg-surface-bright rounded-t-[32px] shadow-[0_-12px_48px_rgba(29,27,26,0.15)] border-t border-outline-variant/10 flex flex-col max-h-[92vh]">
+<div class="linen-overlay absolute inset-0 rounded-t-[32px]"></div>
+<!-- Drag Handle -->
+<div class="flex justify-center pt-4 pb-2 shrink-0">
+<div class="w-12 h-1.5 bg-secondary-container rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="px-8 pt-2 pb-6 flex justify-between items-center shrink-0">
+<h1 class="font-headline text-2xl font-bold text-primary tracking-tight">New Order</h1>
+<div class="flex gap-3 items-center">
+<button class="text-on-surface-variant font-medium text-sm px-2">Cancel</button>
+<button class="px-6 py-2 bg-tertiary text-on-tertiary rounded-full font-bold text-sm shadow-md">Save</button>
+</div>
+</div>
+<!-- Scrollable Form Content -->
+<div class="px-8 pb-32 overflow-y-auto space-y-10 flex-1">
+<!-- Order Details Section -->
+<section class="space-y-6">
+<h2 class="text-xl font-headline font-bold text-on-surface">Order Details</h2>
+<div class="space-y-2">
+<label class="artisan-label px-1">Order Name *</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 focus:ring-2 focus:ring-tertiary/20 text-on-surface placeholder-on-surface-variant/40" placeholder="e.g. Floral Hoodie Set" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Description</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 focus:ring-2 focus:ring-tertiary/20 text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Describe the order..." rows="3"></textarea>
+</div>
+<div class="space-y-3">
+<label class="artisan-label px-1">Craft Category</label>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-2 bg-tertiary/10 text-tertiary rounded-full text-xs font-bold flex items-center gap-1.5 border border-tertiary/20">
+<span class="material-symbols-outlined text-[14px] fill-1">diamond</span> Custom Embroidery
+                        </span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-medium flex items-center gap-1.5 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[14px]">apparel</span> Clothes
+                        </span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-medium flex items-center gap-1.5 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[14px]">auto_awesome</span> Accessories
+                        </span>
+<span class="px-4 py-2 bg-surface-container-high text-on-surface-variant rounded-full text-xs font-medium flex items-center gap-1.5 border border-outline-variant/30">
+<span class="material-symbols-outlined text-[14px]">home</span> Home Goods
+                        </span>
+</div>
+</div>
+<div class="space-y-3">
+<label class="artisan-label px-1">Tags</label>
+<div class="flex flex-wrap gap-2 mb-4">
+<span class="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium">+ rush</span>
+<span class="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium">+ custom</span>
+<span class="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium">+ gift</span>
+<span class="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium">+ large</span>
+<span class="px-3 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium">+ repeat customer</span>
+</div>
+<div class="flex gap-3">
+<input class="flex-1 bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-3.5 text-sm focus:ring-2 focus:ring-tertiary/20" placeholder="Custom tag..." type="text"/>
+<button class="px-6 py-3.5 bg-tertiary/10 text-tertiary rounded-artisan font-bold text-sm border border-tertiary/20">Add</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Photos (0/5)</label>
+<div class="w-full aspect-[21/6] rounded-artisan bg-surface-container-low border-2 border-dashed border-outline-variant/50 flex flex-col items-center justify-center group cursor-pointer hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-2 text-on-surface-variant/60">
+<span class="material-symbols-outlined">attach_file</span>
+<span class="font-medium text-sm">Attach photos</span>
+</div>
+</div>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Source Link (Optional)</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 focus:ring-2 focus:ring-tertiary/20 text-on-surface placeholder-on-surface-variant/40" placeholder="Instagram / WhatsApp link" type="text"/>
+</div>
+</section>
+<div class="h-px bg-outline-variant/20 -mx-8"></div>
+<!-- Customer Info Section -->
+<section class="space-y-6">
+<h2 class="text-xl font-headline font-bold text-on-surface">Customer Info</h2>
+<div class="space-y-2">
+<label class="artisan-label px-1">Customer Name *</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface" type="text" value="Emma Kowalski"/>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Address</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Street, City, Country" rows="2"></textarea>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="artisan-label px-1">Phone</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface" placeholder="+49 123 456789" type="tel"/>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Instagram</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface" placeholder="@username" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Delivery Time</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface" placeholder="e.g. 3:00 PM" type="text"/>
+</div>
+</section>
+<div class="h-px bg-outline-variant/20 -mx-8"></div>
+<!-- Financials Section -->
+<section class="space-y-6">
+<h2 class="text-xl font-headline font-bold text-on-surface">Financials</h2>
+<div class="space-y-3">
+<label class="artisan-label px-1">Currency</label>
+<div class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1">
+<button class="px-6 py-2.5 bg-tertiary text-on-tertiary rounded-full font-bold text-sm shadow-sm">EUR</button>
+<button class="px-6 py-2.5 bg-surface-bright border border-outline-variant/50 text-on-surface-variant rounded-full font-bold text-sm">GBP</button>
+<button class="px-6 py-2.5 bg-surface-bright border border-outline-variant/50 text-on-surface-variant rounded-full font-bold text-sm">USD</button>
+<button class="px-6 py-2.5 bg-surface-bright border border-outline-variant/50 text-on-surface-variant rounded-full font-bold text-sm">CHF</button>
+<button class="px-6 py-2.5 bg-surface-bright border border-outline-variant/50 text-on-surface-variant rounded-full font-bold text-sm">INR</button>
+</div>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Price</label>
+<input class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-5 text-2xl font-headline font-bold text-on-surface" step="0.01" type="number" value="0.00"/>
+</div>
+<div class="flex items-center justify-between bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4">
+<span class="font-medium text-on-surface">Already paid</span>
+<button class="w-12 h-6 bg-surface-container-highest rounded-full relative p-1 transition-colors">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</button>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Payment Notes</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Bank transfer, PayPal..." rows="2"></textarea>
+</div>
+</section>
+<div class="h-px bg-outline-variant/20 -mx-8"></div>
+<!-- Dates & Notes Section -->
+<section class="space-y-6">
+<h2 class="text-xl font-headline font-bold text-on-surface">Dates &amp; Notes</h2>
+<div class="space-y-2">
+<label class="artisan-label px-1">Due Date (YYYY-MM-DD)</label>
+<div class="space-y-1.5">
+<div class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-5 text-lg font-medium text-on-surface flex justify-between items-center">
+<span>2026-04-04</span>
+<span class="material-symbols-outlined text-outline">calendar_month</span>
+</div>
+<p class="text-[13px] text-tertiary px-1">Saturday, April 4, 2026</p>
+</div>
+</div>
+<div class="space-y-2">
+<label class="artisan-label px-1">Internal Notes</label>
+<textarea class="w-full bg-surface-container-low border border-outline-variant/30 rounded-artisan px-6 py-4 text-on-surface placeholder-on-surface-variant/40 resize-none min-h-[120px]" placeholder="Private notes..."></textarea>
+</div>
+</section>
+</div>
+<!-- Sticky Footer Action -->
+<div class="absolute bottom-0 left-0 right-0 p-8 pt-4 bg-surface-bright/90 backdrop-blur-md border-t border-outline-variant/10">
+<button class="w-full h-14 bg-tertiary text-on-tertiary rounded-artisan font-headline font-bold text-lg shadow-[0_8px_24px_rgba(153,69,48,0.25)] hover:bg-tertiary/90 active:scale-[0.98] transition-all">
+                Save Order
+            </button>
+</div>
+</div>
+<!-- Floating Helper (Thread Motif) -->
+<div class="fixed top-1/2 -right-4 translate-y-[-50%] z-30 opacity-10 pointer-events-none hidden lg:block">
+<svg fill="none" height="400" viewbox="0 0 100 200" width="200" xmlns="http://www.w3.org/2000/svg">
+<path d="M50 0C50 50 20 80 20 120C20 160 80 160 80 120C80 80 50 50 50 0Z" stroke="#994530" stroke-dasharray="4 4" stroke-width="0.5"></path>
+<path d="M50 200C50 150 80 120 80 80C80 40 20 40 20 80C20 120 50 150 50 200Z" stroke="#864D5F" stroke-dasharray="2 2" stroke-width="0.5"></path>
+</svg>
+</div>
+</body></html>

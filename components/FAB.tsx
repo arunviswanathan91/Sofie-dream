@@ -1,21 +1,19 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
-import { Colors } from '../lib/theme';
 
 interface Props {
   onPress: () => void;
-  icon?: string;
 }
 
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
-export function FAB({ onPress, icon = '+' }: Props) {
+export function FAB({ onPress }: Props) {
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -32,7 +30,10 @@ export function FAB({ onPress, icon = '+' }: Props) {
 
   return (
     <AnimatedTouchable style={[styles.fab, animatedStyle]} onPress={handlePress} activeOpacity={0.9}>
-      <Text style={styles.icon}>{icon}</Text>
+      <View style={styles.inner}>
+        <Text style={styles.icon}>+</Text>
+        <Text style={styles.label}>New Order</Text>
+      </View>
     </AnimatedTouchable>
   );
 }
@@ -42,22 +43,35 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 24,
-    width: 56,
-    height: 56,
+    height: 52,
     borderRadius: 999,
-    backgroundColor: Colors.primaryContainer,
+    paddingHorizontal: 24,
+    backgroundColor: '#994530',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: 'rgba(201,135,154,0.4)',
+    shadowColor: 'rgba(153,69,48,0.35)',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 20,
     elevation: 8,
   },
+  inner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   icon: {
-    fontSize: 26,
-    color: Colors.onPrimary,
-    lineHeight: 30,
-    marginBottom: 2,
+    fontSize: 22,
+    color: '#FFFFFF',
+    lineHeight: 26,
+    fontWeight: '300',
+  },
+  label: {
+    fontSize: 13,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
   },
 });

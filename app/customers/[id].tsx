@@ -8,10 +8,31 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useCustomers } from '../../hooks/useCustomers';
 import { useOrders } from '../../hooks/useOrders';
 import { OrderCard } from '../../components/OrderCard';
-import { Colors, Spacing, BorderRadius } from '../../lib/theme';
+
+// Design tokens — Stitch "Warm Artisan Editorial"
+const T = {
+  bg: '#FFF8F5',
+  surfaceLow: '#F9F2EF',
+  surfaceContainer: '#F3ECEA',
+  surfaceHigh: '#EDE7E4',
+  surfaceLowest: '#FFFFFF',
+  primary: '#864D5F',
+  primaryContainer: '#C9879A',
+  primaryFixed: '#FFD9E2',
+  onPrimary: '#FFFFFF',
+  onPrimaryContainer: '#522232',
+  tertiary: '#994530',
+  tertiaryFixed: '#FFDAD2',
+  secondary: '#625E5A',
+  text: '#1D1B1A',
+  subText: '#514346',
+  outline: '#837376',
+  outlineVariant: '#D5C2C5',
+};
 
 export default function CustomerProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -25,6 +46,11 @@ export default function CustomerProfileScreen() {
     [orders, customer]
   );
 
+  const completedOrders = useMemo(
+    () => customerOrders.filter((o) => o.status === 'delivered' || o.status === 'shipped').length,
+    [customerOrders]
+  );
+
   if (!customer) {
     return (
       <SafeAreaView style={styles.container}>
@@ -35,49 +61,80 @@ export default function CustomerProfileScreen() {
     );
   }
 
+  const avatarInitial = customer.name.trim().charAt(0).toUpperCase();
+
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header with pill back button */}
+      {/* Header with chevron back button */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backPill}>
-          <Text style={styles.backText}>← Back</Text>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backPill} activeOpacity={0.7}>
+          <Text style={styles.backChevron}>‹</Text>
+          <Text style={styles.backText}>Back</Text>
         </TouchableOpacity>
         <View style={{ width: 72 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero profile block — tonal surfaceLow, no border */}
-        <View style={styles.heroCard}>
+        {/* Hero profile card */}
+        <Animated.View entering={FadeInDown.delay(0).duration(400)} style={styles.heroCard}>
+          {/* Decorative background blob */}
+          <View style={styles.heroBlobTop} />
+          <View style={styles.heroBlobBottom} />
+
           {/* Avatar */}
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{customer.name[0].toUpperCase()}</Text>
+          <View style={styles.avatarWrapper}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>{avatarInitial}</Text>
+            </View>
+            {/* Verified badge */}
+            <View style={styles.verifiedBadge}>
+              <Text style={styles.verifiedText}>✓</Text>
+            </View>
           </View>
 
-          {/* Customer name — PlayfairDisplay 28px hero */}
+          {/* Customer name */}
           <Text style={styles.customerName}>{customer.name}</Text>
+
+          {/* Verified client label */}
+          <View style={styles.verifiedChip}>
+            <Text style={styles.verifiedChipText}>✓ Verified client</Text>
+          </View>
+
           {customer.instagram && (
             <Text style={styles.instagram}>{customer.instagram}</Text>
           )}
 
-          {/* Stats row */}
-          <View style={styles.statsRow}>
+          {/* Location placeholder */}
+          {customer.address ? (
+            <Text style={styles.location}>📍 {customer.address}</Text>
+          ) : null}
+
+          {/* Stats row — animated */}
+          <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{customer.totalOrders}</Text>
               <Text style={styles.statLabel}>Orders</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: Colors.primary }]}>
+              <Text style={[styles.statValue, { color: T.primary }]}>
                 €{customer.totalSpent.toFixed(2)}
               </Text>
               <Text style={styles.statLabel}>Total Spent</Text>
             </View>
-          </View>
-        </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={[styles.statValue, { color: T.tertiary }]}>
+                {completedOrders}
+              </Text>
+              <Text style={styles.statLabel}>Completed</Text>
+            </View>
+          </Animated.View>
+        </Animated.View>
 
-        {/* Contact Info — surfaceLowest card, no border */}
+        {/* Contact Info */}
         {(customer.address || customer.phone || customer.instagram) && (
-          <View style={styles.section}>
+          <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
             <Text style={styles.sectionTitle}>Contact</Text>
             <View style={styles.contactCard}>
               {customer.address ? (
@@ -99,23 +156,32 @@ export default function CustomerProfileScreen() {
                 </View>
               ) : null}
             </View>
-          </View>
+          </Animated.View>
         )}
 
-        {/* Order history — 4px ribbon cards from OrderCard */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            All Orders ({customerOrders.length})
-          </Text>
-          {customerOrders.map((order) => (
-            <OrderCard key={order.id} order={order} />
+        {/* Order history */}
+        <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
+          {/* Section title with count badge */}
+          <View style={styles.orderHistoryHeader}>
+            <Text style={styles.sectionTitle}>Order History</Text>
+            <View style={styles.orderCountBadge}>
+              <Text style={styles.orderCountText}>{customerOrders.length}</Text>
+            </View>
+          </View>
+          {customerOrders.map((order, index) => (
+            <Animated.View
+              key={order.id}
+              entering={FadeInDown.delay(250 + index * 50).duration(300)}
+            >
+              <OrderCard order={order} />
+            </Animated.View>
           ))}
           {customerOrders.length === 0 && (
             <View style={styles.emptyOrders}>
               <Text style={styles.emptyText}>No orders yet</Text>
             </View>
           )}
-        </View>
+        </Animated.View>
 
         <View style={{ height: 60 }} />
       </ScrollView>
@@ -124,148 +190,278 @@ export default function CustomerProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
-  notFound: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  notFoundText: { fontFamily: 'DMSans', color: Colors.subText, fontSize: 15 },
+  container: {
+    flex: 1,
+    backgroundColor: T.bg,
+  },
+  notFound: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notFoundText: {
+    fontFamily: 'DMSans',
+    color: T.subText,
+    fontSize: 15,
+  },
 
+  // Header
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.sm,
-  },
-  backPill: {
-    backgroundColor: Colors.surfaceContainer,
-    borderRadius: BorderRadius.pill,
     paddingHorizontal: 16,
     paddingVertical: 8,
+  },
+  backPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: T.surfaceContainer,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    gap: 4,
+  },
+  backChevron: {
+    fontSize: 22,
+    color: T.primary,
+    lineHeight: 22,
+    marginTop: -1,
+    fontWeight: '300',
   },
   backText: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: Colors.primary,
+    color: T.primary,
     fontWeight: '600',
   },
 
+  // Hero card
   heroCard: {
     alignItems: 'center',
-    padding: Spacing.xl,
-    marginHorizontal: Spacing.md,
-    marginBottom: Spacing.md,
-    backgroundColor: Colors.surfaceLow,
-    borderRadius: BorderRadius.cardLarge,
+    padding: 24,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: T.primaryFixed,
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: T.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    elevation: 3,
+  },
+  heroBlobTop: {
+    position: 'absolute',
+    top: -40,
+    right: -40,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: T.primary,
+    opacity: 0.06,
+  },
+  heroBlobBottom: {
+    position: 'absolute',
+    bottom: -20,
+    left: -20,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: T.tertiary,
+    opacity: 0.04,
+  },
+  avatarWrapper: {
+    position: 'relative',
+    marginBottom: 12,
   },
   avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: Colors.primaryContainer,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: T.primaryContainer,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    shadowColor: T.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 4,
   },
   avatarText: {
-    fontSize: 30,
-    color: Colors.onPrimary,
+    fontSize: 34,
+    color: '#FFFFFF',
     fontFamily: 'PlayfairDisplay',
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: -4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: T.tertiary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: T.primaryFixed,
+  },
+  verifiedText: {
+    fontSize: 11,
+    color: '#FFFFFF',
+    fontWeight: '700',
   },
   customerName: {
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 4,
+    color: T.onPrimaryContainer,
+    marginBottom: 6,
     textAlign: 'center',
+  },
+  verifiedChip: {
+    backgroundColor: T.primaryContainer + '30',
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    marginBottom: 8,
+  },
+  verifiedChipText: {
+    fontSize: 11,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: T.primary,
+    letterSpacing: 0.5,
   },
   instagram: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: Colors.subText,
-    marginBottom: Spacing.md,
+    color: T.subText,
+    marginBottom: 4,
   },
+  location: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    color: T.subText,
+    marginBottom: 16,
+  },
+  // Stats row
   statsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xl,
-    marginTop: Spacing.md,
+    gap: 24,
+    marginTop: 8,
+    backgroundColor: T.surfaceLowest,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    alignSelf: 'stretch',
+    shadowColor: T.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
-  statItem: { alignItems: 'center' },
+  statItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
   statValue: {
-    fontSize: 24,
+    fontSize: 22,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
+    color: T.text,
   },
   statLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
     marginTop: 2,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   statDivider: {
     width: 1,
-    height: 40,
-    backgroundColor: Colors.outlineVariant,
+    height: 36,
+    backgroundColor: T.outlineVariant,
   },
 
+  // Sections
   section: {
-    paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.md,
-    marginBottom: Spacing.sm,
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    marginBottom: 8,
+  },
+  orderHistoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 12,
   },
   sectionTitle: {
     fontSize: 20,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
-    marginBottom: Spacing.sm,
+    color: T.text,
+  },
+  orderCountBadge: {
+    backgroundColor: T.tertiary,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+  },
+  orderCountText: {
+    fontSize: 12,
+    fontFamily: 'DMSans',
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
 
+  // Contact card
   contactCard: {
-    backgroundColor: Colors.surfaceLowest,
-    borderRadius: BorderRadius.card,
-    padding: Spacing.md,
+    backgroundColor: T.surfaceLowest,
+    borderRadius: 16,
+    padding: 16,
     shadowColor: 'rgba(0,0,0,0.03)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 2,
+    marginBottom: 8,
   },
   infoRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.outlineVariant,
+    borderBottomColor: T.outlineVariant,
   },
   infoLabel: {
     fontSize: 11,
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   infoValue: {
     fontSize: 14,
     fontFamily: 'DMSans',
-    color: Colors.text,
+    color: T.text,
     flex: 2,
     textAlign: 'right',
   },
 
+  // Empty orders
   emptyOrders: {
-    paddingVertical: Spacing.lg,
+    paddingVertical: 24,
     alignItems: 'center',
-    backgroundColor: Colors.surfaceLow,
-    borderRadius: BorderRadius.card,
+    backgroundColor: T.surfaceLow,
+    borderRadius: 16,
   },
   emptyText: {
     fontFamily: 'DMSans',
-    color: Colors.subText,
+    color: T.subText,
     fontSize: 14,
   },
 });

@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&amp;family=DM+Sans:wght@400;500;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Noto+Serif:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-primary-container": "#522232",
+              "surface-variant": "#e8e1de",
+              "surface-dim": "#dfd9d6",
+              "secondary-fixed-dim": "#cbc5c1",
+              "on-surface-variant": "#514346",
+              "surface-bright": "#fff8f5",
+              "on-error": "#ffffff",
+              "on-surface": "#1d1b1a",
+              "surface-tint": "#864d5f",
+              "surface-container-lowest": "#ffffff",
+              "on-error-container": "#93000a",
+              "on-background": "#1d1b1a",
+              "primary-fixed": "#ffd9e2",
+              "inverse-on-surface": "#f6efec",
+              "secondary-fixed": "#e8e1dc",
+              "secondary-container": "#e8e1dc",
+              "error": "#ba1a1a",
+              "outline-variant": "#d5c2c5",
+              "tertiary-fixed-dim": "#ffb4a2",
+              "outline": "#837376",
+              "on-tertiary-container": "#5f1a08",
+              "on-tertiary-fixed-variant": "#7b2e1b",
+              "on-secondary-fixed": "#1e1b18",
+              "surface": "#fff8f5",
+              "secondary": "#625e5a",
+              "primary": "#864d5f",
+              "on-tertiary-fixed": "#3c0700",
+              "surface-container-highest": "#e8e1de",
+              "tertiary-fixed": "#ffdad2",
+              "primary-container": "#c9879a",
+              "surface-container": "#f3ecea",
+              "on-primary-fixed-variant": "#6b3647",
+              "on-primary": "#ffffff",
+              "on-secondary-container": "#686460",
+              "on-secondary": "#ffffff",
+              "surface-container-high": "#ede7e4",
+              "error-container": "#ffdad6",
+              "on-tertiary": "#ffffff",
+              "inverse-primary": "#fbb3c7",
+              "primary-fixed-dim": "#fbb3c7",
+              "tertiary-container": "#e37e65",
+              "background": "#fff8f5",
+              "inverse-surface": "#33302e",
+              "on-secondary-fixed-variant": "#4a4643",
+              "surface-container-low": "#f9f2ef",
+              "tertiary": "#994530",
+              "on-primary-fixed": "#360b1c"
+            },
+            fontFamily: {
+              "headline": ["Noto Serif"],
+              "body": ["Plus Jakarta Sans"],
+              "label": ["Plus Jakarta Sans"]
+            },
+            borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>.material-symbols-outlined {
+    font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+    }
+.linen-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCHMBJkIs4yhyuoar6W68Xednla6hsleXakbNiw4i_sSc7CRo6fFJjK-WI_WVjLBRvsxw5JE19zXNqhXzTH-l_U5qqpwvbLNWm0MsDeFZQ6HPXXetN0YMjyy2mrVSVFa16d6oqdVfDeSeYN3tl8Ty9CIbFnjqsDm5OI9HrFghUfdMyliJc3pBo337VLdmlZGS06K4uOsvJGYyXCzGa5td28w3meSgkwa2ealcfdxkIv-VFqq0ftmKFh-IXugZN3Urt5nv1qICf8aoqm);
+    opacity: 0.03;
+    pointer-events: none
+    }</style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex items-end">
+<!-- Background Content Layer (Simulating Workspace Behind Modal) -->
+<div class="fixed inset-0 z-0 overflow-hidden bg-surface flex flex-col items-center justify-start p-8 opacity-40">
+<div class="w-full max-w-md space-y-8">
+<div class="h-64 w-full bg-surface-container rounded-lg border-2 border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-outline">architecture</span>
+</div>
+<div class="space-y-4">
+<div class="h-4 w-3/4 bg-surface-container-highest rounded-full"></div>
+<div class="h-4 w-full bg-surface-container-highest rounded-full"></div>
+<div class="h-4 w-5/6 bg-surface-container-highest rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Backdrop Overlay -->
+<div class="fixed inset-0 bg-on-surface/20 backdrop-blur-sm z-10"></div>
+<!-- Bottom Sheet Modal Container -->
+<div class="relative z-20 w-full max-w-2xl mx-auto bg-surface-bright rounded-t-xl shadow-[0_-12px_32px_rgba(29,27,26,0.12)] border-t border-outline-variant/10 overflow-hidden">
+<div class="linen-overlay absolute inset-0"></div>
+<!-- Drag Handle -->
+<div class="flex justify-center pt-4 pb-2">
+<div class="w-12 h-1.5 bg-secondary-container rounded-full"></div>
+</div>
+<!-- Header -->
+<div class="px-8 pt-4 pb-6 flex justify-between items-center">
+<h1 class="font-headline text-3xl font-bold text-primary tracking-tight">New Embroidery Order</h1>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">close</span>
+</button>
+</div>
+<!-- Form Content (KeyboardAwareScrollView Simulation) -->
+<div class="px-8 pb-32 overflow-y-auto max-h-[663px] space-y-8">
+<!-- Customer Section -->
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Customer Name</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-full px-6 py-4 focus:ring-2 focus:ring-tertiary/20 text-on-surface placeholder-on-surface-variant/40" placeholder="Elena Rossi..." type="text"/>
+<div class="absolute right-4 top-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-tertiary">search</span>
+</div>
+</div>
+<!-- Suggestion Chips -->
+<div class="flex gap-2 px-2 overflow-x-auto no-scrollbar">
+<span class="px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-fixed transition-colors">Sofia M.</span>
+<span class="px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-fixed transition-colors">Marco V.</span>
+<span class="px-4 py-1.5 bg-secondary-container text-on-secondary-container rounded-full text-xs font-medium cursor-pointer hover:bg-secondary-fixed transition-colors">Lucia G.</span>
+</div>
+</div>
+<!-- Item Description -->
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Item Description</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-lg px-6 py-4 focus:ring-2 focus:ring-tertiary/20 text-on-surface placeholder-on-surface-variant/40 resize-none" placeholder="Hand-stitched silk lining with floral motifs..." rows="3"></textarea>
+</div>
+<!-- Bento Layout for Small Fields -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Quantity Stepper -->
+<div class="space-y-3 bg-surface-container-low p-6 rounded-lg">
+<label class="font-headline text-sm font-semibold text-on-surface-variant uppercase tracking-widest block">Quantity</label>
+<div class="flex items-center justify-between">
+<button class="w-12 h-12 rounded-full bg-surface-bright flex items-center justify-center shadow-sm text-tertiary hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="text-2xl font-bold font-headline text-on-surface">01</span>
+<button class="w-12 h-12 rounded-full bg-tertiary flex items-center justify-center shadow-md text-on-tertiary hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Price Input -->
+<div class="space-y-3 bg-surface-container-low p-6 rounded-lg">
+<label class="font-headline text-sm font-semibold text-on-surface-variant uppercase tracking-widest block">Unit Price</label>
+<div class="flex items-center gap-3">
+<span class="text-2xl font-headline text-tertiary font-bold">€</span>
+<input class="w-full bg-transparent border-b-2 border-outline-variant focus:border-tertiary focus:ring-0 text-2xl font-bold font-headline text-on-surface placeholder-outline-variant/50" placeholder="0.00" type="number"/>
+</div>
+</div>
+</div>
+<!-- Pickers Section -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Order Date</label>
+<div class="flex items-center gap-3 bg-surface-container-low rounded-full px-5 py-3.5">
+<span class="material-symbols-outlined text-primary text-xl">calendar_today</span>
+<span class="text-sm font-medium">Oct 12, 2023</span>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Delivery</label>
+<div class="flex items-center gap-3 bg-surface-container-low rounded-full px-5 py-3.5">
+<span class="material-symbols-outlined text-tertiary text-xl">event_upcoming</span>
+<span class="text-sm font-medium">Nov 05, 2023</span>
+</div>
+</div>
+</div>
+<!-- Status Dropdown & Photo -->
+<div class="space-y-6">
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Status</label>
+<div class="flex items-center justify-between bg-surface-container-low rounded-full px-6 py-4 cursor-pointer hover:bg-surface-container transition-colors group">
+<div class="flex items-center gap-3">
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary shadow-[0_0_8px_rgba(153,69,48,0.4)]"></div>
+<span class="font-medium">In Production</span>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-y-0.5 transition-transform">expand_more</span>
+</div>
+</div>
+<div class="space-y-3">
+<label class="font-headline text-sm font-semibold text-on-surface-variant px-2 uppercase tracking-widest">Reference Photo</label>
+<div class="relative group">
+<div class="w-full aspect-[21/9] rounded-lg bg-surface-container-low border-2 border-dashed border-outline-variant flex flex-col items-center justify-center overflow-hidden">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 grayscale group-hover:opacity-40 transition-opacity" data-alt="Close up of floral embroidery pattern on white silk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlIS9xpDEsu7tOeEt24bG7G8EkW6KqMC6VyeDMeqBY-GbLmagcBYUr4UfqTt6Bcep4bRYfhOiAfvVmRvP-3vzu0nJHsKesx8OnBgwkqFF6PnRHg0mUyHrBp0mODJsxb7lbs1scfQOQ8VOkVL5LqhsBFypmmLw8TzzJNVSFPWgA1ITRZDk5mjk7RhpcmAc7hoWDgJDqwVVe_X6RaPyaD1DZm8Fl_g9n2f1daXGQf5FIrDAFvZ1xDaecdkKc6Ws9je-_6lh4A5kFNYiS"/>
+<span class="material-symbols-outlined text-3xl text-outline mb-2 relative">photo_camera</span>
+<p class="text-xs font-medium text-outline-variant relative uppercase tracking-widest">Tap to attach fabric sample</p>
+</div>
+<button class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center text-error hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Sticky Action Bar (Kept visible above keyboard) -->
+<div class="absolute bottom-0 left-0 right-0 p-8 bg-surface-bright/80 backdrop-blur-md border-t border-outline-variant/10 flex items-center gap-4">
+<button class="flex-1 h-14 bg-primary text-on-primary rounded-xl font-headline font-bold text-lg shadow-[0_8px_20px_rgba(134,77,95,0.25)] hover:bg-surface-tint active:scale-[0.98] transition-all">
+                Save Order
+            </button>
+<button class="w-14 h-14 bg-surface-container-highest rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-outline-variant/30 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined">archive</span>
+</button>
+</div>
+</div>
+<!-- Floating Helper (Thread Motif) -->
+<div class="fixed top-1/2 -right-4 translate-y-[-50%] z-30 opacity-20 pointer-events-none hidden lg:block">
+<svg fill="none" height="400" viewbox="0 0 100 200" width="200" xmlns="http://www.w3.org/2000/svg">
+<path d="M50 0C50 50 20 80 20 120C20 160 80 160 80 120C80 80 50 50 50 0Z" stroke="#994530" stroke-dasharray="4 4" stroke-width="0.5"></path>
+<path d="M50 200C50 150 80 120 80 80C80 40 20 40 20 80C20 120 50 150 50 200Z" stroke="#864D5F" stroke-dasharray="2 2" stroke-width="0.5"></path>
+</svg>
+</div>
+</body></html>
