@@ -30,28 +30,6 @@ import { InvoicePreview } from '../../components/InvoicePreview';
 import { Colors, Spacing, BorderRadius, StatusColors } from '../../lib/theme';
 import type { OrderStatus } from '../../types';
 
-// Design tokens — Stitch "Warm Artisan Editorial"
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHigh: '#EDE7E4',
-  surfaceHighest: '#E8E1DE',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  secondary: '#625E5A',
-  secondaryContainer: '#E8E1DC',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-};
-
 const STATUS_PIPELINE: OrderStatus[] = ['request', 'accepted', 'shipped', 'delivered'];
 const STATUS_LABELS: Record<OrderStatus, string> = {
   request: 'Request',
@@ -61,13 +39,13 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   cancelled: 'Cancelled',
 };
 
-function getStatusRibbonColor(status: OrderStatus | string): string {
+function getStatusRibbonColor(status: OrderStatus | string, c: any): string {
   switch (status) {
-    case 'accepted': return T.tertiary;
-    case 'request': return T.tertiary;
-    case 'shipped': return T.primary;
-    case 'delivered': return T.primaryContainer;
-    default: return T.outlineVariant;
+    case 'accepted': return c.accent;
+    case 'request': return c.accent;
+    case 'shipped': return c.primary;
+    case 'delivered': return c.primaryContainer;
+    default: return c.outlineVariant;
   }
 }
 
@@ -78,6 +56,7 @@ export default function OrderDetailScreen() {
   const { orders, advanceStatus, togglePaid, deleteOrder } = useOrders();
   const { profile } = useProfile();
   const { colors } = useTheme();
+  const c = colors;
   const { scheduleForOrder, cancelForOrder } = useNotifications();
 
   const order = useMemo(() => orders.find((o) => o.id === id), [orders, id]);
@@ -90,11 +69,11 @@ export default function OrderDetailScreen() {
 
   if (!order) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: c.bg }]}>
         <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>Order not found</Text>
+          <Text style={[styles.notFoundText, { color: c.subText }]}>Order not found</Text>
           <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.backLink}>Go back</Text>
+            <Text style={[styles.backLink, { color: c.primary }]}>Go back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -107,7 +86,7 @@ export default function OrderDetailScreen() {
     : null;
 
   const currencySymbol = getCurrencySymbol(order.currency);
-  const ribbonColor = getStatusRibbonColor(order.status);
+  const ribbonColor = getStatusRibbonColor(order.status, c);
 
   const handleAdvance = async () => {
     if (!nextStatus) return;
@@ -168,22 +147,22 @@ export default function OrderDetailScreen() {
   const isActive = ['request', 'accepted'].includes(order.status);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: c.bg }]}>
       {/* Header: back arrow + PlayfairDisplay title + edit */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>←</Text>
+      <View style={[styles.header, { backgroundColor: c.bg }]}>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backButton, { backgroundColor: c.surfaceLow }]}>
+          <Text style={[styles.backText, { color: c.primary }]}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle} numberOfLines={1}>
+          <Text style={[styles.headerTitle, { color: c.text }]} numberOfLines={1}>
             {order.orderName}
           </Text>
         </View>
         <TouchableOpacity
           onPress={() => router.push(`/order/edit/${order.id}`)}
-          style={styles.editButton}
+          style={[styles.editButton, { backgroundColor: c.surfaceLow }]}
         >
-          <Text style={styles.editText}>Edit</Text>
+          <Text style={[styles.editText, { color: c.primary }]}>Edit</Text>
         </TouchableOpacity>
       </View>
 
@@ -207,40 +186,41 @@ export default function OrderDetailScreen() {
                   <Text style={styles.paidText}>PAID</Text>
                 </View>
               ) : (
-                <View style={styles.unpaidBadge}>
-                  <Text style={styles.unpaidText}>UNPAID</Text>
+                <View style={[styles.unpaidBadge, { backgroundColor: c.accent + '22' }]}>
+                  <Text style={[styles.unpaidText, { color: c.accent }]}>UNPAID</Text>
                 </View>
               )}
             </View>
-            <Text style={styles.heroCustomer}>{order.customerName}</Text>
-            <Text style={styles.heroOrderId}>#{order.id.slice(-8).toUpperCase()}</Text>
+            <Text style={[styles.heroCustomer, { color: c.primary }]}>{order.customerName}</Text>
+            <Text style={[styles.heroOrderId, { color: c.subText }]}>#{order.id.slice(-8).toUpperCase()}</Text>
           </View>
           {isActive && (
-            <CountdownTimer dueDate={order.dueDate} style={styles.countdown} />
+            <CountdownTimer dueDate={order.dueDate} style={[styles.countdown, { color: c.accent }]} />
           )}
         </Animated.View>
 
         {/* Status Pipeline: pill chips row */}
-        <Animated.View entering={FadeInDown.delay(100).duration(300)} style={styles.pipeline}>
+        <Animated.View entering={FadeInDown.delay(100).duration(300)} style={[styles.pipeline, { backgroundColor: c.surfaceLow }]}>
           {STATUS_PIPELINE.map((s, i) => {
             const isCompleted = STATUS_PIPELINE.indexOf(order.status as OrderStatus) >= i;
             const isCurrent = order.status === s;
             const chipColor = isCurrent
-              ? (s === 'accepted' || s === 'request' ? T.tertiary : T.primary)
-              : T.surfaceHighest;
+              ? (s === 'accepted' || s === 'request' ? c.accent : c.primary)
+              : c.surfaceHighest;
 
             return (
               <React.Fragment key={s}>
                 <View style={[
                   styles.pipelineChip,
+                  { backgroundColor: c.surfaceHighest },
                   isCurrent && { backgroundColor: chipColor },
-                  !isCurrent && isCompleted && { backgroundColor: T.secondaryContainer },
+                  !isCurrent && isCompleted && { backgroundColor: c.surfaceContainer },
                 ]}>
                   <Text style={[
                     styles.pipelineChipText,
                     isCurrent && { color: '#FFFFFF', fontWeight: '700' },
-                    !isCurrent && isCompleted && { color: T.secondary },
-                    !isCurrent && !isCompleted && { color: T.subText },
+                    !isCurrent && isCompleted && { color: c.subText },
+                    !isCurrent && !isCompleted && { color: c.subText },
                   ]}>
                     {STATUS_LABELS[s]}
                   </Text>
@@ -248,7 +228,8 @@ export default function OrderDetailScreen() {
                 {i < STATUS_PIPELINE.length - 1 && (
                   <View style={[
                     styles.pipelineConnector,
-                    isCompleted && i < STATUS_PIPELINE.indexOf(order.status as OrderStatus) && { backgroundColor: T.primaryContainer },
+                    { backgroundColor: c.outlineVariant },
+                    isCompleted && i < STATUS_PIPELINE.indexOf(order.status as OrderStatus) && { backgroundColor: c.primaryContainer },
                   ]} />
                 )}
               </React.Fragment>
@@ -262,7 +243,7 @@ export default function OrderDetailScreen() {
             <TouchableOpacity
               style={[
                 styles.advanceButton,
-                { backgroundColor: getStatusRibbonColor(nextStatus) },
+                { backgroundColor: getStatusRibbonColor(nextStatus, c), shadowColor: c.primary },
                 advancing && { opacity: 0.7 },
               ]}
               onPress={handleAdvance}
@@ -279,36 +260,37 @@ export default function OrderDetailScreen() {
           </View>
         )}
 
-        {/* Main detail card — bg surfaceLowest, 24px radius, left ribbon */}
-        <Animated.View entering={FadeInDown.delay(150).duration(300)} style={styles.mainCard}>
+        {/* Main detail card — bg card, 24px radius, left ribbon */}
+        <Animated.View entering={FadeInDown.delay(150).duration(300)} style={[styles.mainCard, { backgroundColor: c.card, shadowColor: c.text }]}>
           <View style={[styles.mainCardRibbon, { backgroundColor: ribbonColor }]} />
           <View style={styles.mainCardContent}>
-            <DetailRow label="Customer" value={order.customerName} />
-            <DetailRow label="Address" value={order.customerAddress} />
-            {order.customerPhone && <DetailRow label="Phone" value={order.customerPhone} />}
-            {order.customerInstagram && <DetailRow label="Instagram" value={order.customerInstagram} />}
-            <DetailRow label="Due Date" value={format(new Date(order.dueDate), 'EEEE, MMMM d, yyyy')} />
-            {order.deliveryTime && <DetailRow label="Delivery Time" value={order.deliveryTime} />}
+            <DetailRow label="Customer" value={order.customerName} colors={c} />
+            <DetailRow label="Address" value={order.customerAddress} colors={c} />
+            {order.customerPhone && <DetailRow label="Phone" value={order.customerPhone} colors={c} />}
+            {order.customerInstagram && <DetailRow label="Instagram" value={order.customerInstagram} colors={c} />}
+            <DetailRow label="Due Date" value={format(new Date(order.dueDate), 'EEEE, MMMM d, yyyy')} colors={c} />
+            {order.deliveryTime && <DetailRow label="Delivery Time" value={order.deliveryTime} colors={c} />}
             <DetailRow
               label="Price"
               value={`${currencySymbol}${order.askingPrice.toFixed(2)}`}
-              valueStyle={{ fontFamily: 'DMSans', fontWeight: '700', color: T.primary, fontSize: 16 }}
+              valueStyle={{ fontFamily: 'DMSans', fontWeight: '700', color: c.primary, fontSize: 16 }}
+              colors={c}
             />
-            <DetailRow label="Category" value={order.craftCategory || '—'} />
-            {order.invoiceNumber && <DetailRow label="Invoice #" value={order.invoiceNumber} mono />}
-            {order.shipmentId && <DetailRow label="Shipment ID" value={order.shipmentId} mono />}
-            {order.carrier && <DetailRow label="Carrier" value={order.carrier} />}
-            {order.sourceLink && <DetailRow label="Source" value={order.sourceLink} />}
-            {order.description && <DetailRow label="Description" value={order.description} multiline />}
-            {order.internalNotes && <DetailRow label="Internal Notes" value={order.internalNotes} multiline />}
-            {order.paymentNotes && <DetailRow label="Payment Notes" value={order.paymentNotes} />}
+            <DetailRow label="Category" value={order.craftCategory || '—'} colors={c} />
+            {order.invoiceNumber && <DetailRow label="Invoice #" value={order.invoiceNumber} mono colors={c} />}
+            {order.shipmentId && <DetailRow label="Shipment ID" value={order.shipmentId} mono colors={c} />}
+            {order.carrier && <DetailRow label="Carrier" value={order.carrier} colors={c} />}
+            {order.sourceLink && <DetailRow label="Source" value={order.sourceLink} colors={c} />}
+            {order.description && <DetailRow label="Description" value={order.description} multiline colors={c} />}
+            {order.internalNotes && <DetailRow label="Internal Notes" value={order.internalNotes} multiline colors={c} />}
+            {order.paymentNotes && <DetailRow label="Payment Notes" value={order.paymentNotes} colors={c} />}
           </View>
         </Animated.View>
 
         {/* Tags */}
         {order.tags.length > 0 && (
           <View style={styles.tagsSection}>
-            <Text style={styles.sectionLabel}>Tags</Text>
+            <Text style={[styles.sectionLabel, { color: c.subText }]}>Tags</Text>
             <View style={styles.tagsRow}>
               {order.tags.map((tag) => (
                 <TagChip key={tag} label={tag} />
@@ -320,7 +302,7 @@ export default function OrderDetailScreen() {
         {/* Photos */}
         {order.photos.length > 0 && (
           <View style={styles.photosSection}>
-            <Text style={styles.sectionLabel}>Photos</Text>
+            <Text style={[styles.sectionLabel, { color: c.subText }]}>Photos</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
               {order.photos.map((uri, i) => (
                 <Image key={i} source={{ uri }} style={styles.photo} />
@@ -331,19 +313,19 @@ export default function OrderDetailScreen() {
 
         {/* Timeline */}
         <View style={styles.timelineSection}>
-          <Text style={styles.sectionLabel}>Timeline</Text>
-          <View style={styles.timelineCard}>
-            <DetailRow label="Created" value={format(new Date(order.createdAt), 'MMM d, yyyy')} />
-            {order.acceptedAt && <DetailRow label="Accepted" value={format(new Date(order.acceptedAt), 'MMM d, yyyy')} />}
-            {order.shippedAt && <DetailRow label="Shipped" value={format(new Date(order.shippedAt), 'MMM d, yyyy')} />}
-            {order.deliveredAt && <DetailRow label="Delivered" value={format(new Date(order.deliveredAt), 'MMM d, yyyy')} />}
+          <Text style={[styles.sectionLabel, { color: c.subText }]}>Timeline</Text>
+          <View style={[styles.timelineCard, { backgroundColor: c.card, shadowColor: c.text }]}>
+            <DetailRow label="Created" value={format(new Date(order.createdAt), 'MMM d, yyyy')} colors={c} />
+            {order.acceptedAt && <DetailRow label="Accepted" value={format(new Date(order.acceptedAt), 'MMM d, yyyy')} colors={c} />}
+            {order.shippedAt && <DetailRow label="Shipped" value={format(new Date(order.shippedAt), 'MMM d, yyyy')} colors={c} />}
+            {order.deliveredAt && <DetailRow label="Delivered" value={format(new Date(order.deliveredAt), 'MMM d, yyyy')} colors={c} />}
           </View>
         </View>
 
         {/* Action Buttons — pill shape */}
         <View style={styles.actions}>
           <TouchableOpacity
-            style={styles.paidButton}
+            style={[styles.paidButton, { backgroundColor: c.primaryContainer }]}
             onPress={() => togglePaid(order)}
           >
             <Text style={styles.paidButtonText}>
@@ -352,10 +334,10 @@ export default function OrderDetailScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.invoiceButton}
+            style={[styles.invoiceButton, { borderColor: c.primaryContainer, backgroundColor: c.primaryContainer + '18' }]}
             onPress={() => setShowInvoice(!showInvoice)}
           >
-            <Text style={styles.invoiceButtonText}>
+            <Text style={[styles.invoiceButtonText, { color: c.primary }]}>
               {showInvoice ? 'Hide Invoice' : '🧾 Generate Invoice'}
             </Text>
           </TouchableOpacity>
@@ -381,30 +363,30 @@ export default function OrderDetailScreen() {
       {/* Ship Modal */}
       <Modal visible={showShipModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Mark as Shipped</Text>
+          <View style={[styles.modalContent, { backgroundColor: c.bg }]}>
+            <Text style={[styles.modalTitle, { color: c.text }]}>Mark as Shipped</Text>
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { backgroundColor: c.surfaceLow, color: c.text }]}
               placeholder="Shipment / Tracking ID (optional)"
-              placeholderTextColor={T.outline}
+              placeholderTextColor={c.outline}
               value={shipmentId}
               onChangeText={setShipmentId}
             />
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { backgroundColor: c.surfaceLow, color: c.text }]}
               placeholder="Carrier (e.g. DHL, PostNL)"
-              placeholderTextColor={T.outline}
+              placeholderTextColor={c.outline}
               value={carrier}
               onChangeText={setCarrier}
             />
             <View style={styles.modalActions}>
               <TouchableOpacity
-                style={styles.modalCancel}
+                style={[styles.modalCancel, { backgroundColor: c.surfaceHighest }]}
                 onPress={() => setShowShipModal(false)}
               >
-                <Text style={styles.modalCancelText}>Cancel</Text>
+                <Text style={[styles.modalCancelText, { color: c.subText }]}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.modalConfirm} onPress={handleShipConfirm}>
+              <TouchableOpacity style={[styles.modalConfirm, { backgroundColor: c.primary }]} onPress={handleShipConfirm}>
                 <Text style={styles.modalConfirmText}>Mark Shipped →</Text>
               </TouchableOpacity>
             </View>
@@ -421,19 +403,22 @@ function DetailRow({
   valueStyle,
   multiline,
   mono,
+  colors: c,
 }: {
   label: string;
   value: string;
   valueStyle?: object;
   multiline?: boolean;
   mono?: boolean;
+  colors: any;
 }) {
   return (
-    <View style={[detailStyles.row, multiline && detailStyles.rowMultiline]}>
-      <Text style={detailStyles.label}>{label}</Text>
+    <View style={[detailStyles.row, multiline && detailStyles.rowMultiline, { borderBottomColor: c.outlineVariant + '40' }]}>
+      <Text style={[detailStyles.label, { color: c.subText }]}>{label}</Text>
       <Text
         style={[
           detailStyles.value,
+          { color: c.text },
           mono && detailStyles.mono,
           multiline && detailStyles.valueMultiline,
           valueStyle,
@@ -451,7 +436,6 @@ const detailStyles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: T.outlineVariant + '40',
   },
   rowMultiline: {
     flexDirection: 'column',
@@ -463,13 +447,11 @@ const detailStyles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    color: T.subText,
     flex: 1,
   },
   value: {
     fontSize: 14,
     fontFamily: 'DMSans',
-    color: T.text,
     flex: 2,
     textAlign: 'right',
   },
@@ -487,7 +469,6 @@ const detailStyles = StyleSheet.create({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: T.bg,
   },
   // Header
   header: {
@@ -495,13 +476,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: T.bg,
     gap: 8,
   },
   backButton: {
     padding: 8,
     borderRadius: 999,
-    backgroundColor: T.surfaceLow,
     width: 36,
     height: 36,
     justifyContent: 'center',
@@ -509,7 +488,6 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 18,
-    color: T.primary,
     fontWeight: '700',
   },
   headerCenter: {
@@ -520,19 +498,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   editButton: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: T.surfaceLow,
   },
   editText: {
     fontSize: 13,
     fontFamily: 'DMSans',
     fontWeight: '600',
-    color: T.primary,
   },
   scroll: {
     flex: 1,
@@ -551,11 +526,9 @@ const styles = StyleSheet.create({
   notFoundText: {
     fontFamily: 'PlayfairDisplay',
     fontSize: 18,
-    color: T.subText,
   },
   backLink: {
     fontFamily: 'DMSans',
-    color: T.primary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -610,7 +583,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   unpaidBadge: {
-    backgroundColor: T.tertiary + '22',
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 4,
@@ -619,21 +591,18 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'DMSans',
     fontWeight: '700',
-    color: T.tertiary,
     letterSpacing: 0.5,
   },
   heroCustomer: {
     fontSize: 32,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.primary,
     letterSpacing: -0.5,
   },
   heroOrderId: {
     fontSize: 12,
     fontFamily: 'DMSans',
     fontWeight: '500',
-    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
   },
@@ -641,13 +610,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'DMSans',
     fontWeight: '700',
-    color: T.tertiary,
   },
   // Status pipeline
   pipeline: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: T.surfaceLow,
     borderRadius: 16,
     padding: 12,
     marginBottom: 16,
@@ -656,7 +623,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: 999,
-    backgroundColor: T.surfaceHighest,
     flexShrink: 1,
   },
   pipelineChipText: {
@@ -668,7 +634,6 @@ const styles = StyleSheet.create({
   pipelineConnector: {
     flex: 1,
     height: 2,
-    backgroundColor: T.outlineVariant,
     marginHorizontal: 4,
   },
   // Advance button
@@ -679,7 +644,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -693,12 +657,10 @@ const styles = StyleSheet.create({
   },
   // Main card
   mainCard: {
-    backgroundColor: T.surfaceLowest,
     borderRadius: 24,
     marginBottom: 16,
     flexDirection: 'row',
     overflow: 'hidden',
-    shadowColor: T.text,
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 0.04,
     shadowRadius: 24,
@@ -719,7 +681,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1.5,
-    color: T.subText,
     marginBottom: 8,
   },
   // Tags
@@ -746,10 +707,8 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   timelineCard: {
-    backgroundColor: T.surfaceLowest,
     borderRadius: 16,
     padding: 16,
-    shadowColor: T.text,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.03,
     shadowRadius: 12,
@@ -764,7 +723,6 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     paddingVertical: 16,
     alignItems: 'center',
-    backgroundColor: T.primaryContainer,
   },
   paidButtonText: {
     color: '#FFFFFF',
@@ -777,11 +735,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: T.primaryContainer,
-    backgroundColor: T.primaryContainer + '18',
   },
   invoiceButtonText: {
-    color: T.primary,
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
@@ -811,22 +766,18 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 28,
     padding: 24,
     gap: 16,
-    backgroundColor: T.bg,
   },
   modalTitle: {
     fontSize: 24,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   modalInput: {
-    backgroundColor: T.surfaceLow,
     borderRadius: 999,
     paddingHorizontal: 20,
     paddingVertical: 14,
     fontFamily: 'DMSans',
     fontSize: 15,
-    color: T.text,
   },
   modalActions: {
     flexDirection: 'row',
@@ -837,18 +788,15 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 999,
     alignItems: 'center',
-    backgroundColor: T.surfaceHighest,
   },
   modalCancelText: {
     fontFamily: 'DMSans',
     fontWeight: '600',
-    color: T.subText,
   },
   modalConfirm: {
     flex: 2,
     paddingVertical: 14,
     borderRadius: 999,
-    backgroundColor: T.primary,
     alignItems: 'center',
   },
   modalConfirmText: {

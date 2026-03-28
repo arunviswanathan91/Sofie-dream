@@ -11,36 +11,18 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useCustomers } from '../../hooks/useCustomers';
 import { useOrders } from '../../hooks/useOrders';
+import { useTheme } from '../../context/ThemeContext';
 import { OrderCard } from '../../components/OrderCard';
-
-// Design tokens — Stitch "Warm Artisan Editorial"
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHigh: '#EDE7E4',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  primaryFixed: '#FFD9E2',
-  onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  secondary: '#625E5A',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-};
 
 export default function CustomerProfileScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { customers } = useCustomers();
   const { orders } = useOrders();
+  const { colors } = useTheme();
+  const c = colors;
 
-  const customer = useMemo(() => customers.find((c) => c.id === id), [customers, id]);
+  const customer = useMemo(() => customers.find((cu) => cu.id === id), [customers, id]);
   const customerOrders = useMemo(
     () => orders.filter((o) => o.customerName === customer?.name),
     [orders, customer]
@@ -53,9 +35,9 @@ export default function CustomerProfileScreen() {
 
   if (!customer) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: c.bg }]}>
         <View style={styles.notFound}>
-          <Text style={styles.notFoundText}>Customer not found</Text>
+          <Text style={[styles.notFoundText, { color: c.subText }]}>Customer not found</Text>
         </View>
       </SafeAreaView>
     );
@@ -64,70 +46,70 @@ export default function CustomerProfileScreen() {
   const avatarInitial = customer.name.trim().charAt(0).toUpperCase();
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: c.bg }]}>
       {/* Header with chevron back button */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backPill} activeOpacity={0.7}>
-          <Text style={styles.backChevron}>‹</Text>
-          <Text style={styles.backText}>Back</Text>
+        <TouchableOpacity onPress={() => router.back()} style={[styles.backPill, { backgroundColor: c.surfaceContainer }]} activeOpacity={0.7}>
+          <Text style={[styles.backChevron, { color: c.primary }]}>‹</Text>
+          <Text style={[styles.backText, { color: c.primary }]}>Back</Text>
         </TouchableOpacity>
         <View style={{ width: 72 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Hero profile card */}
-        <Animated.View entering={FadeInDown.delay(0).duration(400)} style={styles.heroCard}>
+        <Animated.View entering={FadeInDown.delay(0).duration(400)} style={[styles.heroCard, { backgroundColor: c.accentContainer, shadowColor: c.primary }]}>
           {/* Decorative background blob */}
-          <View style={styles.heroBlobTop} />
-          <View style={styles.heroBlobBottom} />
+          <View style={[styles.heroBlobTop, { backgroundColor: c.primary }]} />
+          <View style={[styles.heroBlobBottom, { backgroundColor: c.accent }]} />
 
           {/* Avatar */}
           <View style={styles.avatarWrapper}>
-            <View style={styles.avatar}>
+            <View style={[styles.avatar, { backgroundColor: c.primaryContainer, shadowColor: c.primary }]}>
               <Text style={styles.avatarText}>{avatarInitial}</Text>
             </View>
             {/* Verified badge */}
-            <View style={styles.verifiedBadge}>
+            <View style={[styles.verifiedBadge, { backgroundColor: c.accent, borderColor: c.accentContainer }]}>
               <Text style={styles.verifiedText}>✓</Text>
             </View>
           </View>
 
           {/* Customer name */}
-          <Text style={styles.customerName}>{customer.name}</Text>
+          <Text style={[styles.customerName, { color: c.onPrimary }]}>{customer.name}</Text>
 
           {/* Verified client label */}
-          <View style={styles.verifiedChip}>
-            <Text style={styles.verifiedChipText}>✓ Verified client</Text>
+          <View style={[styles.verifiedChip, { backgroundColor: c.primaryContainer + '30' }]}>
+            <Text style={[styles.verifiedChipText, { color: c.primary }]}>✓ Verified client</Text>
           </View>
 
           {customer.instagram && (
-            <Text style={styles.instagram}>{customer.instagram}</Text>
+            <Text style={[styles.instagram, { color: c.subText }]}>{customer.instagram}</Text>
           )}
 
           {/* Location placeholder */}
           {customer.address ? (
-            <Text style={styles.location}>📍 {customer.address}</Text>
+            <Text style={[styles.location, { color: c.subText }]}>📍 {customer.address}</Text>
           ) : null}
 
           {/* Stats row — animated */}
-          <Animated.View entering={FadeInDown.delay(150).duration(400)} style={styles.statsRow}>
+          <Animated.View entering={FadeInDown.delay(150).duration(400)} style={[styles.statsRow, { backgroundColor: c.card, shadowColor: c.primary }]}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{customer.totalOrders}</Text>
-              <Text style={styles.statLabel}>Orders</Text>
+              <Text style={[styles.statValue, { color: c.text }]}>{customer.totalOrders}</Text>
+              <Text style={[styles.statLabel, { color: c.subText }]}>Orders</Text>
             </View>
-            <View style={styles.statDivider} />
+            <View style={[styles.statDivider, { backgroundColor: c.outlineVariant }]} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: T.primary }]}>
+              <Text style={[styles.statValue, { color: c.primary }]}>
                 €{customer.totalSpent.toFixed(2)}
               </Text>
-              <Text style={styles.statLabel}>Total Spent</Text>
+              <Text style={[styles.statLabel, { color: c.subText }]}>Total Spent</Text>
             </View>
-            <View style={styles.statDivider} />
+            <View style={[styles.statDivider, { backgroundColor: c.outlineVariant }]} />
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: T.tertiary }]}>
+              <Text style={[styles.statValue, { color: c.accent }]}>
                 {completedOrders}
               </Text>
-              <Text style={styles.statLabel}>Completed</Text>
+              <Text style={[styles.statLabel, { color: c.subText }]}>Completed</Text>
             </View>
           </Animated.View>
         </Animated.View>
@@ -135,24 +117,24 @@ export default function CustomerProfileScreen() {
         {/* Contact Info */}
         {(customer.address || customer.phone || customer.instagram) && (
           <Animated.View entering={FadeInDown.delay(100).duration(400)} style={styles.section}>
-            <Text style={styles.sectionTitle}>Contact</Text>
-            <View style={styles.contactCard}>
+            <Text style={[styles.sectionTitle, { color: c.text }]}>Contact</Text>
+            <View style={[styles.contactCard, { backgroundColor: c.card }]}>
               {customer.address ? (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Address</Text>
-                  <Text style={styles.infoValue}>{customer.address}</Text>
+                <View style={[styles.infoRow, { borderBottomColor: c.outlineVariant }]}>
+                  <Text style={[styles.infoLabel, { color: c.subText }]}>Address</Text>
+                  <Text style={[styles.infoValue, { color: c.text }]}>{customer.address}</Text>
                 </View>
               ) : null}
               {customer.phone ? (
-                <View style={styles.infoRow}>
-                  <Text style={styles.infoLabel}>Phone</Text>
-                  <Text style={styles.infoValue}>{customer.phone}</Text>
+                <View style={[styles.infoRow, { borderBottomColor: c.outlineVariant }]}>
+                  <Text style={[styles.infoLabel, { color: c.subText }]}>Phone</Text>
+                  <Text style={[styles.infoValue, { color: c.text }]}>{customer.phone}</Text>
                 </View>
               ) : null}
               {customer.instagram ? (
                 <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-                  <Text style={styles.infoLabel}>Instagram</Text>
-                  <Text style={styles.infoValue}>{customer.instagram}</Text>
+                  <Text style={[styles.infoLabel, { color: c.subText }]}>Instagram</Text>
+                  <Text style={[styles.infoValue, { color: c.text }]}>{customer.instagram}</Text>
                 </View>
               ) : null}
             </View>
@@ -163,8 +145,8 @@ export default function CustomerProfileScreen() {
         <Animated.View entering={FadeInDown.delay(200).duration(400)} style={styles.section}>
           {/* Section title with count badge */}
           <View style={styles.orderHistoryHeader}>
-            <Text style={styles.sectionTitle}>Order History</Text>
-            <View style={styles.orderCountBadge}>
+            <Text style={[styles.sectionTitle, { color: c.text }]}>Order History</Text>
+            <View style={[styles.orderCountBadge, { backgroundColor: c.accent }]}>
               <Text style={styles.orderCountText}>{customerOrders.length}</Text>
             </View>
           </View>
@@ -177,8 +159,8 @@ export default function CustomerProfileScreen() {
             </Animated.View>
           ))}
           {customerOrders.length === 0 && (
-            <View style={styles.emptyOrders}>
-              <Text style={styles.emptyText}>No orders yet</Text>
+            <View style={[styles.emptyOrders, { backgroundColor: c.surfaceLow }]}>
+              <Text style={[styles.emptyText, { color: c.subText }]}>No orders yet</Text>
             </View>
           )}
         </Animated.View>
@@ -192,7 +174,6 @@ export default function CustomerProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: T.bg,
   },
   notFound: {
     flex: 1,
@@ -201,7 +182,6 @@ const styles = StyleSheet.create({
   },
   notFoundText: {
     fontFamily: 'DMSans',
-    color: T.subText,
     fontSize: 15,
   },
 
@@ -216,7 +196,6 @@ const styles = StyleSheet.create({
   backPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: T.surfaceContainer,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -224,7 +203,6 @@ const styles = StyleSheet.create({
   },
   backChevron: {
     fontSize: 22,
-    color: T.primary,
     lineHeight: 22,
     marginTop: -1,
     fontWeight: '300',
@@ -232,7 +210,6 @@ const styles = StyleSheet.create({
   backText: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: T.primary,
     fontWeight: '600',
   },
 
@@ -242,10 +219,8 @@ const styles = StyleSheet.create({
     padding: 24,
     marginHorizontal: 16,
     marginBottom: 16,
-    backgroundColor: T.primaryFixed,
     borderRadius: 24,
     overflow: 'hidden',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
@@ -258,7 +233,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: T.primary,
     opacity: 0.06,
   },
   heroBlobBottom: {
@@ -268,7 +242,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: T.tertiary,
     opacity: 0.04,
   },
   avatarWrapper: {
@@ -279,10 +252,8 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: T.primaryContainer,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
@@ -301,11 +272,9 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: T.tertiary,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: T.primaryFixed,
   },
   verifiedText: {
     fontSize: 11,
@@ -316,12 +285,10 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.onPrimaryContainer,
     marginBottom: 6,
     textAlign: 'center',
   },
   verifiedChip: {
-    backgroundColor: T.primaryContainer + '30',
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 4,
@@ -331,19 +298,16 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: 'DMSans',
     fontWeight: '700',
-    color: T.primary,
     letterSpacing: 0.5,
   },
   instagram: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: T.subText,
     marginBottom: 4,
   },
   location: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: T.subText,
     marginBottom: 16,
   },
   // Stats row
@@ -352,12 +316,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 24,
     marginTop: 8,
-    backgroundColor: T.surfaceLowest,
     borderRadius: 16,
     paddingVertical: 16,
     paddingHorizontal: 20,
     alignSelf: 'stretch',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
@@ -371,12 +333,10 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   statLabel: {
     fontSize: 10,
     fontFamily: 'DMSans',
-    color: T.subText,
     marginTop: 2,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
@@ -384,7 +344,6 @@ const styles = StyleSheet.create({
   statDivider: {
     width: 1,
     height: 36,
-    backgroundColor: T.outlineVariant,
   },
 
   // Sections
@@ -403,10 +362,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   orderCountBadge: {
-    backgroundColor: T.tertiary,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 2,
@@ -420,7 +377,6 @@ const styles = StyleSheet.create({
 
   // Contact card
   contactCard: {
-    backgroundColor: T.surfaceLowest,
     borderRadius: 16,
     padding: 16,
     shadowColor: 'rgba(0,0,0,0.03)',
@@ -435,19 +391,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: T.outlineVariant,
   },
   infoLabel: {
     fontSize: 11,
     fontFamily: 'DMSans',
-    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
   },
   infoValue: {
     fontSize: 14,
     fontFamily: 'DMSans',
-    color: T.text,
     flex: 2,
     textAlign: 'right',
   },
@@ -456,12 +409,10 @@ const styles = StyleSheet.create({
   emptyOrders: {
     paddingVertical: 24,
     alignItems: 'center',
-    backgroundColor: T.surfaceLow,
     borderRadius: 16,
   },
   emptyText: {
     fontFamily: 'DMSans',
-    color: T.subText,
     fontSize: 14,
   },
 });

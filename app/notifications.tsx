@@ -12,49 +12,28 @@ import { useTheme } from '../context/ThemeContext';
 import { DEFAULT_NOTIFICATION_PREFS } from '../types';
 import { Colors, Spacing, BorderRadius } from '../lib/theme';
 
-// Design tokens — Stitch "Warm Artisan Editorial"
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHigh: '#EDE7E4',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  primaryFixed: '#FFD9E2',
-  onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  secondary: '#625E5A',
-  secondaryContainer: '#E8E1DC',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-};
-
 const DAY_OPTIONS = [
   { label: 'Sun', value: 0 }, { label: 'Mon', value: 1 }, { label: 'Tue', value: 2 },
   { label: 'Wed', value: 3 }, { label: 'Thu', value: 4 }, { label: 'Fri', value: 5 },
   { label: 'Sat', value: 6 },
 ];
 
-// Section icon color configs
-const SEC_ICONS: Record<string, { icon: string; bg: string }> = {
-  Master: { icon: '🔔', bg: T.primaryFixed },
-  'Due-Date Alerts': { icon: '⏱', bg: T.tertiaryFixed },
-  'Daily Digest': { icon: '☀️', bg: '#FFF3E0' },
-  'Weekly Summary': { icon: '📅', bg: T.surfaceHigh },
-  'Shipping Reminders': { icon: '📦', bg: T.secondaryContainer },
-  'Payment Reminders': { icon: '💰', bg: T.surfaceContainer },
-};
-
 export default function NotificationsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { prefs, loading, updatePrefs, testNotification } = useNotifications();
   const { colors } = useTheme();
+  const c = colors;
+
+  // Section icon color configs — computed inside component so c.xxx is in scope
+  const SEC_ICONS: Record<string, { icon: string; bg: string }> = {
+    Master: { icon: '🔔', bg: c.accentContainer },
+    'Due-Date Alerts': { icon: '⏱', bg: c.accentContainer },
+    'Daily Digest': { icon: '☀️', bg: '#FFF3E0' },
+    'Weekly Summary': { icon: '📅', bg: c.surfaceHigh },
+    'Shipping Reminders': { icon: '📦', bg: c.surfaceContainer },
+    'Payment Reminders': { icon: '💰', bg: c.surfaceContainer },
+  };
 
   // Local draft state — only committed on Save
   const [draft, setDraft] = useState({ ...prefs });
@@ -134,27 +113,27 @@ export default function NotificationsScreen() {
   };
 
   return (
-    <SafeAreaView style={s.container}>
+    <SafeAreaView style={[s.container, { backgroundColor: c.bg }]}>
       {/* Header */}
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backPill} hitSlop={12}>
-          <Text style={s.backChevron}>‹</Text>
-          <Text style={s.back}>Back</Text>
+      <View style={[s.header, { backgroundColor: c.bg }]}>
+        <TouchableOpacity onPress={() => router.back()} style={[s.backPill, { backgroundColor: c.surfaceContainer }]} hitSlop={12}>
+          <Text style={[s.backChevron, { color: c.primary }]}>‹</Text>
+          <Text style={[s.back, { color: c.primary }]}>Back</Text>
         </TouchableOpacity>
-        <Text style={s.headerTitle}>Notifications</Text>
-        <TouchableOpacity onPress={handleSave} style={s.saveHeaderBtn} hitSlop={8}>
-          <Text style={s.saveHeaderTxt}>Save</Text>
+        <Text style={[s.headerTitle, { color: c.text }]}>Notifications</Text>
+        <TouchableOpacity onPress={handleSave} style={[s.saveHeaderBtn, { backgroundColor: c.primaryContainer }]} hitSlop={8}>
+          <Text style={[s.saveHeaderTxt, { color: c.onPrimary }]}>Save</Text>
         </TouchableOpacity>
       </View>
 
       {/* Decorative hoop motif at top of content */}
       <View style={s.hoopMotifRow}>
-        <View style={s.hoopCircle}>
+        <View style={[s.hoopCircle, { backgroundColor: c.accentContainer, shadowColor: c.primary }]}>
           <Text style={s.hoopEmoji}>🪡</Text>
         </View>
         <View style={s.hoopMotifText}>
-          <Text style={s.hoopMotifTitle}>Notification Preferences</Text>
-          <Text style={s.hoopMotifSub}>Stay on top of every stitch</Text>
+          <Text style={[s.hoopMotifTitle, { color: c.text }]}>Notification Preferences</Text>
+          <Text style={[s.hoopMotifSub, { color: c.subText }]}>Stay on top of every stitch</Text>
         </View>
       </View>
 
@@ -165,42 +144,44 @@ export default function NotificationsScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         >
           {/* Master */}
-          <Sec title="Master">
+          <Sec title="Master" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Enable all notifications"
               value={draft.enabled}
               onChange={(v) => set('enabled', v)}
+              colors={c}
             />
           </Sec>
 
           {/* Due alerts */}
-          <Sec title="Due-Date Alerts">
+          <Sec title="Due-Date Alerts" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Remind me before due dates"
               value={draft.dueSoonAlerts.enabled}
               onChange={(v) => set('dueSoonAlerts', { ...draft.dueSoonAlerts, enabled: v })}
+              colors={c}
             />
             {draft.dueSoonAlerts.enabled && (
               <>
-                <Lbl>Days before due (tap to toggle)</Lbl>
+                <Lbl colors={c}>Days before due (tap to toggle)</Lbl>
                 <View style={s.chips}>
                   {[1, 2, 3, 5, 7, 14].map((d) => (
                     <TouchableOpacity
                       key={d}
-                      style={[s.chip, draft.dueSoonAlerts.intervals.includes(d) && s.chipOn]}
+                      style={[s.chip, { backgroundColor: c.surfaceContainer }, draft.dueSoonAlerts.intervals.includes(d) && { backgroundColor: c.primaryContainer }]}
                       onPress={() => toggleDayInterval(d)}
                     >
-                      <Text style={[s.chipTxt, draft.dueSoonAlerts.intervals.includes(d) && s.chipTxtOn]}>{d}d</Text>
+                      <Text style={[s.chipTxt, { color: c.subText }, draft.dueSoonAlerts.intervals.includes(d) && { color: c.onPrimary, fontWeight: '600' }]}>{d}d</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                <Lbl>Alert time (HH:MM)</Lbl>
+                <Lbl colors={c}>Alert time (HH:MM)</Lbl>
                 <TextInput
-                  style={s.input}
+                  style={[s.input, { backgroundColor: c.surfaceContainer, color: c.text }]}
                   value={dueAlertTime}
                   onChangeText={setDueAlertTime}
                   placeholder="09:00"
-                  placeholderTextColor={T.outline}
+                  placeholderTextColor={c.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -208,22 +189,23 @@ export default function NotificationsScreen() {
           </Sec>
 
           {/* Daily digest */}
-          <Sec title="Daily Digest">
+          <Sec title="Daily Digest" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Morning summary"
               sublabel="Active orders, what's due, revenue"
               value={draft.dailyDigest.enabled}
               onChange={(v) => set('dailyDigest', { ...draft.dailyDigest, enabled: v })}
+              colors={c}
             />
             {draft.dailyDigest.enabled && (
               <>
-                <Lbl>Send at (HH:MM)</Lbl>
+                <Lbl colors={c}>Send at (HH:MM)</Lbl>
                 <TextInput
-                  style={s.input}
+                  style={[s.input, { backgroundColor: c.surfaceContainer, color: c.text }]}
                   value={digestTime}
                   onChangeText={setDigestTime}
                   placeholder="08:00"
-                  placeholderTextColor={T.outline}
+                  placeholderTextColor={c.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -231,34 +213,35 @@ export default function NotificationsScreen() {
           </Sec>
 
           {/* Weekly summary */}
-          <Sec title="Weekly Summary">
+          <Sec title="Weekly Summary" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Weekly recap"
               sublabel="Revenue, completed orders, upcoming"
               value={draft.weeklySummary.enabled}
               onChange={(v) => set('weeklySummary', { ...draft.weeklySummary, enabled: v })}
+              colors={c}
             />
             {draft.weeklySummary.enabled && (
               <>
-                <Lbl>Day of week</Lbl>
+                <Lbl colors={c}>Day of week</Lbl>
                 <View style={s.chips}>
                   {DAY_OPTIONS.map((d) => (
                     <TouchableOpacity
                       key={d.value}
-                      style={[s.chip, draft.weeklySummary.dayOfWeek === d.value && s.chipOn]}
+                      style={[s.chip, { backgroundColor: c.surfaceContainer }, draft.weeklySummary.dayOfWeek === d.value && { backgroundColor: c.primaryContainer }]}
                       onPress={() => set('weeklySummary', { ...draft.weeklySummary, dayOfWeek: d.value })}
                     >
-                      <Text style={[s.chipTxt, draft.weeklySummary.dayOfWeek === d.value && s.chipTxtOn]}>{d.label}</Text>
+                      <Text style={[s.chipTxt, { color: c.subText }, draft.weeklySummary.dayOfWeek === d.value && { color: c.onPrimary, fontWeight: '600' }]}>{d.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                <Lbl>Send at (HH:MM)</Lbl>
+                <Lbl colors={c}>Send at (HH:MM)</Lbl>
                 <TextInput
-                  style={s.input}
+                  style={[s.input, { backgroundColor: c.surfaceContainer, color: c.text }]}
                   value={weeklyTime}
                   onChangeText={setWeeklyTime}
                   placeholder="09:00"
-                  placeholderTextColor={T.outline}
+                  placeholderTextColor={c.outline}
                   keyboardType="numbers-and-punctuation"
                 />
               </>
@@ -266,44 +249,46 @@ export default function NotificationsScreen() {
           </Sec>
 
           {/* Shipping */}
-          <Sec title="Shipping Reminders">
+          <Sec title="Shipping Reminders" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Remind me to ship accepted orders"
               value={draft.shippingReminder.enabled}
               onChange={(v) => set('shippingReminder', { ...draft.shippingReminder, enabled: v })}
+              colors={c}
             />
             {draft.shippingReminder.enabled && (
               <>
-                <Lbl>Days after accepting order</Lbl>
+                <Lbl colors={c}>Days after accepting order</Lbl>
                 <TextInput
-                  style={s.input}
+                  style={[s.input, { backgroundColor: c.surfaceContainer, color: c.text }]}
                   value={shipDays}
                   onChangeText={setShipDays}
                   keyboardType="number-pad"
                   placeholder="3"
-                  placeholderTextColor={T.outline}
+                  placeholderTextColor={c.outline}
                 />
               </>
             )}
           </Sec>
 
           {/* Payment */}
-          <Sec title="Payment Reminders">
+          <Sec title="Payment Reminders" secIcons={SEC_ICONS} colors={c}>
             <Row
               label="Remind me about unpaid orders"
               value={draft.paymentReminder.enabled}
               onChange={(v) => set('paymentReminder', { ...draft.paymentReminder, enabled: v })}
+              colors={c}
             />
             {draft.paymentReminder.enabled && (
               <>
-                <Lbl>Days after delivery if unpaid</Lbl>
+                <Lbl colors={c}>Days after delivery if unpaid</Lbl>
                 <TextInput
-                  style={s.input}
+                  style={[s.input, { backgroundColor: c.surfaceContainer, color: c.text }]}
                   value={payDays}
                   onChangeText={setPayDays}
                   keyboardType="number-pad"
                   placeholder="2"
-                  placeholderTextColor={T.outline}
+                  placeholderTextColor={c.outline}
                 />
               </>
             )}
@@ -311,11 +296,11 @@ export default function NotificationsScreen() {
 
           {/* Test + Reset */}
           <View style={s.actions}>
-            <TouchableOpacity style={s.testBtn} onPress={testNotification}>
-              <Text style={s.testTxt}>Send Test Notification</Text>
+            <TouchableOpacity style={[s.testBtn, { backgroundColor: c.surfaceContainer }]} onPress={testNotification}>
+              <Text style={[s.testTxt, { color: c.primary }]}>Send Test Notification</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={s.resetBtn} onPress={handleResetDefaults}>
-              <Text style={s.resetTxt}>Reset to Defaults</Text>
+            <TouchableOpacity style={[s.resetBtn, { backgroundColor: c.surfaceHigh }]} onPress={handleResetDefaults}>
+              <Text style={[s.resetTxt, { color: c.subText }]}>Reset to Defaults</Text>
             </TouchableOpacity>
           </View>
 
@@ -323,57 +308,56 @@ export default function NotificationsScreen() {
       </KeyboardAvoidingView>
 
       {/* Sticky save bar */}
-      <View style={[s.stickyBar, { paddingBottom: insets.bottom + 8 }]}>
-        <TouchableOpacity style={s.stickySave} onPress={handleSave}>
-          <Text style={s.stickySaveTxt}>Save Preferences</Text>
+      <View style={[s.stickyBar, { paddingBottom: insets.bottom + 8, borderTopColor: c.outlineVariant, backgroundColor: c.bg }]}>
+        <TouchableOpacity style={[s.stickySave, { backgroundColor: c.primaryContainer }]} onPress={handleSave}>
+          <Text style={[s.stickySaveTxt, { color: c.onPrimary }]}>Save Preferences</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
-function Sec({ title, children }: { title: string; children: React.ReactNode }) {
-  const iconConfig = SEC_ICONS[title] ?? { icon: '⚙', bg: T.surfaceContainer };
+function Sec({ title, children, secIcons, colors: c }: { title: string; children: React.ReactNode; secIcons: Record<string, { icon: string; bg: string }>; colors: any }) {
+  const iconConfig = secIcons[title] ?? { icon: '⚙', bg: c.surfaceContainer };
   return (
     <View style={s.section}>
       <View style={s.secHeaderRow}>
         <View style={[s.secIconBg, { backgroundColor: iconConfig.bg }]}>
           <Text style={s.secIconEmoji}>{iconConfig.icon}</Text>
         </View>
-        <Text style={s.sectionTitle}>{title}</Text>
+        <Text style={[s.sectionTitle, { color: c.text }]}>{title}</Text>
       </View>
-      <View style={s.card}>{children}</View>
+      <View style={[s.card, { backgroundColor: c.card }]}>{children}</View>
     </View>
   );
 }
 
-function Row({ label, sublabel, value, onChange }: {
-  label: string; sublabel?: string; value: boolean; onChange: (v: boolean) => void;
+function Row({ label, sublabel, value, onChange, colors: c }: {
+  label: string; sublabel?: string; value: boolean; onChange: (v: boolean) => void; colors: any;
 }) {
   return (
     <View style={s.row}>
       <View style={{ flex: 1, marginRight: 12 }}>
-        <Text style={s.rowLabel}>{label}</Text>
-        {sublabel && <Text style={s.rowSub}>{sublabel}</Text>}
+        <Text style={[s.rowLabel, { color: c.text }]}>{label}</Text>
+        {sublabel && <Text style={[s.rowSub, { color: c.subText }]}>{sublabel}</Text>}
       </View>
       <Switch
         value={value}
         onValueChange={onChange}
-        trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
-        thumbColor={T.surfaceLowest}
+        trackColor={{ false: c.outlineVariant, true: c.primaryContainer }}
+        thumbColor={c.card}
       />
     </View>
   );
 }
 
-function Lbl({ children }: { children: string }) {
-  return <Text style={s.fieldLbl}>{children}</Text>;
+function Lbl({ children, colors: c }: { children: string; colors: any }) {
+  return <Text style={[s.fieldLbl, { color: c.subText }]}>{children}</Text>;
 }
 
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: T.bg,
   },
 
   // Header
@@ -387,7 +371,6 @@ const s = StyleSheet.create({
   backPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: T.surfaceContainer,
     borderRadius: 999,
     paddingHorizontal: 14,
     paddingVertical: 7,
@@ -395,7 +378,6 @@ const s = StyleSheet.create({
   },
   backChevron: {
     fontSize: 20,
-    color: T.primary,
     lineHeight: 20,
     fontWeight: '300',
     marginTop: -1,
@@ -403,23 +385,19 @@ const s = StyleSheet.create({
   back: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: T.primary,
     fontWeight: '600',
   },
   headerTitle: {
     fontSize: 20,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   saveHeaderBtn: {
     paddingHorizontal: 14,
     paddingVertical: 7,
-    backgroundColor: T.primaryContainer,
     borderRadius: 999,
   },
   saveHeaderTxt: {
-    color: T.onPrimary,
     fontFamily: 'DMSans',
     fontSize: 13,
     fontWeight: '700',
@@ -437,12 +415,10 @@ const s = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: T.primaryFixed,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
     borderColor: '#D7B49E',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -458,13 +434,11 @@ const s = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
     marginBottom: 2,
   },
   hoopMotifSub: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: T.subText,
     fontStyle: 'italic',
   },
 
@@ -493,12 +467,10 @@ const s = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   card: {
     borderRadius: 16,
     padding: 16,
-    backgroundColor: T.surfaceLowest,
     gap: 8,
     shadowColor: 'rgba(0,0,0,0.03)',
     shadowOffset: { width: 0, height: 2 },
@@ -516,19 +488,16 @@ const s = StyleSheet.create({
   rowLabel: {
     fontSize: 14,
     fontFamily: 'DMSans',
-    color: T.text,
   },
   rowSub: {
     fontSize: 12,
     fontFamily: 'DMSans',
     marginTop: 2,
-    color: T.subText,
   },
 
   fieldLbl: {
     fontSize: 11,
     fontFamily: 'DMSans',
-    color: T.subText,
     textTransform: 'uppercase',
     letterSpacing: 0.8,
     marginTop: 8,
@@ -542,8 +511,6 @@ const s = StyleSheet.create({
     paddingVertical: 11,
     fontFamily: 'DMMono',
     fontSize: 15,
-    backgroundColor: T.surfaceContainer,
-    color: T.text,
   },
 
   chips: {
@@ -556,19 +523,10 @@ const s = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    backgroundColor: T.surfaceContainer,
-  },
-  chipOn: {
-    backgroundColor: T.primaryContainer,
   },
   chipTxt: {
     fontSize: 12,
     fontFamily: 'DMMono',
-    color: T.subText,
-  },
-  chipTxtOn: {
-    color: T.onPrimary,
-    fontWeight: '600',
   },
 
   actions: {
@@ -580,10 +538,8 @@ const s = StyleSheet.create({
     borderRadius: 999,
     padding: 16,
     alignItems: 'center',
-    backgroundColor: T.surfaceContainer,
   },
   testTxt: {
-    color: T.primary,
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
@@ -592,10 +548,8 @@ const s = StyleSheet.create({
     borderRadius: 999,
     padding: 16,
     alignItems: 'center',
-    backgroundColor: T.surfaceHigh,
   },
   resetTxt: {
-    color: T.subText,
     fontFamily: 'DMSans',
     fontSize: 14,
     fontWeight: '600',
@@ -603,19 +557,15 @@ const s = StyleSheet.create({
 
   stickyBar: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: T.outlineVariant,
     paddingHorizontal: 16,
     paddingTop: 10,
-    backgroundColor: T.bg,
   },
   stickySave: {
-    backgroundColor: T.primaryContainer,
     borderRadius: 999,
     paddingVertical: 15,
     alignItems: 'center',
   },
   stickySaveTxt: {
-    color: T.onPrimary,
     fontFamily: 'DMSans',
     fontSize: 15,
     fontWeight: '700',

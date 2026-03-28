@@ -12,30 +12,6 @@ import { useProfile } from '../../hooks/useProfile';
 import { useTheme } from '../../context/ThemeContext';
 import type { AppTheme } from '../../types';
 
-// Design tokens — Stitch "Warm Artisan Editorial"
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHigh: '#EDE7E4',
-  surfaceHighest: '#E8E1DE',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  primaryFixed: '#FFD9E2',
-  onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  secondary: '#625E5A',
-  secondaryContainer: '#E8E1DC',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-  error: '#BA1A1A',
-};
-
 const THEMES: { label: string; value: AppTheme; bg: string; text: string; desc: string }[] = [
   { label: 'System Default', value: 'system', bg: '#888888', text: '#FFFFFF', desc: 'Follows device dark/light mode' },
   { label: 'Warm Cream', value: 'warm-cream', bg: '#FAF7F2', text: '#3D2B1F', desc: 'Default warm tone' },
@@ -52,6 +28,7 @@ export default function SettingsScreen() {
   const { prefs, updatePrefs, testNotification } = useNotifications();
   const { profile, saveProfile } = useProfile();
   const { theme: activeTheme, setTheme: setGlobalTheme, colors } = useTheme();
+  const c = colors;
   const { width } = useWindowDimensions();
   const isTablet = width >= 600;
 
@@ -103,7 +80,7 @@ export default function SettingsScreen() {
   const avatarInitial = (name || 'S').trim().charAt(0).toUpperCase();
 
   return (
-    <SafeAreaView style={[s.container, { backgroundColor: colors.bg }]}>
+    <SafeAreaView style={[s.container, { backgroundColor: c.bg }]}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           keyboardShouldPersistTaps="always"
@@ -111,24 +88,24 @@ export default function SettingsScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 80 }}
         >
           {/* Page title */}
-          <Text style={[s.pageTitle, { color: colors.text }]}>Settings</Text>
+          <Text style={[s.pageTitle, { color: c.text }]}>Settings</Text>
 
           {/* Profile Hero Header */}
-          <View style={s.profileHero}>
-            <View style={s.profileHeroBg} />
+          <View style={[s.profileHero, { backgroundColor: c.accentContainer }]}>
+            <View style={[s.profileHeroBg, { backgroundColor: c.primary }]} />
             <View style={s.profileHeroContent}>
               {/* Avatar circle */}
-              <View style={s.avatar}>
+              <View style={[s.avatar, { backgroundColor: c.primaryContainer, shadowColor: c.primary }]}>
                 <Text style={s.avatarText}>{avatarInitial}</Text>
               </View>
               <View style={s.profileHeroInfo}>
-                <Text style={s.profileHeroName}>{name || 'Sofi Dream'}</Text>
-                <Text style={s.profileHeroTagline}>
+                <Text style={[s.profileHeroName, { color: c.onPrimary }]}>{name || 'Sofi Dream'}</Text>
+                <Text style={[s.profileHeroTagline, { color: c.subText }]}>
                   {tagline || 'Handmade with love ✦'}
                 </Text>
               </View>
               <TouchableOpacity
-                style={s.profileEditBtn}
+                style={[s.profileEditBtn, { backgroundColor: c.primary }]}
                 onPress={handleSave}
                 activeOpacity={0.8}
               >
@@ -138,40 +115,40 @@ export default function SettingsScreen() {
           </View>
 
           {/* Business Profile */}
-          <Sec title="Business Profile" icon="🏪" iconBg={T.primaryFixed}>
-            <Lbl>Business Name</Lbl>
-            <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Your business name" placeholderTextColor={T.outline} />
-            <Lbl>Tagline</Lbl>
-            <TextInput style={s.input} value={tagline} onChangeText={setTagline} placeholder="Handmade with love ✦" placeholderTextColor={T.outline} />
-            <Lbl>Business Address (for invoices)</Lbl>
+          <Sec title="Business Profile" icon="🏪" iconBg={c.accentContainer} colors={c}>
+            <Lbl colors={c}>Business Name</Lbl>
+            <TextInput style={[s.input, { backgroundColor: c.card, color: c.text }]} value={name} onChangeText={setName} placeholder="Your business name" placeholderTextColor={c.outline} />
+            <Lbl colors={c}>Tagline</Lbl>
+            <TextInput style={[s.input, { backgroundColor: c.card, color: c.text }]} value={tagline} onChangeText={setTagline} placeholder="Handmade with love ✦" placeholderTextColor={c.outline} />
+            <Lbl colors={c}>Business Address (for invoices)</Lbl>
             <TextInput
-              style={[s.input, s.multiline]}
+              style={[s.input, s.multiline, { backgroundColor: c.card, color: c.text }]}
               value={address}
               onChangeText={setAddress}
               placeholder="Street, City, Country"
-              placeholderTextColor={T.outline}
+              placeholderTextColor={c.outline}
               multiline
               numberOfLines={2}
               textAlignVertical="top"
             />
-            <Lbl>GST / Tax Number (optional)</Lbl>
-            <TextInput style={s.input} value={gstNumber} onChangeText={setGstNumber} placeholder="e.g. 22AAAAA0000A1Z5" placeholderTextColor={T.outline} autoCapitalize="characters" />
-            <Lbl>Default Currency</Lbl>
+            <Lbl colors={c}>GST / Tax Number (optional)</Lbl>
+            <TextInput style={[s.input, { backgroundColor: c.card, color: c.text }]} value={gstNumber} onChangeText={setGstNumber} placeholder="e.g. 22AAAAA0000A1Z5" placeholderTextColor={c.outline} autoCapitalize="characters" />
+            <Lbl colors={c}>Default Currency</Lbl>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }} keyboardShouldPersistTaps="always">
-              {CURRENCIES.map((c) => (
-                <TouchableOpacity key={c} style={[s.chip, currency === c && s.chipOn]} onPress={() => setCurrency(c)}>
-                  <Text style={[s.chipTxt, currency === c && s.chipTxtOn]}>{c}</Text>
+              {CURRENCIES.map((cur) => (
+                <TouchableOpacity key={cur} style={[s.chip, { backgroundColor: c.surfaceHighest }, currency === cur && { backgroundColor: c.primary }]} onPress={() => setCurrency(cur)}>
+                  <Text style={[s.chipTxt, { color: c.subText }, currency === cur && s.chipTxtOn]}>{cur}</Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
-            <TouchableOpacity style={[s.saveBtn, saving && { opacity: 0.6 }]} onPress={handleSave} disabled={saving}>
+            <TouchableOpacity style={[s.saveBtn, { backgroundColor: c.primaryContainer }, saving && { opacity: 0.6 }]} onPress={handleSave} disabled={saving}>
               <Text style={s.saveTxt}>{saving ? 'Saving…' : 'Save Profile'}</Text>
             </TouchableOpacity>
           </Sec>
 
           {/* App Theme */}
-          <Sec title="App Theme" icon="🎨" iconBg={T.tertiaryFixed}>
-            <Text style={s.themeHint}>Tap to apply instantly — changes the whole app</Text>
+          <Sec title="App Theme" icon="🎨" iconBg={c.accentContainer} colors={c}>
+            <Text style={[s.themeHint, { color: c.subText }]}>Tap to apply instantly — changes the whole app</Text>
 
             {/* Full theme grid */}
             <View style={[s.themeGrid, isTablet && s.themeGridTablet]}>
@@ -182,7 +159,7 @@ export default function SettingsScreen() {
                     s.themeCard,
                     isTablet && s.themeCardTablet,
                     { backgroundColor: t.bg },
-                    (theme === t.value || activeTheme === t.value) && s.themeCardOn,
+                    (theme === t.value || activeTheme === t.value) && [s.themeCardOn, { borderColor: c.primary }],
                   ]}
                   onPress={() => handleThemeSelect(t.value)}
                   activeOpacity={0.85}
@@ -198,55 +175,55 @@ export default function SettingsScreen() {
           </Sec>
 
           {/* Notifications */}
-          <Sec title="Notifications" icon="🔔" iconBg="#E8E1DC">
-            <SRow label="Enable Notifications" right={
+          <Sec title="Notifications" icon="🔔" iconBg={c.surfaceContainer} colors={c}>
+            <SRow label="Enable Notifications" colors={c} right={
               <Switch
                 value={prefs.enabled}
                 onValueChange={(v) => updatePrefs({ enabled: v })}
-                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                trackColor={{ false: c.outlineVariant, true: c.primaryContainer }}
                 thumbColor="#FFFFFF"
               />
             } />
-            <SRow label="Daily Digest" right={
+            <SRow label="Daily Digest" colors={c} right={
               <Switch
                 value={prefs.dailyDigest.enabled}
                 onValueChange={(v) => updatePrefs({ dailyDigest: { ...prefs.dailyDigest, enabled: v } })}
-                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                trackColor={{ false: c.outlineVariant, true: c.primaryContainer }}
                 thumbColor="#FFFFFF"
               />
             } />
-            <SRow label="Due Date Alerts" right={
+            <SRow label="Due Date Alerts" colors={c} right={
               <Switch
                 value={prefs.dueSoonAlerts.enabled}
                 onValueChange={(v) => updatePrefs({ dueSoonAlerts: { ...prefs.dueSoonAlerts, enabled: v } })}
-                trackColor={{ false: T.outlineVariant, true: T.primaryContainer }}
+                trackColor={{ false: c.outlineVariant, true: c.primaryContainer }}
                 thumbColor="#FFFFFF"
               />
             } />
-            <TouchableOpacity style={s.testBtn} onPress={testNotification}>
-              <Text style={s.testTxt}>Send Test Notification</Text>
+            <TouchableOpacity style={[s.testBtn, { borderColor: c.primaryContainer }]} onPress={testNotification}>
+              <Text style={[s.testTxt, { color: c.primary }]}>Send Test Notification</Text>
             </TouchableOpacity>
           </Sec>
 
           {/* Quick Links */}
-          <Sec title="More" icon="⬡" iconBg={T.surfaceHigh}>
-            <SRow label="Notification Preferences" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/notifications')} />
-            <SRow label="Craft Categories" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/(tabs)/track')} />
-            <SRow label="Inventory" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/inventory')} />
-            <SRow label="Reports & Export" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/reports')} />
-            <SRow label="Data Backup" right={<Text style={s.arrow}>›</Text>} onPress={() => router.push('/backup')} />
+          <Sec title="More" icon="⬡" iconBg={c.surfaceHigh} colors={c}>
+            <SRow label="Notification Preferences" colors={c} right={<Text style={[s.arrow, { color: c.subText }]}>›</Text>} onPress={() => router.push('/notifications')} />
+            <SRow label="Craft Categories" colors={c} right={<Text style={[s.arrow, { color: c.subText }]}>›</Text>} onPress={() => router.push('/(tabs)/track')} />
+            <SRow label="Inventory" colors={c} right={<Text style={[s.arrow, { color: c.subText }]}>›</Text>} onPress={() => router.push('/inventory')} />
+            <SRow label="Reports & Export" colors={c} right={<Text style={[s.arrow, { color: c.subText }]}>›</Text>} onPress={() => router.push('/reports')} />
+            <SRow label="Data Backup" colors={c} right={<Text style={[s.arrow, { color: c.subText }]}>›</Text>} onPress={() => router.push('/backup')} />
           </Sec>
 
           {/* About */}
-          <Sec title="About" icon="ℹ" iconBg={T.surfaceContainer}>
-            <SRow label="Version" right={<Text style={s.meta}>1.0.0</Text>} />
-            <SRow label="Made with" right={<Text style={s.meta}>✦ for Sofie</Text>} />
+          <Sec title="About" icon="ℹ" iconBg={c.surfaceContainer} colors={c}>
+            <SRow label="Version" colors={c} right={<Text style={[s.meta, { color: c.subText }]}>1.0.0</Text>} />
+            <SRow label="Made with" colors={c} right={<Text style={[s.meta, { color: c.subText }]}>✦ for Sofie</Text>} />
           </Sec>
 
           {/* Sign out */}
           <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
-            <TouchableOpacity style={s.signOutBtn}>
-              <Text style={s.signOutTxt}>Sign Out</Text>
+            <TouchableOpacity style={[s.signOutBtn, { backgroundColor: c.surfaceLow }]}>
+              <Text style={[s.signOutTxt, { color: c.error }]}>Sign Out</Text>
             </TouchableOpacity>
           </View>
 
@@ -256,32 +233,32 @@ export default function SettingsScreen() {
   );
 }
 
-function Sec({ title, icon, iconBg, children }: { title: string; icon?: string; iconBg?: string; children: React.ReactNode }) {
+function Sec({ title, icon, iconBg, children, colors: c }: { title: string; icon?: string; iconBg?: string; children: React.ReactNode; colors: any }) {
   return (
     <View style={s.section}>
       <View style={s.secHeaderRow}>
         {icon && (
-          <View style={[s.secIconBg, { backgroundColor: iconBg ?? T.surfaceContainer }]}>
+          <View style={[s.secIconBg, { backgroundColor: iconBg ?? c.surfaceContainer }]}>
             <Text style={s.secIcon}>{icon}</Text>
           </View>
         )}
-        <Text style={s.secTitle}>{title}</Text>
+        <Text style={[s.secTitle, { color: c.text }]}>{title}</Text>
       </View>
-      <View style={s.secCard}>
+      <View style={[s.secCard, { backgroundColor: c.surfaceLow }]}>
         {children}
       </View>
     </View>
   );
 }
 
-function Lbl({ children }: { children: string }) {
-  return <Text style={s.lbl}>{children}</Text>;
+function Lbl({ children, colors: c }: { children: string; colors: any }) {
+  return <Text style={[s.lbl, { color: c.subText }]}>{children}</Text>;
 }
 
-function SRow({ label, right, onPress }: { label: string; right: React.ReactNode; onPress?: () => void }) {
+function SRow({ label, right, onPress, colors: c }: { label: string; right: React.ReactNode; onPress?: () => void; colors: any }) {
   return (
-    <TouchableOpacity style={s.sRow} onPress={onPress} disabled={!onPress} activeOpacity={onPress ? 0.7 : 1}>
-      <Text style={s.sRowLbl}>{label}</Text>
+    <TouchableOpacity style={[s.sRow, { backgroundColor: c.card }]} onPress={onPress} disabled={!onPress} activeOpacity={onPress ? 0.7 : 1}>
+      <Text style={[s.sRowLbl, { color: c.text }]}>{label}</Text>
       {right}
     </TouchableOpacity>
   );
@@ -290,13 +267,11 @@ function SRow({ label, right, onPress }: { label: string; right: React.ReactNode
 const s = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: T.bg,
   },
   pageTitle: {
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
     paddingHorizontal: 16,
     paddingTop: 20,
     paddingBottom: 8,
@@ -307,7 +282,6 @@ const s = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: T.primaryFixed,
     padding: 20,
   },
   profileHeroBg: {
@@ -317,7 +291,6 @@ const s = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: T.primary,
     opacity: 0.05,
   },
   profileHeroContent: {
@@ -329,11 +302,9 @@ const s = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: T.primaryContainer,
     justifyContent: 'center',
     alignItems: 'center',
     flexShrink: 0,
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -352,17 +323,14 @@ const s = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.onPrimaryContainer,
     marginBottom: 2,
   },
   profileHeroTagline: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: T.subText,
     fontStyle: 'italic',
   },
   profileEditBtn: {
-    backgroundColor: T.primary,
     borderRadius: 999,
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -400,10 +368,8 @@ const s = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: T.text,
   },
   secCard: {
-    backgroundColor: T.surfaceLow,
     borderRadius: 16,
     padding: 8,
     gap: 2,
@@ -414,19 +380,16 @@ const s = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 0.8,
-    color: T.subText,
     marginBottom: 5,
     marginTop: 8,
     paddingHorizontal: 4,
   },
   input: {
-    backgroundColor: T.surfaceLowest,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 13,
     fontFamily: 'DMSans',
     fontSize: 15,
-    color: T.text,
     marginBottom: 4,
   },
   multiline: {
@@ -437,23 +400,17 @@ const s = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 999,
-    backgroundColor: T.surfaceHighest,
     marginRight: 8,
-  },
-  chipOn: {
-    backgroundColor: T.primary,
   },
   chipTxt: {
     fontSize: 13,
     fontFamily: 'DMSans',
     fontWeight: '600',
-    color: T.subText,
   },
   chipTxtOn: {
     color: '#FFFFFF',
   },
   saveBtn: {
-    backgroundColor: T.primaryContainer,
     borderRadius: 999,
     paddingVertical: 14,
     alignItems: 'center',
@@ -470,7 +427,6 @@ const s = StyleSheet.create({
   themeHint: {
     fontSize: 12,
     fontFamily: 'DMSans',
-    color: T.subText,
     marginBottom: 12,
     paddingHorizontal: 4,
   },
@@ -496,7 +452,7 @@ const s = StyleSheet.create({
     height: 90,
   },
   themeCardOn: {
-    borderColor: T.primary,
+    borderWidth: 2,
   },
   themeLbl: {
     fontSize: 13,
@@ -517,27 +473,22 @@ const s = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 12,
-    backgroundColor: T.surfaceLowest,
     borderRadius: 12,
     marginBottom: 2,
   },
   sRowLbl: {
     fontSize: 15,
     fontFamily: 'DMSans',
-    color: T.text,
   },
   arrow: {
     fontSize: 22,
-    color: T.subText,
   },
   meta: {
     fontSize: 13,
     fontFamily: 'DMSans',
-    color: T.subText,
   },
   testBtn: {
     borderWidth: 1,
-    borderColor: T.primaryContainer,
     borderRadius: 999,
     paddingVertical: 12,
     alignItems: 'center',
@@ -545,7 +496,6 @@ const s = StyleSheet.create({
     marginHorizontal: 4,
   },
   testTxt: {
-    color: T.primary,
     fontFamily: 'DMSans',
     fontSize: 13,
     fontWeight: '600',
@@ -554,10 +504,8 @@ const s = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: 'center',
-    backgroundColor: T.surfaceLow,
   },
   signOutTxt: {
-    color: T.error,
     fontFamily: 'DMSans',
     fontSize: 15,
     fontWeight: '600',

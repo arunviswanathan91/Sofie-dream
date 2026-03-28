@@ -144,21 +144,38 @@ export function OrdersProvider({ children }: { children: React.ReactNode }) {
       return id;
     }
 
+    // Sanitize orderItems — Firestore rejects undefined field values
+    const sanitizedItems = (formData.orderItems ?? []).map((item) => ({
+      id: item.id,
+      name: item.name,
+      description: item.description ?? null,
+      quantity: item.quantity,
+      price: item.price,
+    }));
+
     const docRef = await addDoc(collection(db, 'orders'), {
-      ...formData,
+      orderName: formData.orderName,
+      description: formData.description ?? null,
+      craftCategory: formData.craftCategory ?? null,
+      tags: formData.tags ?? [],
+      photos: formData.photos ?? [],
+      sourceLink: formData.sourceLink ?? null,
+      customerName: formData.customerName,
+      customerAddress: formData.customerAddress ?? null,
+      deliveryTime: formData.deliveryTime ?? null,
+      customerPhone: formData.customerPhone ?? null,
+      customerInstagram: formData.customerInstagram ?? null,
+      askingPrice: formData.askingPrice ?? 0,
+      currency: formData.currency ?? 'EUR',
+      isPaid: formData.isPaid ?? false,
+      paymentNotes: formData.paymentNotes ?? null,
+      dueDate: Timestamp.fromDate(new Date(formData.dueDate)),
+      internalNotes: formData.internalNotes ?? null,
+      orderItems: sanitizedItems,
+      completionPercent: formData.completionPercent ?? 0,
       invoiceNumber,
       status: 'request' as OrderStatus,
       createdAt: Timestamp.fromDate(new Date()),
-      dueDate: Timestamp.fromDate(new Date(formData.dueDate)),
-      photos: formData.photos ?? [],
-      tags: formData.tags ?? [],
-      orderItems: formData.orderItems ?? [],
-      completionPercent: formData.completionPercent ?? 0,
-      sourceLink: formData.sourceLink ?? null,
-      customerPhone: formData.customerPhone ?? null,
-      customerInstagram: formData.customerInstagram ?? null,
-      paymentNotes: formData.paymentNotes ?? null,
-      internalNotes: formData.internalNotes ?? null,
     });
 
     upsertCustomer(

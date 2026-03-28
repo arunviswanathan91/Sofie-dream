@@ -18,27 +18,7 @@ import { OrderCard } from '../../components/OrderCard';
 import { FAB } from '../../components/FAB';
 import type { OrderStatus } from '../../types';
 
-// Design tokens — Stitch "Warm Artisan Editorial"
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHighest: '#E8E1DE',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  onPrimary: '#FFFFFF',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  onTertiaryFixed: '#3C0700',
-  secondary: '#625E5A',
-  secondaryContainer: '#E8E1DC',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-};
+// Colors driven by useTheme()
 
 type SortOption = 'dueDate' | 'createdAt' | 'price' | 'customer';
 
@@ -115,33 +95,35 @@ export default function OrdersScreen() {
     return result;
   }, [orders, search, statusFilter, sortBy]);
 
+  const c = colors;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: c.bg }]}>
       {/* Header row */}
       <View style={styles.headerRow}>
-        <Text style={styles.headerTitle}>Orders ✦</Text>
+        <Text style={[styles.headerTitle, { color: c.text }]}>Orders ✦</Text>
         {requestCount > 0 && (
-          <View style={styles.requestBadge}>
+          <View style={[styles.requestBadge, { backgroundColor: c.accent }]}>
             <Text style={styles.requestBadgeText}>{requestCount} new</Text>
           </View>
         )}
       </View>
 
-      {/* Search bar — pill shape, surfaceLow bg */}
+      {/* Search bar */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
+        <View style={[styles.searchBar, { backgroundColor: c.surfaceLow }]}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: c.text }]}
             placeholder="Search orders, customers, tags..."
-            placeholderTextColor={T.outline}
+            placeholderTextColor={c.outline}
             value={search}
             onChangeText={setSearch}
           />
         </View>
       </View>
 
-      {/* Status Filter Chips — pill, active=primary, inactive=surfaceHighest */}
+      {/* Status Filter Chips */}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -153,17 +135,12 @@ export default function OrdersScreen() {
             key={f.value}
             style={[
               styles.filterChip,
-              statusFilter === f.value ? styles.filterChipActive : styles.filterChipInactive,
+              { backgroundColor: statusFilter === f.value ? c.primary : c.surfaceHighest },
             ]}
             onPress={() => setStatusFilter(f.value)}
             activeOpacity={0.8}
           >
-            <Text
-              style={[
-                styles.filterLabel,
-                statusFilter === f.value ? styles.filterLabelActive : styles.filterLabelInactive,
-              ]}
-            >
+            <Text style={[styles.filterLabel, { color: statusFilter === f.value ? c.onPrimary : c.subText }]}>
               {f.label}
             </Text>
           </TouchableOpacity>
@@ -172,7 +149,7 @@ export default function OrdersScreen() {
 
       {/* Sort row */}
       <View style={styles.sortRow}>
-        <Text style={styles.sortRowTitle}>Recent Orders</Text>
+        <Text style={[styles.sortRowTitle, { color: c.primary }]}>Recent Orders</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -182,14 +159,9 @@ export default function OrdersScreen() {
             <TouchableOpacity
               key={s.value}
               onPress={() => setSortBy(s.value)}
-              style={[styles.sortBtn, sortBy === s.value && styles.sortBtnActive]}
+              style={[styles.sortBtn, sortBy === s.value && { backgroundColor: c.surfaceContainer }]}
             >
-              <Text
-                style={[
-                  styles.sortOption,
-                  sortBy === s.value && styles.sortOptionActive,
-                ]}
-              >
+              <Text style={[styles.sortOption, { color: sortBy === s.value ? c.primary : c.subText }]}>
                 {sortBy === s.value ? '⇅ ' : ''}{s.label}
               </Text>
             </TouchableOpacity>
@@ -200,17 +172,17 @@ export default function OrdersScreen() {
       {/* Orders list */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <Text style={styles.loadingText}>Loading orders...</Text>
+          <Text style={[styles.loadingText, { color: c.subText }]}>Loading orders...</Text>
         </View>
       ) : filtered.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyEmoji}>✦</Text>
-          <Text style={styles.emptyTitle}>
+          <Text style={[styles.emptyTitle, { color: c.text }]}>
             {search ? 'No matching orders' : 'No orders yet'}
           </Text>
           {!search && (
             <TouchableOpacity
-              style={styles.emptyButton}
+              style={[styles.emptyButton, { backgroundColor: c.primary }]}
               onPress={() => router.push('/order/new')}
             >
               <Text style={styles.emptyButtonText}>Add your first order →</Text>
@@ -245,192 +217,33 @@ export default function OrdersScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: T.bg,
-  },
-  // Header row
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    paddingBottom: 4,
-    gap: 12,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontFamily: 'PlayfairDisplay',
-    fontWeight: '700',
-    color: T.text,
-    flex: 1,
-  },
-  requestBadge: {
-    backgroundColor: T.tertiary,
-    borderRadius: 999,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-  },
-  requestBadgeText: {
-    fontSize: 11,
-    fontFamily: 'DMSans',
-    fontWeight: '700',
-    color: '#FFFFFF',
-    letterSpacing: 0.5,
-  },
-  // Search
-  searchContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: T.surfaceLow,
-    borderRadius: 999,
-    paddingHorizontal: 20,
-    height: 52,
-    gap: 10,
-  },
-  searchIcon: {
-    fontSize: 16,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: 'DMSans',
-    fontSize: 14,
-    color: T.text,
-  },
-  // Filter chips
-  filtersRow: {
-    maxHeight: 48,
-    marginBottom: 4,
-  },
-  filtersContent: {
-    paddingHorizontal: 16,
-    gap: 10,
-    alignItems: 'center',
-  },
-  filterChip: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 999,
-  },
-  filterChipActive: {
-    backgroundColor: T.primary,
-    shadowColor: T.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  filterChipInactive: {
-    backgroundColor: T.surfaceHighest,
-  },
-  filterLabel: {
-    fontSize: 13,
-    fontFamily: 'DMSans',
-    fontWeight: '600',
-  },
-  filterLabelActive: {
-    color: '#FFFFFF',
-  },
-  filterLabelInactive: {
-    color: T.subText,
-  },
-  // Sort row
-  sortRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-  },
-  sortRowTitle: {
-    fontSize: 18,
-    fontFamily: 'PlayfairDisplay',
-    fontWeight: '700',
-    color: T.primary,
-    flexShrink: 0,
-    marginRight: 8,
-  },
-  sortContent: {
-    gap: 4,
-    alignItems: 'center',
-  },
-  sortBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  sortBtnActive: {
-    backgroundColor: T.secondaryContainer,
-  },
-  sortOption: {
-    fontSize: 11,
-    fontFamily: 'DMSans',
-    fontWeight: '700',
-    color: T.subText,
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  sortOptionActive: {
-    color: T.primary,
-  },
-  // List
-  list: {
-    flex: 1,
-  },
-  listContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 120,
-    gap: 12,
-  },
-  columnWrapper: {
-    gap: 12,
-  },
-  tabletItem: {
-    flex: 1,
-  },
-  // Loading / empty
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    fontFamily: 'PlayfairDisplay',
-    fontSize: 16,
-    color: T.subText,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 16,
-    paddingHorizontal: 32,
-  },
-  emptyEmoji: {
-    fontSize: 48,
-  },
-  emptyTitle: {
-    fontSize: 20,
-    fontFamily: 'PlayfairDisplay',
-    fontWeight: '700',
-    color: T.text,
-    textAlign: 'center',
-  },
-  emptyButton: {
-    backgroundColor: T.primary,
-    borderRadius: 999,
-    paddingHorizontal: 28,
-    paddingVertical: 14,
-  },
-  emptyButtonText: {
-    color: '#FFFFFF',
-    fontFamily: 'DMSans',
-    fontSize: 14,
-    fontWeight: '600',
-  },
+  container: { flex: 1 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingTop: 16, paddingBottom: 4, gap: 12 },
+  headerTitle: { fontSize: 28, fontFamily: 'PlayfairDisplay', fontWeight: '700', flex: 1 },
+  requestBadge: { borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
+  requestBadgeText: { fontSize: 11, fontFamily: 'DMSans', fontWeight: '700', color: '#FFFFFF', letterSpacing: 0.5 },
+  searchContainer: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8 },
+  searchBar: { flexDirection: 'row', alignItems: 'center', borderRadius: 999, paddingHorizontal: 20, height: 52, gap: 10 },
+  searchIcon: { fontSize: 16 },
+  searchInput: { flex: 1, fontFamily: 'DMSans', fontSize: 14 },
+  filtersRow: { maxHeight: 48, marginBottom: 4 },
+  filtersContent: { paddingHorizontal: 16, gap: 10, alignItems: 'center' },
+  filterChip: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 999 },
+  filterLabel: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '600' },
+  sortRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10 },
+  sortRowTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', flexShrink: 0, marginRight: 8 },
+  sortContent: { gap: 4, alignItems: 'center' },
+  sortBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
+  sortOption: { fontSize: 11, fontFamily: 'DMSans', fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5 },
+  list: { flex: 1 },
+  listContent: { paddingHorizontal: 16, paddingBottom: 120, gap: 12 },
+  columnWrapper: { gap: 12 },
+  tabletItem: { flex: 1 },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { fontFamily: 'PlayfairDisplay', fontSize: 16 },
+  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 16, paddingHorizontal: 32 },
+  emptyEmoji: { fontSize: 48 },
+  emptyTitle: { fontSize: 20, fontFamily: 'PlayfairDisplay', fontWeight: '700', textAlign: 'center' },
+  emptyButton: { borderRadius: 999, paddingHorizontal: 28, paddingVertical: 14 },
+  emptyButtonText: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 14, fontWeight: '600' },
 });

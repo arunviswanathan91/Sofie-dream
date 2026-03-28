@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  Alert, TextInput, Switch,
+  Alert, TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -16,28 +16,9 @@ import { generateId } from '../../lib/localStore';
 import { getCurrencySymbol } from '../../lib/theme';
 import type { InventoryMaterial } from '../../types';
 
-const T = {
-  bg: '#FFF8F5',
-  surfaceLow: '#F9F2EF',
-  surfaceContainer: '#F3ECEA',
-  surfaceHigh: '#EDE7E4',
-  surfaceHighest: '#E8E1DE',
-  surfaceLowest: '#FFFFFF',
-  primary: '#864D5F',
-  primaryContainer: '#C9879A',
-  onPrimary: '#FFFFFF',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  secondary: '#625E5A',
-  text: '#1D1B1A',
-  subText: '#514346',
-  outline: '#837376',
-  outlineVariant: '#D5C2C5',
-  error: '#BA1A1A',
-};
-
 const UNITS = ['grams', 'meters', 'pieces', 'skeins', 'ml', 'liters', 'cm', 'yards', 'rolls'];
 const CURRENCIES = ['INR', 'EUR', 'GBP', 'USD'];
+const EMOJIS = ['🧶', '🪡', '💡', '🪢', '🧵', '🪔', '🎨', '✂️', '🪴', '🧲', '🪣', '🔮'];
 
 export default function InventoryProductScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -53,6 +34,7 @@ export default function InventoryProductScreen() {
   const [category, setCategory] = useState(product?.category ?? '');
   const [notes, setNotes] = useState(product?.notes ?? '');
   const [markup, setMarkup] = useState(String(product?.markup ?? 1.5));
+  const [emoji, setEmoji] = useState(product?.emoji ?? '🧶');
   const [materials, setMaterials] = useState<InventoryMaterial[]>(product?.materials ?? []);
   const [showAddMat, setShowAddMat] = useState(false);
   const [matName, setMatName] = useState('');
@@ -62,17 +44,27 @@ export default function InventoryProductScreen() {
   const [matCurrency, setMatCurrency] = useState(product?.materials[0]?.currency ?? 'INR');
   const [saving, setSaving] = useState(false);
 
+  // Material edit state
+  const [editingMatId, setEditingMatId] = useState<string | null>(null);
+  const [editMatName, setEditMatName] = useState('');
+  const [editMatQty, setEditMatQty] = useState('');
+  const [editMatUnit, setEditMatUnit] = useState('pieces');
+  const [editMatCost, setEditMatCost] = useState('');
+  const [editMatCurrency, setEditMatCurrency] = useState('INR');
+
   if (!product) {
     return (
-      <SafeAreaView style={s.container}>
-        <Text style={s.notFound}>Product not found.</Text>
-        <TouchableOpacity onPress={() => router.back()}><Text style={{ color: T.primary, fontFamily: 'DMSans', textAlign: 'center' }}>Go back</Text></TouchableOpacity>
+      <SafeAreaView style={[s.container, { backgroundColor: colors.bg }]}>
+        <Text style={[s.notFound, { color: colors.subText }]}>Product not found.</Text>
+        <TouchableOpacity onPress={() => router.back()}><Text style={{ color: colors.primary, fontFamily: 'DMSans', textAlign: 'center' }}>Go back</Text></TouchableOpacity>
       </SafeAreaView>
     );
   }
 
+  const c = colors;
   const totalCost = materials.reduce((sum, m) => sum + m.costPerUnit * m.quantity, 0);
-  const suggestedPrice = totalCost * (parseFloat(markup) || product.markup);
+  const markupNum = parseFloat(markup) || product.markup;
+  const suggestedPrice = totalCost * markupNum;
   const currency = materials[0]?.currency ?? product.materials[0]?.currency ?? 'INR';
   const sym = getCurrencySymbol(currency);
   const hasReminder = !!product.nextReminderDate;
@@ -89,12 +81,39 @@ export default function InventoryProductScreen() {
     setShowAddMat(false);
   };
 
+  const startEditMaterial = (m: InventoryMaterial) => {
+    setEditingMatId(m.id);
+    setEditMatName(m.name);
+    setEditMatQty(String(m.quantity));
+    setEditMatUnit(m.unit);
+    setEditMatCost(String(m.costPerUnit));
+    setEditMatCurrency(m.currency);
+    setShowAddMat(false);
+  };
+
+  const saveEditMaterial = () => {
+    if (!editingMatId) return;
+    setMaterials((prev) => prev.map((m) => {
+      if (m.id !== editingMatId) return m;
+      return {
+        ...m,
+        name: editMatName.trim() || m.name,
+        quantity: Math.max(0.01, parseFloat(editMatQty) || m.quantity),
+        unit: editMatUnit,
+        costPerUnit: parseFloat(editMatCost) || m.costPerUnit,
+        currency: editMatCurrency,
+      };
+    }));
+    setEditingMatId(null);
+  };
+
   const handleSave = async () => {
     if (!name.trim()) { Alert.alert('Required', 'Product name is required.'); return; }
     setSaving(true);
     try {
       await updateProduct(id, {
         name: name.trim(),
+        emoji,
         category: category.trim() || undefined,
         notes: notes.trim() || undefined,
         markup: Math.max(1, parseFloat(markup) || 1.5),
@@ -124,20 +143,20 @@ export default function InventoryProductScreen() {
   };
 
   return (
-    <SafeAreaView style={[s.container, { backgroundColor: colors.bg }]}>
-      <View style={[s.header, { backgroundColor: colors.bg }]}>
-        <TouchableOpacity onPress={() => router.back()} style={s.backPill} hitSlop={12}>
-          <Text style={s.backChevron}>‹</Text>
-          <Text style={s.back}>Back</Text>
+    <SafeAreaView style={[s.container, { backgroundColor: c.bg }]}>
+      <View style={[s.header, { backgroundColor: c.bg }]}>
+        <TouchableOpacity onPress={() => router.back()} style={[s.backPill, { backgroundColor: c.surfaceContainer }]} hitSlop={12}>
+          <Text style={[s.backChevron, { color: c.primary }]}>‹</Text>
+          <Text style={[s.back, { color: c.primary }]}>Back</Text>
         </TouchableOpacity>
-        <Text style={[s.headerTitle, { color: colors.text }]} numberOfLines={1}>{product.name}</Text>
+        <Text style={[s.headerTitle, { color: c.text }]} numberOfLines={1}>{product.name}</Text>
         {editing ? (
-          <TouchableOpacity onPress={handleSave} style={[s.saveBtn, saving && { opacity: 0.5 }]} disabled={saving}>
-            <Text style={s.saveBtnTxt}>{saving ? '…' : 'Save'}</Text>
+          <TouchableOpacity onPress={handleSave} style={[s.saveBtn, { backgroundColor: c.primaryContainer }, saving && { opacity: 0.5 }]} disabled={saving}>
+            <Text style={[s.saveBtnTxt, { color: c.onPrimary }]}>{saving ? '…' : 'Save'}</Text>
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity onPress={() => setEditing(true)} style={s.editBtn}>
-            <Text style={s.editBtnTxt}>Edit</Text>
+          <TouchableOpacity onPress={() => setEditing(true)} style={[s.editBtn, { backgroundColor: c.surfaceContainer }]}>
+            <Text style={[s.editBtnTxt, { color: c.primary }]}>Edit</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -145,106 +164,161 @@ export default function InventoryProductScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + 60 }}>
 
         {/* Hero */}
-        <View style={s.heroCard}>
+        <View style={[s.heroCard, { backgroundColor: c.surfaceLow }]}>
           <View style={s.heroTop}>
-            <Text style={{ fontSize: 40 }}>{product.emoji ?? '🧶'}</Text>
+            {editing ? (
+              <View>
+                <Text style={{ fontSize: 32, marginBottom: 4 }}>{emoji}</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  {EMOJIS.map((e) => (
+                    <TouchableOpacity
+                      key={e}
+                      style={[s.emojiBtn, { backgroundColor: c.surfaceContainer }, emoji === e && { backgroundColor: c.primaryContainer }]}
+                      onPress={() => setEmoji(e)}
+                    >
+                      <Text style={{ fontSize: 18 }}>{e}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            ) : (
+              <Text style={{ fontSize: 40 }}>{emoji}</Text>
+            )}
             <View style={{ flex: 1 }}>
               {editing ? (
-                <TextInput style={s.heroInput} value={name} onChangeText={setName} placeholder="Product name" placeholderTextColor={T.outline} />
+                <TextInput style={[s.heroInput, { color: c.text, borderBottomColor: c.outlineVariant }]} value={name} onChangeText={setName} placeholder="Product name" placeholderTextColor={c.outline} />
               ) : (
-                <Text style={s.heroName}>{product.name}</Text>
+                <Text style={[s.heroName, { color: c.text }]}>{product.name}</Text>
               )}
               {editing ? (
-                <TextInput style={s.heroCategoryInput} value={category} onChangeText={setCategory} placeholder="Category" placeholderTextColor={T.outline} />
+                <TextInput style={[s.heroCategoryInput, { color: c.subText, borderBottomColor: c.outlineVariant }]} value={category} onChangeText={setCategory} placeholder="Category" placeholderTextColor={c.outline} />
               ) : product.category ? (
-                <Text style={s.heroCategory}>{product.category}</Text>
+                <Text style={[s.heroCategory, { color: c.subText }]}>{product.category}</Text>
               ) : null}
             </View>
           </View>
           <View style={s.heroStats}>
             <View style={s.heroStat}>
-              <Text style={s.heroStatVal}>{sym}{product.totalMaterialCost.toFixed(0)}</Text>
-              <Text style={s.heroStatLbl}>MATERIAL COST</Text>
+              <Text style={[s.heroStatVal, { color: c.text }]}>{sym}{editing ? totalCost.toFixed(0) : product.totalMaterialCost.toFixed(0)}</Text>
+              <Text style={[s.heroStatLbl, { color: c.subText }]}>MATERIAL COST</Text>
             </View>
-            <View style={s.heroStatDivider} />
+            <View style={[s.heroStatDivider, { backgroundColor: c.outlineVariant }]} />
             <View style={s.heroStat}>
-              <Text style={[s.heroStatVal, { color: T.tertiary }]}>{sym}{product.suggestedPrice.toFixed(0)}</Text>
-              <Text style={s.heroStatLbl}>SUGGESTED PRICE</Text>
+              <Text style={[s.heroStatVal, { color: c.accent }]}>{sym}{editing ? suggestedPrice.toFixed(0) : product.suggestedPrice.toFixed(0)}</Text>
+              <Text style={[s.heroStatLbl, { color: c.subText }]}>SUGGESTED PRICE</Text>
             </View>
-            <View style={s.heroStatDivider} />
+            <View style={[s.heroStatDivider, { backgroundColor: c.outlineVariant }]} />
             <View style={s.heroStat}>
-              <Text style={s.heroStatVal}>{((product.markup - 1) * 100).toFixed(0)}%</Text>
-              <Text style={s.heroStatLbl}>MARKUP</Text>
+              <Text style={[s.heroStatVal, { color: c.text }]}>{((( editing ? markupNum : product.markup) - 1) * 100).toFixed(0)}%</Text>
+              <Text style={[s.heroStatLbl, { color: c.subText }]}>MARKUP</Text>
             </View>
           </View>
         </View>
 
         {/* Reminder alert */}
         {reminderOverdue && (
-          <View style={s.reminderAlert}>
-            <Text style={s.reminderAlertTxt}>⏰ Usage reminder is due!</Text>
-            <TouchableOpacity onPress={handleSnoozeReminder} style={s.snoozeBtn}>
-              <Text style={s.snoozeBtnTxt}>Snooze</Text>
+          <View style={[s.reminderAlert, { backgroundColor: c.accentContainer }]}>
+            <Text style={[s.reminderAlertTxt, { color: c.accent }]}>⏰ Usage reminder is due!</Text>
+            <TouchableOpacity onPress={handleSnoozeReminder} style={[s.snoozeBtn, { backgroundColor: c.accent }]}>
+              <Text style={[s.snoozeBtnTxt, { color: c.onPrimary }]}>Snooze</Text>
             </TouchableOpacity>
           </View>
         )}
 
         {/* Materials */}
         <View style={s.section}>
-          <Text style={[s.sectionTitle, { color: colors.text }]}>Materials</Text>
-          <View style={s.card}>
+          <Text style={[s.sectionTitle, { color: c.text }]}>Materials</Text>
+          <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
             {materials.map((m) => (
-              <View key={m.id} style={s.matRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.matName}>{m.name}</Text>
-                  <Text style={s.matDetail}>{m.quantity} {m.unit} × {m.currency} {m.costPerUnit.toFixed(2)}</Text>
-                </View>
-                <View style={{ alignItems: 'flex-end', gap: 4 }}>
-                  <Text style={s.matTotal}>{m.currency} {(m.costPerUnit * m.quantity).toFixed(2)}</Text>
-                  {editing && (
-                    <TouchableOpacity onPress={() => setMaterials((prev) => prev.filter((x) => x.id !== m.id))}>
-                      <Text style={{ color: T.error, fontSize: 11, fontFamily: 'DMSans' }}>Remove</Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+              <View key={m.id}>
+                {editing && editingMatId === m.id ? (
+                  // Inline material edit form
+                  <View style={[s.editMatForm, { backgroundColor: c.surfaceContainer }]}>
+                    <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text }]} value={editMatName} onChangeText={setEditMatName} placeholder="Material name" placeholderTextColor={c.outline} />
+                    <View style={s.row}>
+                      <TextInput style={[s.input, { flex: 1, marginBottom: 0, backgroundColor: c.surfaceLow, color: c.text }]} value={editMatQty} onChangeText={setEditMatQty} keyboardType="decimal-pad" placeholder="Qty" placeholderTextColor={c.outline} />
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {UNITS.map((u) => (
+                          <TouchableOpacity key={u} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, editMatUnit === u && { backgroundColor: c.primary }]} onPress={() => setEditMatUnit(u)}>
+                            <Text style={[s.miniChipTxt, { color: c.subText }, editMatUnit === u && { color: c.onPrimary }]}>{u}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                    <View style={[s.row, { marginTop: 8 }]}>
+                      <TextInput style={[s.input, { flex: 1, marginBottom: 0, fontWeight: '700', backgroundColor: c.surfaceLow, color: c.text }]} value={editMatCost} onChangeText={setEditMatCost} keyboardType="decimal-pad" placeholder="Cost/unit" placeholderTextColor={c.outline} />
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                        {CURRENCIES.map((cur) => (
+                          <TouchableOpacity key={cur} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, editMatCurrency === cur && { backgroundColor: c.primary }]} onPress={() => setEditMatCurrency(cur)}>
+                            <Text style={[s.miniChipTxt, { color: c.subText }, editMatCurrency === cur && { color: c.onPrimary }]}>{cur}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                    <View style={[s.row, { marginTop: 8 }]}>
+                      <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.primaryContainer }]} onPress={saveEditMaterial}><Text style={[s.btnTxt, { color: c.onPrimary }]}>Done</Text></TouchableOpacity>
+                      <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.surfaceHigh }]} onPress={() => setEditingMatId(null)}><Text style={[s.btnTxt, { color: c.subText }]}>Cancel</Text></TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  <View style={[s.matRow, { borderBottomColor: c.outlineVariant }]}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[s.matName, { color: c.text }]}>{m.name}</Text>
+                      <Text style={[s.matDetail, { color: c.subText }]}>{m.quantity} {m.unit} × {m.currency} {m.costPerUnit.toFixed(2)}</Text>
+                    </View>
+                    <View style={{ alignItems: 'flex-end', gap: 4 }}>
+                      <Text style={[s.matTotal, { color: c.primary }]}>{m.currency} {(m.costPerUnit * m.quantity).toFixed(2)}</Text>
+                      {editing && (
+                        <View style={{ flexDirection: 'row', gap: 10 }}>
+                          <TouchableOpacity onPress={() => startEditMaterial(m)}>
+                            <Text style={{ color: c.primary, fontSize: 11, fontFamily: 'DMSans' }}>Edit</Text>
+                          </TouchableOpacity>
+                          <TouchableOpacity onPress={() => setMaterials((prev) => prev.filter((x) => x.id !== m.id))}>
+                            <Text style={{ color: c.error, fontSize: 11, fontFamily: 'DMSans' }}>Remove</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                    </View>
+                  </View>
+                )}
               </View>
             ))}
-            <View style={s.matTotalRow}>
-              <Text style={s.matTotalLabel}>Total</Text>
-              <Text style={s.matTotalVal}>{currency} {totalCost.toFixed(2)}</Text>
+            <View style={[s.matTotalRow, { borderTopColor: c.primary }]}>
+              <Text style={[s.matTotalLabel, { color: c.text }]}>Total</Text>
+              <Text style={[s.matTotalVal, { color: c.primary }]}>{currency} {totalCost.toFixed(2)}</Text>
             </View>
 
             {editing && (showAddMat ? (
-              <View style={s.addMatForm}>
-                <TextInput style={s.input} value={matName} onChangeText={setMatName} placeholder="Material name" placeholderTextColor={T.outline} />
+              <View style={[s.addMatForm, { backgroundColor: c.surfaceContainer }]}>
+                <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text }]} value={matName} onChangeText={setMatName} placeholder="Material name" placeholderTextColor={c.outline} />
                 <View style={s.row}>
-                  <TextInput style={[s.input, { flex: 1, marginBottom: 0 }]} value={matQty} onChangeText={setMatQty} keyboardType="decimal-pad" placeholder="Qty" placeholderTextColor={T.outline} />
+                  <TextInput style={[s.input, { flex: 1, marginBottom: 0, backgroundColor: c.surfaceLow, color: c.text }]} value={matQty} onChangeText={setMatQty} keyboardType="decimal-pad" placeholder="Qty" placeholderTextColor={c.outline} />
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {UNITS.map((u) => (
-                      <TouchableOpacity key={u} style={[s.miniChip, matUnit === u && s.miniChipOn]} onPress={() => setMatUnit(u)}>
-                        <Text style={[s.miniChipTxt, matUnit === u && s.miniChipTxtOn]}>{u}</Text>
+                      <TouchableOpacity key={u} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matUnit === u && { backgroundColor: c.primary }]} onPress={() => setMatUnit(u)}>
+                        <Text style={[s.miniChipTxt, { color: c.subText }, matUnit === u && { color: c.onPrimary }]}>{u}</Text>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
                 </View>
                 <View style={s.row}>
-                  <TextInput style={[s.input, { flex: 1, marginBottom: 0, fontWeight: '700' }]} value={matCost} onChangeText={setMatCost} keyboardType="decimal-pad" placeholder="Cost/unit" placeholderTextColor={T.outline} />
+                  <TextInput style={[s.input, { flex: 1, marginBottom: 0, fontWeight: '700', backgroundColor: c.surfaceLow, color: c.text }]} value={matCost} onChangeText={setMatCost} keyboardType="decimal-pad" placeholder="Cost/unit" placeholderTextColor={c.outline} />
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {CURRENCIES.map((c) => (
-                      <TouchableOpacity key={c} style={[s.miniChip, matCurrency === c && s.miniChipOn]} onPress={() => setMatCurrency(c)}>
-                        <Text style={[s.miniChipTxt, matCurrency === c && s.miniChipTxtOn]}>{c}</Text>
+                    {CURRENCIES.map((cur) => (
+                      <TouchableOpacity key={cur} style={[s.miniChip, { backgroundColor: c.surfaceHighest }, matCurrency === cur && { backgroundColor: c.primary }]} onPress={() => setMatCurrency(cur)}>
+                        <Text style={[s.miniChipTxt, { color: c.subText }, matCurrency === cur && { color: c.onPrimary }]}>{cur}</Text>
                       </TouchableOpacity>
                     ))}
                   </ScrollView>
                 </View>
                 <View style={s.row}>
-                  <TouchableOpacity style={[s.btn, { flex: 1 }]} onPress={addMaterial}><Text style={s.btnTxt}>Add</Text></TouchableOpacity>
-                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: T.surfaceHigh }]} onPress={() => setShowAddMat(false)}><Text style={[s.btnTxt, { color: T.subText }]}>Cancel</Text></TouchableOpacity>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.primaryContainer }]} onPress={addMaterial}><Text style={[s.btnTxt, { color: c.onPrimary }]}>Add</Text></TouchableOpacity>
+                  <TouchableOpacity style={[s.btn, { flex: 1, backgroundColor: c.surfaceHigh }]} onPress={() => setShowAddMat(false)}><Text style={[s.btnTxt, { color: c.subText }]}>Cancel</Text></TouchableOpacity>
                 </View>
               </View>
             ) : (
-              <TouchableOpacity style={s.addMatBtn} onPress={() => setShowAddMat(true)}>
-                <Text style={s.addMatBtnTxt}>+ Add Material</Text>
+              <TouchableOpacity style={[s.addMatBtn, { backgroundColor: c.surfaceLow, borderColor: c.outlineVariant }]} onPress={() => setShowAddMat(true)}>
+                <Text style={[s.addMatBtnTxt, { color: c.primary }]}>+ Add Material</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -253,17 +327,28 @@ export default function InventoryProductScreen() {
         {/* Markup */}
         {editing && (
           <View style={s.section}>
-            <Text style={[s.sectionTitle, { color: colors.text }]}>Markup</Text>
-            <View style={s.card}>
-              <TextInput style={s.input} value={markup} onChangeText={setMarkup} keyboardType="decimal-pad" placeholder="1.5" placeholderTextColor={T.outline} />
-              <View style={s.pricingInfo}>
+            <Text style={[s.sectionTitle, { color: c.text }]}>Pricing & Markup</Text>
+            <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
+              {/* Markup explanation */}
+              <View style={[s.markupExplainer, { backgroundColor: c.surfaceContainer }]}>
+                <Text style={[s.markupExplainerTitle, { color: c.primary }]}>What is markup?</Text>
+                <Text style={[s.markupExplainerBody, { color: c.subText }]}>
+                  Markup multiplies your material cost to set a selling price.{'\n'}
+                  • 1.0 = sell at cost (no profit){'\n'}
+                  • 1.5 = 50% profit above material cost{'\n'}
+                  • 2.0 = double your material cost{'\n'}
+                  For example, if materials cost {currency} 100 and markup is 1.5, suggested price = {currency} 150.
+                </Text>
+              </View>
+              <TextInput style={[s.input, { backgroundColor: c.surfaceLow, color: c.text, marginTop: 8 }]} value={markup} onChangeText={setMarkup} keyboardType="decimal-pad" placeholder="1.5" placeholderTextColor={c.outline} />
+              <View style={[s.pricingInfo, { backgroundColor: c.surfaceContainer }]}>
                 <View style={s.pricingRow}>
-                  <Text style={s.pricingLabel}>Material Cost</Text>
-                  <Text style={s.pricingVal}>{currency} {totalCost.toFixed(2)}</Text>
+                  <Text style={[s.pricingLabel, { color: c.subText }]}>Material Cost</Text>
+                  <Text style={[s.pricingVal, { color: c.text }]}>{currency} {totalCost.toFixed(2)}</Text>
                 </View>
                 <View style={s.pricingRow}>
-                  <Text style={[s.pricingLabel, { fontWeight: '700' }]}>Suggested Price</Text>
-                  <Text style={[s.pricingVal, { color: T.tertiary, fontWeight: '700' }]}>{currency} {suggestedPrice.toFixed(2)}</Text>
+                  <Text style={[s.pricingLabel, { color: c.subText, fontWeight: '700' }]}>Suggested Price</Text>
+                  <Text style={[s.pricingVal, { color: c.accent, fontWeight: '700' }]}>{currency} {suggestedPrice.toFixed(2)}</Text>
                 </View>
               </View>
             </View>
@@ -272,12 +357,12 @@ export default function InventoryProductScreen() {
 
         {/* Notes */}
         <View style={s.section}>
-          <Text style={[s.sectionTitle, { color: colors.text }]}>Notes</Text>
-          <View style={s.card}>
+          <Text style={[s.sectionTitle, { color: c.text }]}>Notes</Text>
+          <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
             {editing ? (
-              <TextInput style={[s.input, { borderRadius: 12, minHeight: 64, textAlignVertical: 'top', paddingTop: 12 }]} value={notes} onChangeText={setNotes} placeholder="Notes about this product…" placeholderTextColor={T.outline} multiline />
+              <TextInput style={[s.input, { borderRadius: 12, minHeight: 64, textAlignVertical: 'top', paddingTop: 12, backgroundColor: c.surfaceLow, color: c.text }]} value={notes} onChangeText={setNotes} placeholder="Notes about this product…" placeholderTextColor={c.outline} multiline />
             ) : (
-              <Text style={{ fontFamily: 'DMSans', fontSize: 14, color: notes ? T.text : T.outline }}>
+              <Text style={{ fontFamily: 'DMSans', fontSize: 14, color: notes ? c.text : c.outline }}>
                 {notes || 'No notes.'}
               </Text>
             )}
@@ -287,18 +372,18 @@ export default function InventoryProductScreen() {
         {/* Reminder info */}
         {product.remindInterval && (
           <View style={s.section}>
-            <Text style={[s.sectionTitle, { color: colors.text }]}>Reminder</Text>
-            <View style={s.card}>
-              <Text style={{ fontFamily: 'DMSans', fontSize: 14, color: T.text }}>
+            <Text style={[s.sectionTitle, { color: c.text }]}>Reminder</Text>
+            <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
+              <Text style={{ fontFamily: 'DMSans', fontSize: 14, color: c.text }}>
                 Every {product.remindInterval} {product.remindUnit}
               </Text>
               {product.nextReminderDate && (
-                <Text style={{ fontFamily: 'DMSans', fontSize: 12, color: T.subText, marginTop: 4 }}>
+                <Text style={{ fontFamily: 'DMSans', fontSize: 12, color: c.subText, marginTop: 4 }}>
                   Next: {format(new Date(product.nextReminderDate), 'MMM d, yyyy')}
                 </Text>
               )}
-              <TouchableOpacity style={[s.btn, { marginTop: 12 }]} onPress={handleSnoozeReminder}>
-                <Text style={s.btnTxt}>Reschedule Reminder</Text>
+              <TouchableOpacity style={[s.btn, { marginTop: 12, backgroundColor: c.primaryContainer }]} onPress={handleSnoozeReminder}>
+                <Text style={[s.btnTxt, { color: c.onPrimary }]}>Reschedule Reminder</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -306,22 +391,22 @@ export default function InventoryProductScreen() {
 
         {/* Meta */}
         <View style={s.section}>
-          <View style={s.card}>
+          <View style={[s.card, { backgroundColor: c.surfaceLowest }]}>
             <View style={s.metaRow}>
-              <Text style={s.metaLabel}>Created</Text>
-              <Text style={s.metaVal}>{format(new Date(product.createdAt), 'MMM d, yyyy')}</Text>
+              <Text style={[s.metaLabel, { color: c.subText }]}>Created</Text>
+              <Text style={[s.metaVal, { color: c.text }]}>{format(new Date(product.createdAt), 'MMM d, yyyy')}</Text>
             </View>
             <View style={s.metaRow}>
-              <Text style={s.metaLabel}>Last updated</Text>
-              <Text style={s.metaVal}>{format(new Date(product.updatedAt), 'MMM d, yyyy')}</Text>
+              <Text style={[s.metaLabel, { color: c.subText }]}>Last updated</Text>
+              <Text style={[s.metaVal, { color: c.text }]}>{format(new Date(product.updatedAt), 'MMM d, yyyy')}</Text>
             </View>
           </View>
         </View>
 
         {/* Delete */}
         <View style={{ paddingHorizontal: 16, marginTop: 8 }}>
-          <TouchableOpacity style={s.deleteBtn} onPress={handleDelete}>
-            <Text style={s.deleteBtnTxt}>Delete Product</Text>
+          <TouchableOpacity style={[s.deleteBtn, { backgroundColor: c.surfaceLow }]} onPress={handleDelete}>
+            <Text style={[s.deleteBtnTxt, { color: c.error }]}>Delete Product</Text>
           </TouchableOpacity>
         </View>
 
@@ -331,60 +416,63 @@ export default function InventoryProductScreen() {
 }
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: T.bg },
-  notFound: { textAlign: 'center', fontFamily: 'DMSans', color: T.subText, paddingTop: 80 },
+  container: { flex: 1 },
+  notFound: { textAlign: 'center', fontFamily: 'DMSans', paddingTop: 80 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
-  backPill: { flexDirection: 'row', alignItems: 'center', backgroundColor: T.surfaceContainer, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7, gap: 2 },
-  backChevron: { fontSize: 20, color: T.primary, lineHeight: 20, fontWeight: '300', marginTop: -1 },
-  back: { fontSize: 13, fontFamily: 'DMSans', color: T.primary, fontWeight: '600' },
-  headerTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.text, flex: 1, textAlign: 'center', marginHorizontal: 8 },
-  saveBtn: { backgroundColor: T.primaryContainer, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 7 },
-  saveBtnTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
-  editBtn: { backgroundColor: T.surfaceContainer, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 7 },
-  editBtnTxt: { color: T.primary, fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
-  heroCard: { margin: 16, backgroundColor: T.surfaceLow, borderRadius: 20, padding: 20, gap: 16 },
-  heroTop: { flexDirection: 'row', gap: 14, alignItems: 'center' },
-  heroName: { fontSize: 22, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.text },
-  heroCategory: { fontSize: 13, fontFamily: 'DMSans', color: T.subText, marginTop: 4 },
-  heroInput: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.text, borderBottomWidth: 1, borderBottomColor: T.outlineVariant, paddingBottom: 4 },
-  heroCategoryInput: { fontSize: 13, fontFamily: 'DMSans', color: T.subText, marginTop: 4, borderBottomWidth: 1, borderBottomColor: T.outlineVariant },
+  backPill: { flexDirection: 'row', alignItems: 'center', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 7, gap: 2 },
+  backChevron: { fontSize: 20, lineHeight: 20, fontWeight: '300', marginTop: -1 },
+  back: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '600' },
+  headerTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', flex: 1, textAlign: 'center', marginHorizontal: 8 },
+  saveBtn: { borderRadius: 999, paddingHorizontal: 16, paddingVertical: 7 },
+  saveBtnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
+  editBtn: { borderRadius: 999, paddingHorizontal: 16, paddingVertical: 7 },
+  editBtnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
+  heroCard: { margin: 16, borderRadius: 20, padding: 20, gap: 16 },
+  heroTop: { flexDirection: 'row', gap: 14, alignItems: 'flex-start' },
+  emojiBtn: { width: 36, height: 36, borderRadius: 10, justifyContent: 'center', alignItems: 'center', marginRight: 6 },
+  heroName: { fontSize: 22, fontFamily: 'PlayfairDisplay', fontWeight: '700' },
+  heroCategory: { fontSize: 13, fontFamily: 'DMSans', marginTop: 4 },
+  heroInput: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', borderBottomWidth: 1, paddingBottom: 4 },
+  heroCategoryInput: { fontSize: 13, fontFamily: 'DMSans', marginTop: 4, borderBottomWidth: 1 },
   heroStats: { flexDirection: 'row', justifyContent: 'space-around' },
   heroStat: { alignItems: 'center', gap: 4 },
-  heroStatVal: { fontSize: 20, fontFamily: 'DMMono', fontWeight: '700', color: T.text },
-  heroStatLbl: { fontSize: 9, fontFamily: 'DMSans', fontWeight: '600', color: T.subText, textTransform: 'uppercase', letterSpacing: 0.8 },
-  heroStatDivider: { width: 1, backgroundColor: T.outlineVariant, alignSelf: 'stretch' },
-  reminderAlert: { marginHorizontal: 16, marginBottom: 8, backgroundColor: '#FFF3E0', borderRadius: 12, padding: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  reminderAlertTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '600', color: T.tertiary },
-  snoozeBtn: { backgroundColor: T.tertiary, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
-  snoozeBtnTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 12, fontWeight: '700' },
+  heroStatVal: { fontSize: 20, fontFamily: 'DMMono', fontWeight: '700' },
+  heroStatLbl: { fontSize: 9, fontFamily: 'DMSans', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.8 },
+  heroStatDivider: { width: 1, alignSelf: 'stretch' },
+  reminderAlert: { marginHorizontal: 16, marginBottom: 8, borderRadius: 12, padding: 14, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  reminderAlertTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
+  snoozeBtn: { borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
+  snoozeBtnTxt: { fontFamily: 'DMSans', fontSize: 12, fontWeight: '700' },
   section: { paddingHorizontal: 16, marginBottom: 16 },
-  sectionTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', color: T.text, marginBottom: 8 },
-  card: { backgroundColor: T.surfaceLowest, borderRadius: 16, padding: 16, gap: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8, elevation: 1 },
-  matRow: { flexDirection: 'row', gap: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: T.outlineVariant, alignItems: 'flex-start' },
-  matName: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700', color: T.text },
-  matDetail: { fontSize: 12, fontFamily: 'DMMono', color: T.subText, marginTop: 2 },
-  matTotal: { fontSize: 14, fontFamily: 'DMMono', fontWeight: '700', color: T.primary },
-  matTotalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, borderTopWidth: 1, borderTopColor: T.primary },
-  matTotalLabel: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700', color: T.text },
-  matTotalVal: { fontSize: 16, fontFamily: 'DMMono', fontWeight: '700', color: T.primary },
-  addMatBtn: { backgroundColor: T.surfaceLow, borderRadius: 12, paddingVertical: 12, borderWidth: 1.5, borderStyle: 'dashed', borderColor: T.outlineVariant, alignItems: 'center', marginTop: 8 },
-  addMatBtnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '500', color: T.primary },
-  addMatForm: { backgroundColor: T.surfaceContainer, borderRadius: 12, padding: 12, marginTop: 8 },
-  input: { backgroundColor: T.surfaceLow, borderRadius: 999, paddingHorizontal: 20, paddingVertical: 12, fontFamily: 'DMSans', fontSize: 14, color: T.text, marginBottom: 8 },
-  row: { flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'center' },
-  miniChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, backgroundColor: T.surfaceHighest, marginRight: 6 },
-  miniChipOn: { backgroundColor: T.primary },
-  miniChipTxt: { fontSize: 12, fontFamily: 'DMSans', fontWeight: '600', color: T.subText },
-  miniChipTxtOn: { color: '#FFFFFF' },
-  btn: { backgroundColor: T.primaryContainer, borderRadius: 999, paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
-  btnTxt: { color: '#FFFFFF', fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
-  pricingInfo: { backgroundColor: T.surfaceContainer, borderRadius: 12, padding: 14, gap: 8, marginTop: 8 },
+  sectionTitle: { fontSize: 18, fontFamily: 'PlayfairDisplay', fontWeight: '700', marginBottom: 8 },
+  card: { borderRadius: 16, padding: 16, gap: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.03, shadowRadius: 8, elevation: 1 },
+  matRow: { flexDirection: 'row', gap: 12, paddingVertical: 8, borderBottomWidth: StyleSheet.hairlineWidth, alignItems: 'flex-start' },
+  matName: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700' },
+  matDetail: { fontSize: 12, fontFamily: 'DMMono', marginTop: 2 },
+  matTotal: { fontSize: 14, fontFamily: 'DMMono', fontWeight: '700' },
+  matTotalRow: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, borderTopWidth: 1 },
+  matTotalLabel: { fontSize: 14, fontFamily: 'DMSans', fontWeight: '700' },
+  matTotalVal: { fontSize: 16, fontFamily: 'DMMono', fontWeight: '700' },
+  editMatForm: { borderRadius: 12, padding: 12, marginVertical: 4 },
+  addMatBtn: { borderRadius: 12, paddingVertical: 12, borderWidth: 1.5, borderStyle: 'dashed', alignItems: 'center', marginTop: 8 },
+  addMatBtnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '500' },
+  addMatForm: { borderRadius: 12, padding: 12, marginTop: 8 },
+  input: { borderRadius: 999, paddingHorizontal: 20, paddingVertical: 12, fontFamily: 'DMSans', fontSize: 14, marginBottom: 8 },
+  row: { flexDirection: 'row', gap: 8, alignItems: 'center' },
+  miniChip: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 999, marginRight: 6 },
+  miniChipTxt: { fontSize: 12, fontFamily: 'DMSans', fontWeight: '600' },
+  btn: { borderRadius: 999, paddingVertical: 12, alignItems: 'center', justifyContent: 'center' },
+  btnTxt: { fontFamily: 'DMSans', fontSize: 13, fontWeight: '700' },
+  markupExplainer: { borderRadius: 12, padding: 14, marginBottom: 4 },
+  markupExplainerTitle: { fontSize: 13, fontFamily: 'DMSans', fontWeight: '700', marginBottom: 6 },
+  markupExplainerBody: { fontSize: 12, fontFamily: 'DMSans', lineHeight: 20 },
+  pricingInfo: { borderRadius: 12, padding: 14, gap: 8, marginTop: 8 },
   pricingRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  pricingLabel: { fontSize: 13, fontFamily: 'DMSans', color: T.subText },
-  pricingVal: { fontSize: 14, fontFamily: 'DMMono', color: T.text },
+  pricingLabel: { fontSize: 13, fontFamily: 'DMSans' },
+  pricingVal: { fontSize: 14, fontFamily: 'DMMono' },
   metaRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 6 },
-  metaLabel: { fontSize: 13, fontFamily: 'DMSans', color: T.subText },
-  metaVal: { fontSize: 13, fontFamily: 'DMMono', color: T.text },
-  deleteBtn: { borderRadius: 12, paddingVertical: 16, alignItems: 'center', backgroundColor: T.surfaceLow },
-  deleteBtnTxt: { color: T.error, fontFamily: 'DMSans', fontSize: 15, fontWeight: '600' },
+  metaLabel: { fontSize: 13, fontFamily: 'DMSans' },
+  metaVal: { fontSize: 13, fontFamily: 'DMMono' },
+  deleteBtn: { borderRadius: 12, paddingVertical: 16, alignItems: 'center' },
+  deleteBtnTxt: { fontFamily: 'DMSans', fontSize: 15, fontWeight: '600' },
 });
