@@ -53,7 +53,7 @@ export default function OrderDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { orders, advanceStatus, togglePaid, deleteOrder } = useOrders();
+  const { orders, advanceStatus, togglePaid, deleteOrder, updateOrder } = useOrders();
   const { profile } = useProfile();
   const { colors } = useTheme();
   const c = colors;
@@ -236,6 +236,30 @@ export default function OrderDetailScreen() {
             );
           })}
         </Animated.View>
+
+        {/* Completion Progress — visible always for active orders, quick-tap to update */}
+        {isActive && (
+          <Animated.View entering={FadeInDown.delay(120).duration(300)} style={[styles.progressSection, { backgroundColor: c.surfaceLow }]}>
+            <View style={styles.progressHeader}>
+              <Text style={[styles.progressTitle, { color: c.text }]}>Completion</Text>
+              <Text style={[styles.progressPctText, { color: c.accent }]}>{order.completionPercent ?? 0}%</Text>
+            </View>
+            <View style={[styles.progressTrack, { backgroundColor: c.outlineVariant }]}>
+              <View style={[styles.progressFill, { width: `${order.completionPercent ?? 0}%` as any, backgroundColor: c.accent }]} />
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: 10 }} keyboardShouldPersistTaps="always">
+              {[0, 10, 25, 50, 75, 90, 100].map((v) => (
+                <TouchableOpacity
+                  key={v}
+                  style={[styles.progressChip, { backgroundColor: c.surfaceHighest }, (order.completionPercent ?? 0) === v && { backgroundColor: c.accent }]}
+                  onPress={() => updateOrder(order.id, { completionPercent: v })}
+                >
+                  <Text style={[styles.progressChipTxt, { color: c.subText }, (order.completionPercent ?? 0) === v && { color: '#FFFFFF' }]}>{v}%</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </Animated.View>
+        )}
 
         {/* Advance Status Button */}
         {nextStatus && order.status !== 'cancelled' && (
@@ -516,6 +540,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
   },
+  // Progress section
+  progressSection: { borderRadius: 16, padding: 16, marginBottom: 12 },
+  progressHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
+  progressTitle: { fontSize: 15, fontFamily: 'DMSans', fontWeight: '700' },
+  progressPctText: { fontSize: 18, fontFamily: 'DMMono', fontWeight: '700' },
+  progressTrack: { height: 8, borderRadius: 6, overflow: 'hidden' },
+  progressFill: { height: 8, borderRadius: 6 },
+  progressChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 999, marginRight: 8 },
+  progressChipTxt: { fontSize: 12, fontFamily: 'DMSans', fontWeight: '600' },
   // Not found
   notFound: {
     flex: 1,

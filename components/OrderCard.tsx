@@ -136,6 +136,16 @@ export function OrderCard({ order, compact = false }: Props) {
           </View>
         )}
 
+        {/* Completion progress bar */}
+        {isActive && (order.completionPercent ?? 0) > 0 && (
+          <View>
+            <View style={[styles.progressTrack, { backgroundColor: c.outlineVariant }]}>
+              <View style={[styles.progressFill, { width: `${order.completionPercent}%` as any, backgroundColor: c.accent }]} />
+            </View>
+            <Text style={[styles.progressLabel, { color: c.subText }]}>{order.completionPercent}% complete</Text>
+          </View>
+        )}
+
         {/* Tags scroll (non-compact only) */}
         {!compact && order.tags && order.tags.length > 0 && (
           <ScrollView
@@ -187,4 +197,7 @@ const styles = StyleSheet.create({
   urgentCountdownTimer: { fontSize: 12, fontWeight: '600' },
   countdown: { fontSize: 12 },
   tagsRow: { marginTop: 2 },
+  progressTrack: { height: 4, borderRadius: 4, overflow: 'hidden', marginTop: 6 },
+  progressFill: { height: 4, borderRadius: 4 },
+  progressLabel: { fontSize: 10, fontFamily: 'DMSans', marginTop: 3 },
 });
