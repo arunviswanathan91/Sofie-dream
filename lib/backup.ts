@@ -25,10 +25,14 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as DocumentPicker from 'expo-document-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import type { Order, CraftCategory, BusinessProfile } from '../types';
+import type { Order, CraftCategory, BusinessProfile, Customer, InventoryProduct, NotificationPrefs } from '../types';
+import { DEFAULT_NOTIFICATION_PREFS } from '../types';
 import {
   getLocalOrders, getLocalCategories, getLocalProfile,
   saveLocalOrders, saveLocalCategories, saveLocalProfile,
+  getLocalCustomers, saveLocalCustomers,
+  getLocalInventory, saveLocalInventory,
+  getLocalNotifPrefs, saveLocalNotifPrefs,
 } from './localStore';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
@@ -50,7 +54,7 @@ const K = {
 };
 
 // ─── Backup Format ────────────────────────────────────────────────────────────
-const BACKUP_VERSION = 1;
+const BACKUP_VERSION = 2;
 
 export interface AppBackup {
   sofie_backup_version: number;
@@ -59,17 +63,23 @@ export interface AppBackup {
     orders: Order[];
     categories: CraftCategory[];
     profile: BusinessProfile;
+    customers: Customer[];
+    inventory: InventoryProduct[];
+    notifPrefs: NotificationPrefs;
   };
 }
 
 // ─── Collect / Apply ──────────────────────────────────────────────────────────
 async function collectData(): Promise<AppBackup['data']> {
-  const [orders, categories, profile] = await Promise.all([
+  const [orders, categories, profile, customers, inventory, notifPrefs] = await Promise.all([
     getLocalOrders(),
     getLocalCategories(),
     getLocalProfile(),
+    getLocalCustomers(),
+    getLocalInventory(),
+    getLocalNotifPrefs(),
   ]);
-  return { orders, categories, profile };
+  return { orders, categories, profile, customers, inventory, notifPrefs };
 }
 
 async function applyData(data: AppBackup['data']): Promise<void> {
@@ -77,6 +87,9 @@ async function applyData(data: AppBackup['data']): Promise<void> {
     saveLocalOrders(data.orders),
     saveLocalCategories(data.categories),
     saveLocalProfile(data.profile),
+    saveLocalCustomers(data.customers),
+    saveLocalInventory(data.inventory),
+    saveLocalNotifPrefs(data.notifPrefs),
   ]);
 }
 
@@ -94,7 +107,9 @@ function deserialize(json: string): AppBackup {
   if (!parsed.sofie_backup_version || !parsed.data?.orders) {
     throw new Error('This does not look like a valid Sofi Dream backup file.');
   }
-  // Re-hydrate Date objects
+  const v = parsed.sofie_backup_version as number;
+
+  // Re-hydrate Date objects — orders
   parsed.data.orders = (parsed.data.orders as any[]).map((o) => ({
     ...o,
     dueDate: new Date(o.dueDate),
@@ -103,6 +118,32 @@ function deserialize(json: string): AppBackup {
     shippedAt: o.shippedAt ? new Date(o.shippedAt) : undefined,
     deliveredAt: o.deliveredAt ? new Date(o.deliveredAt) : undefined,
   }));
+
+  // v1 backups: default missing fields so old backups restore without crashing
+  if (v < 2) {
+    parsed.data.customers = [];
+    parsed.data.inventory = [];
+    parsed.data.notifPrefs = { ...DEFAULT_NOTIFICATION_PREFS };
+  } else {
+    // Re-hydrate Date objects — customers
+    parsed.data.customers = ((parsed.data.customers ?? []) as any[]).map((c) => ({
+      ...c,
+      createdAt: new Date(c.createdAt),
+    }));
+    // Re-hydrate Date objects — inventory
+    parsed.data.inventory = ((parsed.data.inventory ?? []) as any[]).map((p) => ({
+      ...p,
+      createdAt: new Date(p.createdAt),
+      updatedAt: new Date(p.updatedAt),
+      nextReminderDate: p.nextReminderDate ? new Date(p.nextReminderDate) : undefined,
+    }));
+    // Merge notifPrefs with defaults in case new fields were added
+    parsed.data.notifPrefs = {
+      ...DEFAULT_NOTIFICATION_PREFS,
+      ...(parsed.data.notifPrefs ?? {}),
+    };
+  }
+
   return parsed as AppBackup;
 }
 

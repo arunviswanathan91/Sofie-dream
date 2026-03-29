@@ -48,6 +48,8 @@
     },
     "plugins": [
       "expo-router",
+      "expo-background-fetch",
+      "expo-task-manager",
       [
         "expo-notifications",
         {

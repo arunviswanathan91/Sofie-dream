@@ -89,6 +89,21 @@ export async function saveLocalProfile(profile: BusinessProfile): Promise<void> 
   await AsyncStorage.setItem(KEYS.profile, JSON.stringify(profile));
 }
 
+// ─── Customers ────────────────────────────────────────────────
+export async function getLocalCustomers(): Promise<Customer[]> {
+  const raw = await AsyncStorage.getItem(KEYS.customers);
+  if (!raw) return [];
+  const parsed = JSON.parse(raw) as Customer[];
+  return parsed.map((c) => ({
+    ...c,
+    createdAt: new Date(c.createdAt),
+  }));
+}
+
+export async function saveLocalCustomers(customers: Customer[]): Promise<void> {
+  await AsyncStorage.setItem(KEYS.customers, JSON.stringify(customers));
+}
+
 // ─── Inventory ─────────────────────────────────────────────────
 export async function getLocalInventory(): Promise<InventoryProduct[]> {
   const raw = await AsyncStorage.getItem(KEYS.inventory);

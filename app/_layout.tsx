@@ -12,6 +12,8 @@ import { NotificationsProvider } from '../context/NotificationsContext';
 import { InventoryProvider } from '../context/InventoryContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { SplashOverlay } from '../components/SplashOverlay';
+import { isDailyBackupEnabled, registerDailyBackup } from '../lib/autoBackup';
+import { getGoogleSession } from '../lib/backup';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -20,6 +22,16 @@ function InnerLayout() {
   const router = useRouter();
   const { colors } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
+
+  // Re-register daily backup task after app restarts
+  useEffect(() => {
+    (async () => {
+      const [enabled, session] = await Promise.all([isDailyBackupEnabled(), getGoogleSession()]);
+      if (enabled && session) {
+        registerDailyBackup().catch(() => {});
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
