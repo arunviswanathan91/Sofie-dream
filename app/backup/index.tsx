@@ -199,13 +199,16 @@ function GoogleSection({
 
   const [request, response, promptAsync] = AuthSession.useAuthRequest(
     {
-      clientId: GOOGLE_CLIENT_ID_WEB || 'unconfigured',
+      clientId: GOOGLE_CLIENT_ID_WEB,
       scopes: ['profile', 'email', 'https://www.googleapis.com/auth/drive.appdata'],
       redirectUri,
       responseType: AuthSession.ResponseType.Token,
       usePKCE: false,
     },
-    GOOGLE_CLIENT_ID_WEB ? GOOGLE_DISCOVERY : null,
+    // Always pass the discovery document — if the client ID was missing at
+    // bundle time (e.g. release APK built without env vars loaded) the sign-in
+    // button still renders and the error surfaces at auth time, not at startup.
+    GOOGLE_DISCOVERY,
   );
 
   useEffect(() => {
@@ -278,12 +281,7 @@ function GoogleSection({
 
   return (
     <Section label="Google Drive" colors={colors}>
-      {!GOOGLE_CLIENT_ID_WEB ? (
-        <ConfigNote
-          text="Set EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB in your .env to enable Google Drive backup. Create a Web OAuth 2.0 client in Google Cloud Console and add sofi-dream://auth as an authorised redirect URI."
-          colors={colors}
-        />
-      ) : googleUser ? (
+      {googleUser ? (
         <>
           <SignedInBadge email={googleUser} onSignOut={handleSignOut} colors={colors} />
           <ActionRow
