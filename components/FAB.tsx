@@ -6,6 +6,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { useTheme } from '../context/ThemeContext';
 
 interface Props {
   onPress: () => void;
@@ -14,6 +15,7 @@ interface Props {
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 
 export function FAB({ onPress }: Props) {
+  const { colors } = useTheme();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -29,7 +31,11 @@ export function FAB({ onPress }: Props) {
   };
 
   return (
-    <AnimatedTouchable style={[styles.fab, animatedStyle]} onPress={handlePress} activeOpacity={0.9}>
+    <AnimatedTouchable
+      style={[styles.fab, { backgroundColor: colors.accent, shadowColor: colors.accent + '59' }, animatedStyle]}
+      onPress={handlePress}
+      activeOpacity={0.9}
+    >
       <View style={styles.inner}>
         <Text style={styles.icon}>+</Text>
         <Text style={styles.label}>New Order</Text>
@@ -46,10 +52,8 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 999,
     paddingHorizontal: 24,
-    backgroundColor: '#994530',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: 'rgba(153,69,48,0.35)',
     shadowOffset: { width: 0, height: 8 },
     shadowOpacity: 1,
     shadowRadius: 20,

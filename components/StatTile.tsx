@@ -2,11 +2,11 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, {
   useSharedValue,
-  useAnimatedProps,
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Colors, Spacing, BorderRadius } from '../lib/theme';
+import { Spacing, BorderRadius } from '../lib/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface Props {
   label: string;
@@ -18,6 +18,7 @@ interface Props {
 }
 
 export function StatTile({ label, value, prefix = '', suffix = '', onPress, accentColor }: Props) {
+  const { colors } = useTheme();
   const animatedValue = useSharedValue(0);
 
   useEffect(() => {
@@ -27,21 +28,21 @@ export function StatTile({ label, value, prefix = '', suffix = '', onPress, acce
     });
   }, [value]);
 
-  const color = accentColor ?? Colors.primary;
+  const dotColor = accentColor ?? colors.primary;
 
   return (
     <TouchableOpacity
-      style={styles.tile}
+      style={[styles.tile, { backgroundColor: colors.surfaceLow }]}
       onPress={onPress}
       disabled={!onPress}
       activeOpacity={onPress ? 0.8 : 1}
     >
       {/* Accent indicator dot */}
-      <View style={[styles.dot, { backgroundColor: color }]} />
-      <Text style={styles.value}>
+      <View style={[styles.dot, { backgroundColor: dotColor }]} />
+      <Text style={[styles.value, { color: colors.text }]}>
         {prefix}{value.toFixed(value % 1 === 0 ? 0 : 2)}{suffix}
       </Text>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, { color: colors.subText }]}>{label}</Text>
     </TouchableOpacity>
   );
 }
@@ -49,7 +50,6 @@ export function StatTile({ label, value, prefix = '', suffix = '', onPress, acce
 const styles = StyleSheet.create({
   tile: {
     flex: 1,
-    backgroundColor: Colors.surfaceLow,
     borderRadius: BorderRadius.card,
     padding: Spacing.md,
     alignItems: 'flex-start',
@@ -70,13 +70,11 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: 'PlayfairDisplay',
     fontWeight: '700',
-    color: Colors.text,
     marginBottom: 4,
   },
   label: {
     fontSize: 10,
     fontFamily: 'DMSans',
-    color: Colors.subText,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },

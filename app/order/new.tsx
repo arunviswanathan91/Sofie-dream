@@ -15,8 +15,9 @@ import { TagChip } from '../../components/TagChip';
 import type { OrderItem } from '../../types';
 import { generateId } from '../../lib/localStore';
 import { useInventory } from '../../context/InventoryContext';
+import { useProfileContext } from '../../context/ProfileContext';
 
-const CURRENCIES = ['EUR', 'GBP', 'USD', 'CHF', 'INR'];
+const BASE_CURRENCIES = ['EUR', 'GBP', 'USD', 'CHF', 'INR'];
 const PRESET_TAGS = ['rush', 'custom', 'gift', 'large', 'repeat customer'];
 
 interface FormState {
@@ -29,23 +30,29 @@ interface FormState {
   completionPercent: number;
 }
 
-const INITIAL: FormState = {
-  orderName: '', description: '', craftCategory: '', tags: [], photos: [],
-  sourceLink: '', customerName: '', customerAddress: '', customerPhone: '',
-  customerInstagram: '', deliveryTime: '', askingPrice: '', currency: 'EUR',
-  isPaid: false, paymentNotes: '',
-  dueDateText: format(addDays(new Date(), 7), 'yyyy-MM-dd'), internalNotes: '',
-  completionPercent: 0,
-};
-
 export default function NewOrderScreen() {
   const router = useRouter();
   const { addOrder } = useOrders();
   const insets = useSafeAreaInsets();
   const { categories } = useCategories();
   const { colors } = useTheme();
+  const { profile } = useProfileContext();
   const { products: inventoryProducts, addProduct } = useInventory();
-  const [form, setForm] = useState<FormState>(INITIAL);
+
+  // Build currency list: master currency first, then remaining defaults
+  const CURRENCIES = [
+    profile.currency,
+    ...BASE_CURRENCIES.filter((c) => c !== profile.currency),
+  ];
+
+  const [form, setForm] = useState<FormState>(() => ({
+    orderName: '', description: '', craftCategory: '', tags: [], photos: [],
+    sourceLink: '', customerName: '', customerAddress: '', customerPhone: '',
+    customerInstagram: '', deliveryTime: '', askingPrice: '', currency: profile.currency,
+    isPaid: false, paymentNotes: '',
+    dueDateText: format(addDays(new Date(), 7), 'yyyy-MM-dd'), internalNotes: '',
+    completionPercent: 0,
+  }));
   const [customTag, setCustomTag] = useState('');
   const [saving, setSaving] = useState(false);
 
@@ -420,11 +427,17 @@ export default function NewOrderScreen() {
           <Block title="Financials" colors={c}>
             <F label="Currency" colors={c}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 12 }}>
-                {CURRENCIES.map((cur) => (
-                  <TouchableOpacity key={cur} style={[s.chip, { backgroundColor: c.surfaceHighest }, form.currency === cur && { backgroundColor: c.primary }]} onPress={() => set('currency', cur)}>
-                    <Text style={[s.chipTxt, { color: c.subText }, form.currency === cur && { color: c.onPrimary }]}>{cur}</Text>
-                  </TouchableOpacity>
-                ))}
+                {CURRENCIES.map((cur) => {
+                  const isMaster = cur === profile.currency;
+                  const isSelected = form.currency === cur;
+                  return (
+                    <TouchableOpacity key={cur} style={[s.chip, { backgroundColor: c.surfaceHighest }, isSelected && { backgroundColor: c.primary }]} onPress={() => set('currency', cur)}>
+                      <Text style={[s.chipTxt, { color: c.subText }, isSelected && { color: c.onPrimary }]}>
+                        {cur}{isMaster ? ' ★' : ''}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </ScrollView>
             </F>
             <F label="Total Asking Price" colors={c}>

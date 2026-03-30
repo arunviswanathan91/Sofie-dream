@@ -4,33 +4,35 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 
-const ACTIVE = '#994530';
-const INACTIVE = 'rgba(134,77,95,0.4)';
-
 interface TabIconProps {
   name: keyof typeof Ionicons.glyphMap;
   label: string;
   focused: boolean;
+  activeColor: string;
+  inactiveColor: string;
 }
 
-function TabIcon({ name, label, focused }: TabIconProps) {
+function TabIcon({ name, label, focused, activeColor, inactiveColor }: TabIconProps) {
+  const color = focused ? activeColor : inactiveColor;
   return (
     <View style={styles.tabIcon}>
       <Ionicons
         name={focused ? name : (`${name}-outline` as keyof typeof Ionicons.glyphMap)}
         size={24}
-        color={focused ? ACTIVE : INACTIVE}
+        color={color}
       />
-      <Text style={[styles.tabLabel, focused && styles.tabLabelFocused]}>
+      <Text style={[styles.tabLabel, { color }, focused && styles.tabLabelFocused]}>
         {label}
       </Text>
-      {focused && <View style={styles.dot} />}
+      {focused && <View style={[styles.dot, { backgroundColor: activeColor }]} />}
     </View>
   );
 }
 
 export default function TabsLayout() {
   const { colors } = useTheme();
+  const activeColor = colors.accent;
+  const inactiveColor = colors.subText + '99'; // ~60% opacity
 
   return (
     <Tabs
@@ -52,7 +54,7 @@ export default function TabsLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="home" label="Home" focused={focused} />
+            <TabIcon name="home" label="Home" focused={focused} activeColor={activeColor} inactiveColor={inactiveColor} />
           ),
         }}
       />
@@ -61,7 +63,7 @@ export default function TabsLayout() {
         options={{
           title: 'Orders',
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="list" label="Orders" focused={focused} />
+            <TabIcon name="list" label="Orders" focused={focused} activeColor={activeColor} inactiveColor={inactiveColor} />
           ),
         }}
       />
@@ -70,7 +72,7 @@ export default function TabsLayout() {
         options={{
           title: 'Craft',
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="color-palette" label="Craft" focused={focused} />
+            <TabIcon name="color-palette" label="Craft" focused={focused} activeColor={activeColor} inactiveColor={inactiveColor} />
           ),
         }}
       />
@@ -79,7 +81,7 @@ export default function TabsLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ focused }) => (
-            <TabIcon name="settings" label="Settings" focused={focused} />
+            <TabIcon name="settings" label="Settings" focused={focused} activeColor={activeColor} inactiveColor={inactiveColor} />
           ),
         }}
       />
@@ -97,19 +99,16 @@ const styles = StyleSheet.create({
   tabLabel: {
     fontSize: 10,
     fontFamily: 'DMSans',
-    color: INACTIVE,
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   tabLabelFocused: {
-    color: ACTIVE,
     fontWeight: '700',
   },
   dot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: ACTIVE,
     marginTop: 2,
   },
 });

@@ -19,7 +19,8 @@ TaskManager.defineTask(TASK_NAME, async () => {
     if (!session) return BackgroundFetch.BackgroundFetchResult.NoData;
     await backupToGoogleDrive(session.token);
     return BackgroundFetch.BackgroundFetchResult.NewData;
-  } catch {
+  } catch (err) {
+    console.warn('[AutoBackup] Daily backup failed:', err);
     return BackgroundFetch.BackgroundFetchResult.Failed;
   }
 });

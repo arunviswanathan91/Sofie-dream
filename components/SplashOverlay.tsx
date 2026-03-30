@@ -8,14 +8,17 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
+import { useTheme } from '../context/ThemeContext';
 
 interface Props {
   onFinish: () => void;
 }
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 export function SplashOverlay({ onFinish }: Props) {
+  const { colors } = useTheme();
+
   const containerOpacity = useSharedValue(1);
   const logoScale = useSharedValue(0.7);
   const logoOpacity = useSharedValue(0);
@@ -61,56 +64,44 @@ export function SplashOverlay({ onFinish }: Props) {
   }));
 
   return (
-    <Animated.View style={[styles.container, containerStyle]} pointerEvents="none">
+    <Animated.View style={[styles.container, { backgroundColor: colors.bg }, containerStyle]} pointerEvents="none">
       {/* Decorative blobs */}
-      <View style={[styles.blob, styles.blobTopLeft]} />
-      <View style={[styles.blob, styles.blobBottomRight]} />
+      <View style={[styles.blob, styles.blobTopLeft, { backgroundColor: colors.primary }]} />
+      <View style={[styles.blob, styles.blobBottomRight, { backgroundColor: colors.accent }]} />
 
       {/* Center content */}
       <View style={styles.center}>
         {/* Embroidery Hoop Logo */}
         <Animated.View style={[styles.hoopWrapper, logoStyle]}>
-          <View style={styles.hoopOuter}>
-            <View style={styles.hoopInner}>
+          <View style={[styles.hoopOuter, { borderColor: colors.outlineVariant, shadowColor: colors.primary }]}>
+            <View style={[styles.hoopInner, { backgroundColor: colors.card }]}>
               <Text style={styles.hoopEmoji}>🪡</Text>
             </View>
           </View>
           {/* Needle accent */}
-          <View style={styles.needle} />
+          <View style={[styles.needle, { backgroundColor: colors.outlineVariant }]} />
         </Animated.View>
 
         {/* Title */}
         <Animated.View style={[styles.titleGroup, titleStyle]}>
-          <Text style={styles.title}>Sofi Dream ✦</Text>
-          <Text style={styles.tagline}>Handmade with love ✦</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Sofi Dream ✦</Text>
+          <Text style={[styles.tagline, { color: colors.subText }]}>Handmade with love ✦</Text>
         </Animated.View>
       </View>
 
       {/* Bottom quote card */}
-      <Animated.View style={[styles.quoteCard, quoteStyle]}>
-        <Text style={styles.quoteIcon}>"</Text>
-        <Text style={styles.quoteText}>Every stitch tells a story.</Text>
+      <Animated.View style={[styles.quoteCard, { backgroundColor: colors.primaryContainer + '55', shadowColor: colors.primary }, quoteStyle]}>
+        <Text style={[styles.quoteIcon, { color: colors.primary }]}>"</Text>
+        <Text style={[styles.quoteText, { color: colors.text }]}>Every stitch tells a story.</Text>
         <View style={styles.quoteDivider}>
-          <View style={[styles.divLine, { width: 32, opacity: 0.2 }]} />
-          <View style={[styles.divLine, { width: 8 }]} />
-          <View style={[styles.divLine, { width: 8, opacity: 0.2 }]} />
+          <View style={[styles.divLine, { width: 32, opacity: 0.2, backgroundColor: colors.primary }]} />
+          <View style={[styles.divLine, { width: 8, backgroundColor: colors.primary }]} />
+          <View style={[styles.divLine, { width: 8, opacity: 0.2, backgroundColor: colors.primary }]} />
         </View>
       </Animated.View>
     </Animated.View>
   );
 }
-
-const T = {
-  bg: '#FFF8F5',
-  primary: '#864D5F',
-  primaryFixed: '#FFD9E2',
-  onPrimaryContainer: '#522232',
-  tertiary: '#994530',
-  tertiaryFixed: '#FFDAD2',
-  text: '#3D2B1F',
-  subText: '#514346',
-  outlineVariant: '#D5C2C5',
-};
 
 const styles = StyleSheet.create({
   container: {
@@ -119,7 +110,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: T.bg,
     zIndex: 9999,
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -128,22 +118,19 @@ const styles = StyleSheet.create({
   blob: {
     position: 'absolute',
     borderRadius: 999,
+    opacity: 0.04,
   },
   blobTopLeft: {
     width: width * 0.5,
     height: width * 0.5,
     top: -width * 0.15,
     left: -width * 0.2,
-    backgroundColor: T.primary,
-    opacity: 0.04,
   },
   blobBottomRight: {
     width: width * 0.4,
     height: width * 0.4,
     bottom: -width * 0.1,
     right: -width * 0.1,
-    backgroundColor: T.tertiary,
-    opacity: 0.04,
   },
   center: {
     flex: 1,
@@ -161,10 +148,8 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 80,
     borderWidth: 10,
-    borderColor: '#D7B49E',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.12,
     shadowRadius: 30,
@@ -174,7 +159,6 @@ const styles = StyleSheet.create({
     width: '88%',
     height: '88%',
     borderRadius: 999,
-    backgroundColor: '#F9F2EF',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -187,7 +171,6 @@ const styles = StyleSheet.create({
     top: '50%',
     width: 2,
     height: 60,
-    backgroundColor: T.outlineVariant,
     borderRadius: 1,
     transform: [{ translateY: -30 }, { rotate: '35deg' }],
   },
@@ -199,25 +182,21 @@ const styles = StyleSheet.create({
     fontFamily: 'PlayfairDisplay',
     fontSize: 32,
     fontWeight: '700',
-    color: T.text,
     letterSpacing: -0.5,
   },
   tagline: {
     fontFamily: 'DMSans',
     fontSize: 13,
     fontStyle: 'italic',
-    color: T.subText,
     letterSpacing: 1.5,
     opacity: 0.7,
   },
   quoteCard: {
     width: width - 48,
-    backgroundColor: T.primaryFixed,
     borderRadius: 16,
     padding: 24,
     alignItems: 'center',
     gap: 8,
-    shadowColor: T.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
     shadowRadius: 16,
@@ -226,7 +205,6 @@ const styles = StyleSheet.create({
   quoteIcon: {
     fontFamily: 'PlayfairDisplay',
     fontSize: 32,
-    color: T.primary,
     opacity: 0.5,
     lineHeight: 32,
   },
@@ -234,7 +212,6 @@ const styles = StyleSheet.create({
     fontFamily: 'PlayfairDisplay',
     fontSize: 18,
     fontStyle: 'italic',
-    color: T.onPrimaryContainer,
     textAlign: 'center',
     lineHeight: 28,
   },
@@ -246,7 +223,6 @@ const styles = StyleSheet.create({
   },
   divLine: {
     height: 2,
-    backgroundColor: T.primary,
     borderRadius: 1,
   },
 });

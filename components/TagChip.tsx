@@ -1,6 +1,7 @@
 import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors, BorderRadius } from '../lib/theme';
+import { BorderRadius } from '../lib/theme';
+import { useTheme } from '../context/ThemeContext';
 
 interface Props {
   label: string;
@@ -11,13 +12,14 @@ interface Props {
 }
 
 export function TagChip({ label, onRemove, onPress, selected, color }: Props) {
-  // When a custom color is provided: tinted bg; selected: primary tint; default: surfaceContainer
+  const { colors } = useTheme();
+
   const bg = color
     ? `${color}22`
     : selected
-    ? `${Colors.primaryContainer}33`
-    : Colors.surfaceContainer;
-  const textColor = color ?? (selected ? Colors.primary : Colors.subText);
+    ? `${colors.primaryContainer}33`
+    : colors.surfaceContainer;
+  const textColor = color ?? (selected ? colors.primary : colors.subText);
 
   return (
     <TouchableOpacity
