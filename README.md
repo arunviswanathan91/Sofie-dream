@@ -127,10 +127,10 @@ Each theme applies across the entire app instantly — no restart needed:
 | **System Default** | Follows your device's dark/light mode |
 
 ### Data & Backup
-- **All data is stored 100% locally on your phone** — no mandatory account, no third-party cloud required
-- Export a full backup as a `.json` file and save it anywhere (Google Drive, iCloud, USB, email)
+- **All data is stored 100% locally on your phone** — no account needed, no internet required
+- Export a full backup as a `.json` file and save it anywhere (Google Drive, iCloud, USB, email to yourself)
 - Restore from a backup file at any time
-- Optional Google Drive and OneDrive sync (requires OAuth setup — see `.env.example`)
+- Optional Google Drive and OneDrive sync available
 
 ### Business Profile
 - Set your business name, tagline, address, and GST/tax number
@@ -158,104 +158,13 @@ Add your own from the Settings screen.
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | React Native + Expo SDK 51 |
+| Framework | React Native + Expo |
 | Language | TypeScript |
-| Routing | Expo Router (file-based) |
-| Local Storage | AsyncStorage (all keys prefixed `sofi:`) |
-| Optional Cloud | Firebase Firestore (local-first, cloud optional) |
-| Notifications | Expo Notifications + Background Fetch |
+| Local Storage | AsyncStorage — 100% on-device |
+| Notifications | Expo Notifications |
 | PDF Generation | expo-print + expo-sharing |
-| Charts | Custom SVG via react-native-svg |
-| Animations | react-native-reanimated (FadeInDown) |
+| Charts | react-native-svg |
 | Fonts | Playfair Display · DM Sans · DM Mono |
-| Build | Expo EAS Build |
-
----
-
-## Project Structure
-
-```
-app/
-  (tabs)/           # Main tab screens
-    index.tsx       # Dashboard
-    orders.tsx      # Orders list
-    track.tsx       # Craft category tracking
-    settings.tsx    # Settings & profile
-  order/[id].tsx    # Order create / edit / detail
-  inventory/        # Inventory list, new product, product detail
-  customers/[id].tsx
-  reports/index.tsx
-  notifications.tsx
-
-components/         # Shared UI components (OrderCard, InvoicePreview, EarningsChart, …)
-context/            # React context providers (Orders, Profile, Notifications, Inventory, Theme)
-hooks/              # Data & logic hooks
-lib/
-  localStore.ts     # All AsyncStorage read/write — single source of truth for local data
-  backup.ts         # Full backup/restore logic (local, Google Drive, OneDrive)
-  reports.ts        # Report & invoice HTML/CSV generation
-  theme.ts          # Colour tokens and currency symbol helpers
-types/index.ts      # All TypeScript interfaces and default values
-```
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+
-- Expo CLI (`npm install -g eas-cli`)
-- A physical Android device or Android Studio emulator
-
-### Install & Run
-
-```bash
-# Clone the repo
-git clone https://github.com/arunviswanathan91/sofi-dream.git
-cd sofi-dream
-
-# Install dependencies
-npm install
-
-# Download fonts (Playfair Display, DM Sans, DM Mono)
-bash scripts/download-fonts.sh
-
-# Copy environment config (optional — only needed for cloud backup)
-cp .env.example .env
-
-# Start the dev server
-npx expo start
-```
-
-Scan the QR code in the Expo Go app, or press `a` to open an Android emulator.
-
-### Build for Android
-
-```bash
-# Development build
-eas build --platform android --profile development
-
-# Preview APK (direct install)
-eas build --platform android --profile preview
-
-# Production AAB (Play Store)
-eas build --platform android --profile production
-```
-
----
-
-## Environment Variables
-
-The app works fully out-of-the-box with zero environment variables. These are only needed to enable optional cloud backup:
-
-| Variable | Purpose |
-|----------|---------|
-| `EXPO_PUBLIC_GOOGLE_CLIENT_ID_ANDROID` | Google Drive backup — Android OAuth client |
-| `EXPO_PUBLIC_GOOGLE_CLIENT_ID_WEB` | Google Drive backup — Web OAuth client |
-| `EXPO_PUBLIC_MICROSOFT_CLIENT_ID` | OneDrive backup — Azure app registration |
-
-See `.env.example` for full setup instructions.
 
 ---
 
