@@ -26,7 +26,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
       
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       
       - name: Download fonts
         run: bash scripts/download-fonts.sh
@@ -75,8 +75,11 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
+
       - name: Prebuild
-        run: npx expo prebuild --platform android --clean
+        run: |
+          npx expo prebuild --platform android
+          cd android && chmod +x gradlew && cd ..
 
       - name: Copy google-services.json
         env:
