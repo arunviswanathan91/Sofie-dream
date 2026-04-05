@@ -12,25 +12,39 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: '8.6'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Setup EAS
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Download fonts
         run: bash scripts/download-fonts.sh
-      
+
       - name: Create .env.local
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -48,38 +62,9 @@ jobs:
           EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID
           EXPO_PUBLIC_FIREBASE_APP_ID=$FIREBASE_APP_ID
           ENVEOF
-      
-      - name: Decode and create google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          echo "Creating google-services.json from GitHub secret..."
-          mkdir -p android/app
-          echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json
-          echo "google-services.json created"
-          if jq empty android/app/google-services.json 2>/dev/null; then
-            echo "google-services.json is valid JSON"
-            echo "Package name: $(jq -r '.client[0].client_info.android_client_info.package_name' android/app/google-services.json)"
-          else
-            echo "google-services.json is invalid or corrupted"
-            exit 1
-          fi
-      
-      
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
 
       - name: Prebuild
-        run: |
-          npx expo prebuild --platform android
-          cd android && chmod +x gradlew && cd ..
+        run: npx expo prebuild --platform android
 
       - name: Copy google-services.json
         env:
@@ -88,6 +73,8 @@ jobs:
           echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json
 
       - name: Build APK
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
         run: |
           cd android
           chmod +x gradlew
