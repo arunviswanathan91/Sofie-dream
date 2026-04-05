@@ -54,14 +54,14 @@ jobs:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           echo "Creating google-services.json from GitHub secret..."
-          echo "$GOOGLE_SERVICES_JSON" | base64 -d > google-services.json
-          echo "✓ google-services.json created"
-          # Verify the file exists and is valid JSON
-          if jq empty google-services.json 2>/dev/null; then
-            echo "✓ google-services.json is valid JSON"
-            echo "✓ Package name: $(jq -r '.client[0].client_info.android_client_info.package_name' google-services.json)"
+          mkdir -p android/app
+          echo "$GOOGLE_SERVICES_JSON" | base64 -d > android/app/google-services.json
+          echo "google-services.json created"
+          if jq empty android/app/google-services.json 2>/dev/null; then
+            echo "google-services.json is valid JSON"
+            echo "Package name: $(jq -r '.client[0].client_info.android_client_info.package_name' android/app/google-services.json)"
           else
-            echo "✗ google-services.json is invalid or corrupted"
+            echo "google-services.json is invalid or corrupted"
             exit 1
           fi
       
