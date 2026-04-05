@@ -5,7 +5,6 @@ on:
       - main
       - claude/sofi-dream-android-app-4so2E
   workflow_dispatch:
-
 jobs:
   build:
     name: Build Android APK
@@ -66,6 +65,25 @@ jobs:
         run: |
           sed -i 's|gradle-8.8-all.zip|gradle-8.6-all.zip|g' android/gradle/wrapper/gradle-wrapper.properties
           cat android/gradle/wrapper/gradle-wrapper.properties
+
+      - name: Patch settings.gradle for expo-module-gradle-plugin
+        run: |
+          node -e "
+          const fs = require('fs');
+          const path = 'android/settings.gradle';
+          let content = fs.readFileSync(path, 'utf8');
+          const injection = \`
+            repositories {
+              gradlePluginPortal()
+              google()
+              mavenCentral()
+              maven { url '\$rootDir/../node_modules/expo/android/maven' }
+            }
+          \`;
+          content = content.replace('pluginManagement {', 'pluginManagement {' + injection);
+          fs.writeFileSync(path, content);
+          console.log('Patched settings.gradle');
+          "
 
       - name: Copy google-services.json
         env:
