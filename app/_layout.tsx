@@ -8,6 +8,7 @@ import { OrdersProvider } from '../context/OrdersContext';
 import { ProfileProvider } from '../context/ProfileContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
 import { AuthProvider, useAuth } from '../context/AuthContext';
+import { registerBackgroundBackupTask } from '../lib/backgroundBackup';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,7 +18,12 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (loading) return;
+    // Register background tasks
+    registerBackgroundBackupTask();
+  }, []);
+
+  useEffect(() => {
+...
 
     const inAuthGroup = segments[0] === 'login';
 
