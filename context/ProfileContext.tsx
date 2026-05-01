@@ -6,6 +6,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../lib/firebase';
+import { useAuth } from './AuthContext';
 import { getLocalProfile, saveLocalProfile } from '../lib/localStore';
 import { DEFAULT_BUSINESS_PROFILE } from '../types';
 import type { BusinessProfile } from '../types';
@@ -21,17 +22,21 @@ const ProfileContext = createContext<ProfileContextValue | null>(null);
 export function ProfileProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<BusinessProfile>(DEFAULT_BUSINESS_PROFILE);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
-      getLocalProfile().then((p) => {
-        setProfile(p);
-        setLoading(false);
-      });
+      getLocalOrdersProfile();
       return;
     }
 
-    const docRef = doc(db, 'settings', 'profile');
+    if (!user) {
+      setProfile(DEFAULT_BUSINESS_PROFILE);
+      setLoading(false);
+      return;
+    }
+
+    const docRef = doc(db, 'users', user.uid, 'settings', 'profile');
     const unsubscribe = onSnapshot(
       docRef,
       (snap) => {
@@ -41,26 +46,28 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
         setLoading(false);
       },
       () => {
-        // Firebase failed — fall back to local
-        getLocalProfile().then((p) => {
-          setProfile(p);
-          setLoading(false);
-        });
+        getLocalOrdersProfile();
       }
     );
     return unsubscribe;
-  }, []);
+  }, [user]);
+
+  const getLocalOrdersProfile = async () => {
+    const p = await getLocalProfile();
+    setProfile(p);
+    setLoading(false);
+  };
 
   const saveProfile = useCallback(
     async (updates: Partial<BusinessProfile>): Promise<void> => {
       const next = { ...profile, ...updates };
       setProfile(next);
       await saveLocalProfile(next);
-      if (isFirebaseConfigured) {
-        await setDoc(doc(db, 'settings', 'profile'), next, { merge: true });
+      if (isFirebaseConfigured && user) {
+        await setDoc(doc(db, 'users', user.uid, 'settings', 'profile'), next, { merge: true });
       }
     },
-    [profile]
+    [profile, user]
   );
 
   return (

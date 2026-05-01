@@ -1,15 +1,23 @@
 import { useState, useEffect } from 'react';
 import { collection, onSnapshot, Timestamp } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
 import type { Customer } from '../types';
 
 export function useCustomers() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, 'customers'), (snapshot) => {
-      const fetched = snapshot.docs.map((d) => {
+    if (!user) {
+      setCustomers([]);
+      setLoading(false);
+      return;
+    }
+
+    const unsubscribe = onSnapshot(collection(db, 'users', user.uid, 'customers'), (snapshot) => {
+...
         const data = d.data();
         return {
           id: d.id,

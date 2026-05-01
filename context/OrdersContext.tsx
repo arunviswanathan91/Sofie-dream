@@ -246,6 +246,7 @@ export function useOrders() {
 
 // ─── Customer upsert (Firebase only) ───────────────────────────
 async function upsertCustomer(
+  uid: string,
   name: string,
   address: string,
   orderId: string,
@@ -253,7 +254,7 @@ async function upsertCustomer(
   phone?: string,
   instagram?: string
 ): Promise<void> {
-  const customersRef = collection(db, 'customers');
+  const customersRef = collection(db, 'users', uid, 'customers');
   const q = query(customersRef, where('name', '==', name));
   const snapshot = await getDocs(q);
 
@@ -270,12 +271,17 @@ async function upsertCustomer(
   } else {
     const customerDoc = snapshot.docs[0];
     const data = customerDoc.data();
-    await updateDoc(doc(db, 'customers', customerDoc.id), {
+    await updateDoc(doc(db, 'users', uid, 'customers', customerDoc.id), {
       totalOrders: ((data.totalOrders as number) ?? 0) + 1,
       totalSpent: ((data.totalSpent as number) ?? 0) + amount,
       orderIds: [...((data.orderIds as string[]) ?? []), orderId],
       address,
       phone: phone ?? data.phone ?? null,
+      instagram: instagram ?? data.instagram ?? null,
+    });
+  }
+}
+? data.phone ?? null,
       instagram: instagram ?? data.instagram ?? null,
     });
   }

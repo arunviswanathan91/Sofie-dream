@@ -17,6 +17,7 @@ export function useNotifications() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIFICATION_PREFS);
   const [loading, setLoading] = useState(true);
   const [pushToken, setPushToken] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     registerForPushNotifications().then(setPushToken);
@@ -29,7 +30,13 @@ export function useNotifications() {
       return;
     }
 
-    const docRef = doc(db, 'settings', 'notifications');
+    if (!user) {
+      setPrefs(DEFAULT_NOTIFICATION_PREFS);
+      setLoading(false);
+      return;
+    }
+
+    const docRef = doc(db, 'users', user.uid, 'settings', 'notifications');
     const unsubscribe = onSnapshot(
       docRef,
       (snap) => {

@@ -3,6 +3,7 @@ import {
   collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, setDoc,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../lib/firebase';
+import { useAuth } from '../context/AuthContext';
 import { getLocalCategories, saveLocalCategories } from '../lib/localStore';
 import { DEFAULT_CATEGORIES } from '../types';
 import type { CraftCategory } from '../types';
@@ -11,6 +12,7 @@ import { generateId } from '../lib/localStore';
 export function useCategories() {
   const [categories, setCategories] = useState<CraftCategory[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!isFirebaseConfigured) {
@@ -21,12 +23,20 @@ export function useCategories() {
       return;
     }
 
+    if (!user) {
+      setCategories(DEFAULT_CATEGORIES);
+      setLoading(false);
+      return;
+    }
+
+    const categoriesRef = collection(db, 'users', user.uid, 'categories');
+
     const unsubscribe = onSnapshot(
-      collection(db, 'categories'),
+      categoriesRef,
       (snapshot) => {
         if (snapshot.empty) {
           DEFAULT_CATEGORIES.forEach((cat) =>
-            setDoc(doc(db, 'categories', cat.id), cat).catch(console.error)
+            setDoc(doc(db, 'users', user.uid, 'categories', cat.id), cat).catch(console.error)
           );
           setCategories(DEFAULT_CATEGORIES);
         } else {
@@ -43,7 +53,7 @@ export function useCategories() {
       }
     );
     return unsubscribe;
-  }, []);
+  }, [user]);
 
   const addCategory = useCallback(async (cat: Omit<CraftCategory, 'id'>): Promise<void> => {
     if (!isFirebaseConfigured) {
@@ -53,8 +63,10 @@ export function useCategories() {
       await saveLocalCategories(updated);
       return;
     }
-    await addDoc(collection(db, 'categories'), cat);
-  }, [categories]);
+    if (user) {
+      await addDoc(collection(db, 'users', user.uid, 'categories'), cat);
+    }
+  }, [categories, user]);
 
   const updateCategory = useCallback(async (id: string, updates: Partial<CraftCategory>): Promise<void> => {
     if (!isFirebaseConfigured) {
@@ -63,8 +75,10 @@ export function useCategories() {
       await saveLocalCategories(updated);
       return;
     }
-    await updateDoc(doc(db, 'categories', id), updates as Record<string, unknown>);
-  }, [categories]);
+    if (user) {
+      await updateDoc(doc(db, 'users', user.uid, 'categories', id), updates as Record<string, unknown>);
+    }
+  }, [categories, user]);
 
   const deleteCategory = useCallback(async (id: string): Promise<void> => {
     if (!isFirebaseConfigured) {
@@ -73,8 +87,10 @@ export function useCategories() {
       await saveLocalCategories(updated);
       return;
     }
-    await deleteDoc(doc(db, 'categories', id));
-  }, [categories]);
+    if (user) {
+      await deleteDoc(doc(db, 'users', user.uid, 'categories', id));
+    }
+  }, [categories, user]);
 
   return { categories, loading, addCategory, updateCategory, deleteCategory };
 }

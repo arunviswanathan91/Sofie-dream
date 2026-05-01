@@ -27,7 +27,7 @@ export default function LoginScreen() {
       } else {
         await signInWithEmailAndPassword(auth, email, password);
       }
-      router.replace('/(tabs)');
+      // Success - AuthGuard in _layout will also handle this, but explicit is fine.
     } catch (error: any) {
       Alert.alert('Auth Error', error.message);
     } finally {
