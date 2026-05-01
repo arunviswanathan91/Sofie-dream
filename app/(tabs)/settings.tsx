@@ -161,6 +161,7 @@ export default function SettingsScreen() {
             <SRow label="Craft Categories" colors={colors} right={<Text style={[s.arrow, { color: colors.subText }]}>›</Text>} onPress={() => router.push('/(tabs)/track')} />
             <SRow label="Reports & Export" colors={colors} right={<Text style={[s.arrow, { color: colors.subText }]}>›</Text>} onPress={() => router.push('/reports')} />
             <SRow label="Data Backup" colors={colors} right={<Text style={[s.arrow, { color: colors.subText }]}>›</Text>} onPress={() => router.push('/backup')} />
+            <SRow label="Logout" colors={colors} right={<Text style={[s.arrow, { color: Colors.rose }]}>⏻</Text>} onPress={handleLogout} />
           </Sec>
 
           {/* About */}
@@ -221,6 +222,12 @@ const s = StyleSheet.create({
   themeCheck: { fontSize: 11, fontFamily: 'DMMono' },
   sRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12, borderBottomWidth: StyleSheet.hairlineWidth },
   sRowLbl: { fontSize: 14, fontFamily: 'DMSans' },
+  arrow: { fontSize: 20 },
+  meta: { fontSize: 13, fontFamily: 'DMMono' },
+  testBtn: { borderWidth: 1, borderColor: Colors.rose, borderRadius: BorderRadius.md, paddingVertical: 11, alignItems: 'center', marginTop: 8 },
+  testTxt: { color: Colors.rose, fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
+});
+Sans' },
   arrow: { fontSize: 20 },
   meta: { fontSize: 13, fontFamily: 'DMMono' },
   testBtn: { borderWidth: 1, borderColor: Colors.rose, borderRadius: BorderRadius.md, paddingVertical: 11, alignItems: 'center', marginTop: 8 },

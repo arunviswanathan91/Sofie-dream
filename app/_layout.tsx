@@ -1,15 +1,37 @@
 import React, { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Notifications from 'expo-notifications';
-import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { OrdersProvider } from '../context/OrdersContext';
 import { ProfileProvider } from '../context/ProfileContext';
 import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 
 SplashScreen.preventAutoHideAsync();
+
+function AuthGuard({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthGroup = segments[0] === 'login';
+
+    if (!user && !inAuthGroup) {
+      // Redirect to the login page if they are not logged in
+      router.replace('/login');
+    } else if (user && inAuthGroup) {
+      // Redirect away from the login page if they are logged in
+      router.replace('/(tabs)');
+    }
+  }, [user, segments, loading]);
+
+  return <>{children}</>;
+}
 
 // Inner layout reads theme colors
 function InnerLayout() {
@@ -42,6 +64,7 @@ function InnerLayout() {
           gestureEnabled: true,
         }}
       >
+        <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="order/new" options={{ presentation: 'modal', headerShown: false, animation: 'fade_from_bottom' }} />
         <Stack.Screen name="order/[id]" options={{ headerShown: false }} />
@@ -77,11 +100,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <OrdersProvider>
-        <ProfileProvider>
-          <InnerLayout />
-        </ProfileProvider>
-      </OrdersProvider>
+      <AuthProvider>
+        <AuthGuard>
+          <OrdersProvider>
+            <ProfileProvider>
+              <InnerLayout />
+            </ProfileProvider>
+          </OrdersProvider>
+        </AuthGuard>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
