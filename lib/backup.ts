@@ -30,6 +30,8 @@ import {
   getLocalOrders, getLocalCategories, getLocalProfile,
   saveLocalOrders, saveLocalCategories, saveLocalProfile,
 } from './localStore';
+import { auth, db, isFirebaseConfigured } from './firebase';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
 
 // ─── Configuration ────────────────────────────────────────────────────────────
 export const GOOGLE_CLIENT_ID_WEB =
@@ -72,11 +74,6 @@ async function collectData(): Promise<AppBackup['data']> {
   return { orders, categories, profile };
 }
 
-import { auth, db, isFirebaseConfigured } from './firebase';
-import { doc, setDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
-
-...
-
 async function applyData(data: AppBackup['data']): Promise<void> {
   // Always save to local storage
   await Promise.all([
@@ -95,13 +92,13 @@ async function applyData(data: AppBackup['data']): Promise<void> {
     batchPromises.push(setDoc(doc(db, 'users', uid, 'settings', 'profile'), data.profile, { merge: true }));
 
     // Sync Categories
-    for (const cat of data.data.categories) {
+    for (const cat of data.categories) {
        const { id, ...rest } = cat;
        batchPromises.push(setDoc(doc(db, 'users', uid, 'categories', id), rest, { merge: true }));
     }
 
     // Sync Orders (Simplified: overwrite/merge into cloud)
-    for (const order of data.data.orders) {
+    for (const order of data.orders) {
       const { id, ...rest } = order;
       const firestoreOrder: any = { ...rest };
       // Convert Dates to Timestamps

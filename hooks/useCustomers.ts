@@ -17,7 +17,7 @@ export function useCustomers() {
     }
 
     const unsubscribe = onSnapshot(collection(db, 'users', user.uid, 'customers'), (snapshot) => {
-...
+      const fetched = snapshot.docs.map((d) => {
         const data = d.data();
         return {
           id: d.id,

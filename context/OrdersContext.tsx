@@ -281,8 +281,3 @@ async function upsertCustomer(
     });
   }
 }
-? data.phone ?? null,
-      instagram: instagram ?? data.instagram ?? null,
-    });
-  }
-}

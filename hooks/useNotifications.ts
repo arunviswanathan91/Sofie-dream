@@ -12,6 +12,7 @@ import {
 import { getLocalNotifPrefs, saveLocalNotifPrefs } from '../lib/localStore';
 import { DEFAULT_NOTIFICATION_PREFS } from '../types';
 import type { NotificationPrefs, Order } from '../types';
+import { useAuth } from '../context/AuthContext';
 
 export function useNotifications() {
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULT_NOTIFICATION_PREFS);
