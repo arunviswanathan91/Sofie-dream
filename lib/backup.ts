@@ -72,12 +72,50 @@ async function collectData(): Promise<AppBackup['data']> {
   return { orders, categories, profile };
 }
 
+import { auth, db, isFirebaseConfigured } from './firebase';
+import { doc, setDoc, collection, addDoc, Timestamp } from 'firebase/firestore';
+
+...
+
 async function applyData(data: AppBackup['data']): Promise<void> {
+  // Always save to local storage
   await Promise.all([
     saveLocalOrders(data.orders),
     saveLocalCategories(data.categories),
     saveLocalProfile(data.profile),
   ]);
+
+  // If Firebase is configured and user is logged in, sync to cloud
+  const user = auth.currentUser;
+  if (isFirebaseConfigured && user) {
+    const uid = user.uid;
+    const batchPromises = [];
+
+    // Sync Profile
+    batchPromises.push(setDoc(doc(db, 'users', uid, 'settings', 'profile'), data.profile, { merge: true }));
+
+    // Sync Categories
+    for (const cat of data.data.categories) {
+       const { id, ...rest } = cat;
+       batchPromises.push(setDoc(doc(db, 'users', uid, 'categories', id), rest, { merge: true }));
+    }
+
+    // Sync Orders (Simplified: overwrite/merge into cloud)
+    for (const order of data.data.orders) {
+      const { id, ...rest } = order;
+      const firestoreOrder: any = { ...rest };
+      // Convert Dates to Timestamps
+      if (rest.dueDate) firestoreOrder.dueDate = Timestamp.fromDate(new Date(rest.dueDate));
+      if (rest.createdAt) firestoreOrder.createdAt = Timestamp.fromDate(new Date(rest.createdAt));
+      if (rest.acceptedAt) firestoreOrder.acceptedAt = Timestamp.fromDate(new Date(rest.acceptedAt));
+      if (rest.shippedAt) firestoreOrder.shippedAt = Timestamp.fromDate(new Date(rest.shippedAt));
+      if (rest.deliveredAt) firestoreOrder.deliveredAt = Timestamp.fromDate(new Date(rest.deliveredAt));
+      
+      batchPromises.push(setDoc(doc(db, 'users', uid, 'orders', id), firestoreOrder, { merge: true }));
+    }
+
+    await Promise.all(batchPromises);
+  }
 }
 
 function serialize(data: AppBackup['data']): string {
