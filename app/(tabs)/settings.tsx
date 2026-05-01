@@ -227,9 +227,3 @@ const s = StyleSheet.create({
   testBtn: { borderWidth: 1, borderColor: Colors.rose, borderRadius: BorderRadius.md, paddingVertical: 11, alignItems: 'center', marginTop: 8 },
   testTxt: { color: Colors.rose, fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
 });
-Sans' },
-  arrow: { fontSize: 20 },
-  meta: { fontSize: 13, fontFamily: 'DMMono' },
-  testBtn: { borderWidth: 1, borderColor: Colors.rose, borderRadius: BorderRadius.md, paddingVertical: 11, alignItems: 'center', marginTop: 8 },
-  testTxt: { color: Colors.rose, fontFamily: 'DMSans', fontSize: 13, fontWeight: '600' },
-});

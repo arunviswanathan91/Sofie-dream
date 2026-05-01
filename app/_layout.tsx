@@ -23,7 +23,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-...
+    if (loading) return;
 
     const inAuthGroup = segments[0] === 'login';
 
